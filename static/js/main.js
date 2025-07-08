@@ -8,7 +8,7 @@ let currentProjectId = null;
 let currentlySelectedItem = null;
 let currentlySelectedType = null;
 let db; // This will be our database interface (either API or LocalStorage)
-let currentUser = null; // Holds session info like { username, is_guest }
+let currentUser = null; // Holds session info like { username, is_guest, isAdmin }
 let globalSettings = {}; // Guest limits etc.
 
 // =================================================================
@@ -115,17 +115,15 @@ function runPageSpecificSetup() {
     const path = window.location.pathname;
     if (path.startsWith('/project/')) {
         const projectId = path.split('/')[2];
-        if (path.endsWith('/checklist')) {
-            setupChecklistPage(projectId);
-        } else {
-            setupProjectManagerPage(projectId);
-        }
+        setupProjectManagerPage(projectId);
     } else if (path.startsWith('/dashboard')) {
         setupDashboardPage();
     } else if (path.startsWith('/settings')) {
         setupSettingsPage();
     } else if (path.startsWith('/info') || path.startsWith('/agb')) {
         setupInfoPage();
+    } else if (path.startsWith('/admin')) {
+        setupAdminPages();
     }
 }
 
@@ -150,6 +148,13 @@ function setupGlobalUI(session) {
             toggle.nextElementSibling.classList.toggle('open');
         });
     });
+    // Admin-Menü anzeigen, wenn der Benutzer Admin ist
+    if (session.isAdmin) {
+        const adminMenu = document.getElementById('admin-menu');
+        if (adminMenu) {
+            adminMenu.classList.remove('hidden');
+        }
+    }
 }
 
 async function setupDashboardPage() {
@@ -199,52 +204,125 @@ async function setupSettingsPage() {
 }
 
 function setupInfoPage() {
-    const accordionContainer = document.querySelector('.accordion-container');
-    if (!accordionContainer) return;
-
-    const openAccordionItem = (toggle) => {
-        accordionContainer.querySelectorAll('.accordion-toggle.open').forEach(t => {
-            if (t !== toggle) {
-                t.classList.remove('open');
-                t.nextElementSibling.classList.remove('open');
-            }
-        });
-        toggle.classList.toggle('open');
-        toggle.nextElementSibling.classList.toggle('open');
-    };
-
-    accordionContainer.addEventListener('click', (e) => {
-        const toggle = e.target.closest('.accordion-toggle');
-        if (toggle) openAccordionItem(toggle);
-    });
-
-    const handleHash = () => {
-        const hash = window.location.hash;
-        if (hash) {
-            const targetElement = document.querySelector(hash);
-            if (targetElement && targetElement.querySelector('.accordion-toggle')) {
-                const toggle = targetElement.querySelector('.accordion-toggle');
-                setTimeout(() => openAccordionItem(toggle), 100);
-            }
-        }
-    };
-    handleHash();
-    window.addEventListener('hashchange', handleHash, false);
-
     const supportForm = document.getElementById('support-form');
     if (supportForm) {
         if (currentUser && currentUser.logged_in) {
             document.getElementById('support-name').value = currentUser.username;
-            // Assuming email is available in session, otherwise fetch it
-            // For now, we'll leave email blank if not directly available
         }
         supportForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            showInfoModal('Nachricht gesendet', 'Vielen Dank für Ihre Nachricht. Wir werden uns in Kürze bei Ihnen melden (dies ist eine Demo).');
+            showInfoModal('Nachricht gesendet', 'Vielen Dank für Ihre Nachricht (dies ist eine Demo).');
             supportForm.reset();
         });
     }
 }
+
+function setupAdminPages() {
+    const path = window.location.pathname;
+    if (path.endsWith('/users')) {
+        setupUserManagementPage();
+    } else if (path.endsWith('/settings')) {
+        setupGlobalSettingsPage();
+    } else if (path.endsWith('/structure-check')) {
+        setupStructureCheckPage();
+    }
+}
+
+async function setupUserManagementPage() {
+    const tableBody = document.querySelector('#user-table tbody');
+    if (!tableBody) return;
+    tableBody.innerHTML = '<tr><td colspan="4">Lade Benutzer...</td></tr>';
+
+    try {
+        const response = await fetch('/api/admin/users');
+        const users = await response.json();
+        
+        tableBody.innerHTML = Object.entries(users).map(([username, data]) => `
+            <tr>
+                <td>${username}</td>
+                <td>${data.email}</td>
+                <td>${data.isAdmin ? 'Ja' : 'Nein'}</td>
+                <td>
+                    <button class="btn btn-secondary btn-sm">Bearbeiten</button>
+                    <button class="btn btn-danger btn-sm">Löschen</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        tableBody.innerHTML = '<tr><td colspan="4">Fehler beim Laden der Benutzer.</td></tr>';
+    }
+}
+
+async function setupGlobalSettingsPage() {
+    const container = document.getElementById('global-settings-form-container');
+    if (!container) return;
+    container.innerHTML = '<p>Lade globale Einstellungen...</p>';
+    try {
+        const response = await fetch('/api/admin/global-settings');
+        const settings = await response.json();
+        
+        container.innerHTML = `
+            <form id="global-settings-form">
+                <div class="form-group">
+                    <label for="guest-projects-limit">Max. Projekte für Gäste</label>
+                    <input type="number" id="guest-projects-limit" class="form-control" value="${settings.guest_limits.projects}">
+                </div>
+                 <div class="form-group">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="general-debug" ${settings.general_debug ? 'checked' : ''}>
+                        <span class="checkmark"></span>
+                        <span>Allgemeines Debugging aktivieren</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Einstellungen speichern</button>
+            </form>
+        `;
+
+        document.getElementById('global-settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newSettings = {
+                guest_limits: {
+                    projects: parseInt(document.getElementById('guest-projects-limit').value)
+                },
+                general_debug: document.getElementById('general-debug').checked
+            };
+            await fetch('/api/admin/global-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newSettings)
+            });
+            showInfoModal('Gespeichert', 'Die globalen Einstellungen wurden aktualisiert.');
+        });
+
+    } catch (error) {
+        container.innerHTML = '<p>Fehler beim Laden der Einstellungen.</p>';
+    }
+}
+
+function setupStructureCheckPage() {
+    const runCheckBtn = document.getElementById('run-check-btn');
+    const runGenerateBtn = document.getElementById('run-generate-btn');
+    const output = document.getElementById('check-log-output');
+    
+    const runCheck = async (flag) => {
+        output.textContent = 'Befehl wird ausgeführt...';
+        try {
+            const response = await fetch('/api/admin/run-check', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ flag: flag })
+            });
+            const result = await response.json();
+            output.textContent = result.log;
+        } catch (error) {
+            output.textContent = 'Fehler bei der Ausführung des Checks.';
+        }
+    };
+
+    if (runCheckBtn) runCheckBtn.addEventListener('click', () => runCheck('--check'));
+    if (runGenerateBtn) runGenerateBtn.addEventListener('click', () => runCheck('--generate'));
+}
+
 
 // =================================================================
 // DYNAMIC CONTENT RENDERING

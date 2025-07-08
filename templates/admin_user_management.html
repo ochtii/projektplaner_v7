@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Benutzerverwaltung{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>Benutzerverwaltung</h2>
+</div>
+<div class="admin-table-container">
+    <table id="user-table">
+        <thead>
+            <tr>
+                <th>Benutzername</th>
+                <th>E-Mail</th>
+                <th>Admin-Status</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Benutzer werden hier per JavaScript eingefügt -->
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -15,6 +15,7 @@
             <div class="sidebar-header"><h1 class="logo">Planer</h1></div>
             <nav class="main-nav">
                 <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                
                 <div id="current-project-menu" class="hidden">
                     <div class="submenu-toggle"><span>Aktuelles Projekt</span><span class="arrow">&#9662;</span></div>
                     <div class="submenu">
@@ -23,25 +24,33 @@
                         <a href="#" id="current-project-checklist-link">Checkliste</a>
                     </div>
                 </div>
+
                 <div class="info-menu">
                     <div class="submenu-toggle"><span>Info & Hilfe</span><span class="arrow">&#9662;</span></div>
                     <div class="submenu">
                         <a href="{{ url_for('info') }}#about">Über die App</a>
                         <a href="{{ url_for('info') }}#anleitung">Anleitung</a>
-                        <a href="{{ url_for('info') }}#faq">FAQ</a>
+                        <a href="{{ url_for('agb') }}">AGB</a>
                         <a href="{{ url_for('info') }}#support">Support</a>
                     </div>
                 </div>
                 <a href="{{ url_for('settings') }}">Einstellungen</a>
+
+                <!-- Admin Menü (wird per JS ein- oder ausgeblendet) -->
+                <div id="admin-menu" class="hidden">
+                     <div class="submenu-toggle"><span>Admin</span><span class="arrow">&#9662;</span></div>
+                     <div class="submenu">
+                        <a href="{{ url_for('admin_user_management') }}">Benutzer verwalten</a>
+                        <a href="{{ url_for('admin_global_settings') }}">Globale Einstellungen</a>
+                        <a href="{{ url_for('admin_structure_check') }}">Struktur-Check</a>
+                     </div>
+                </div>
             </nav>
             <div class="sidebar-footer"><p>&copy; 2025 Projektplaner</p></div>
         </aside>
         <div class="main-content">
             <header class="main-header">
-                <div class="header-title-container">
-                    <button class="mobile-menu-button" id="mobileMenuButton">&#9776;</button>
-                    <span id="header-page-title" class="header-page-title"></span>
-                </div>
+                <!-- Header-Inhalt -->
                 <div id="header-actions" class="header-actions"></div>
             </header>
             <main>
@@ -58,8 +67,6 @@
             </main>
         </div>
     </div>
-    <div class="mobile-nav" id="mobileNav"><button class="close-btn" id="closeMobileNav">&times;</button><nav></nav></div>
-    <div class="overlay" id="overlay"></div>
     <div id="modal-container"></div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

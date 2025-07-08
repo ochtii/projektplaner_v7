@@ -2,6 +2,8 @@ import os
 import json
 import re
 import uuid
+import subprocess
+import sys
 from functools import wraps
 from datetime import datetime
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
@@ -48,6 +50,15 @@ def login_required(f):
         if 'user_id' not in session and not session.get('is_guest'):
             flash("Sie müssen angemeldet sein, um diese Seite zu sehen.", "error")
             return redirect(url_for('login_route'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('isAdmin'):
+            flash("Zugriff verweigert. Sie benötigen Administratorrechte.", "error")
+            return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -150,6 +161,32 @@ def info():
 def agb():
     return render_template('agb.html')
 
+# --- Admin-Routen ---
+@app.route('/admin')
+@login_required
+@admin_required
+def admin_dashboard():
+    return render_template('admin_dashboard.html')
+
+@app.route('/admin/users')
+@login_required
+@admin_required
+def admin_user_management():
+    return render_template('admin_user_management.html')
+
+@app.route('/admin/settings')
+@login_required
+@admin_required
+def admin_global_settings():
+    return render_template('admin_global_settings.html')
+
+@app.route('/admin/structure-check')
+@login_required
+@admin_required
+def admin_structure_check():
+    return render_template('admin_run_check.html')
+
+
 # --- API-Endpunkte ---
 
 @app.route('/api/session', methods=['GET'])
@@ -157,7 +194,7 @@ def get_session():
     if session.get('is_guest'):
         return jsonify({"logged_in": False, "is_guest": True, "username": "Gast"})
     if 'user_id' in session:
-        return jsonify({"logged_in": True, "is_guest": False, "username": session.get('username')})
+        return jsonify({"logged_in": True, "is_guest": False, "username": session.get('username'), "isAdmin": session.get('isAdmin', False)})
     return jsonify({"logged_in": False, "is_guest": False})
 
 @app.route('/api/settings', methods=['GET', 'POST'])
@@ -213,6 +250,47 @@ def handle_project(project_id):
             del projects[project_id]
             _save_json(user_projects_path, projects)
         return jsonify({"success": True})
+
+# --- Admin API Endpunkte ---
+
+@app.route('/api/admin/users', methods=['GET'])
+@login_required
+@admin_required
+def get_all_users_api():
+    users = _load_json(USERS_FILE)
+    users_safe = {uname: {k: v for k, v in uinfo.items() if k != 'password'} for uname, uinfo in users.items()}
+    return jsonify(users_safe)
+
+@app.route('/api/admin/global-settings', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def handle_global_settings_api():
+    if request.method == 'GET':
+        return jsonify(_load_json(SETTINGS_FILE))
+    if request.method == 'POST':
+        _save_json(SETTINGS_FILE, request.get_json())
+        return jsonify({"success": True})
+
+@app.route('/api/admin/run-check', methods=['POST'])
+@login_required
+@admin_required
+def run_structure_check_api():
+    command_flag = request.json.get('flag')
+    if command_flag not in ['--check', '--generate']:
+        return jsonify({"log": "Ungültiges Kommando."}), 400
+
+    try:
+        result = subprocess.run(
+            [sys.executable, 'structure_tool.py', command_flag],
+            capture_output=True,
+            text=True,
+            encoding='utf-8'
+        )
+        log_output = result.stdout + result.stderr
+        return jsonify({"log": log_output})
+    except Exception as e:
+        return jsonify({"log": f"Fehler bei der Ausführung des Skripts: {e}"}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
