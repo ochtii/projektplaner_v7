@@ -1,9 +1,12 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/admin/global_settings.js
 "use strict";
 
 // =================================================================
 // GLOBALE EINSTELLUNGEN LOGIK
 // =================================================================
 // Dieses Modul enthält die Logik für die globale Einstellungsseite im Admin-Bereich.
+
+import { showInfoModal } from '../ui/modals.js'; // showInfoModal hinzugefügt
 
 /**
  * Richtet die Seite für globale Einstellungen ein.
@@ -36,7 +39,7 @@ export async function setupGlobalSettingsPage() {
 
         } catch (error) {
             console.error("Fehler beim Laden der globalen Einstellungen:", error);
-            window.showInfoModal('Fehler', 'Globale Einstellungen konnten nicht geladen werden.');
+            showInfoModal('Fehler', 'Globale Einstellungen konnten nicht geladen werden.'); // window. entfernt
         }
     };
 
@@ -63,15 +66,15 @@ export async function setupGlobalSettingsPage() {
                 body: JSON.stringify(updatedSettings)
             });
             if (response.ok) {
-                window.showInfoModal('Erfolg', 'Globale Einstellungen erfolgreich gespeichert.');
+                showInfoModal('Erfolg', 'Globale Einstellungen erfolgreich gespeichert.'); // window. entfernt
                 // Globale Einstellung im Frontend aktualisieren, falls sie von anderen Modulen verwendet werden
                 window.globalSettings = updatedSettings;
             } else {
-                window.showInfoModal('Fehler', 'Globale Einstellungen konnten nicht gespeichert werden.');
+                showInfoModal('Fehler', 'Globale Einstellungen konnten nicht gespeichert werden.'); // window. entfernt
             }
         } catch (error) {
             console.error("Fehler beim Speichern der globalen Einstellungen:", error);
-            window.showInfoModal('Fehler', 'Ein Fehler ist beim Speichern aufgetreten.');
+            showInfoModal('Fehler', 'Ein Fehler ist beim Speichern aufgetreten.'); // window. entfernt
         }
     };
 

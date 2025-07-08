@@ -1,0 +1,69 @@
+/* static/css/pages/project_overview.css */
+
+/* Styling for Project Overview text view */
+.project-overview-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.project-overview-list ul {
+    list-style: none;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.project-overview-list li {
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.project-overview-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.9em; 
+    width: 8px;
+    height: 1px;
+    background-color: var(--border-color);
+}
+
+.project-overview-list li ul li::before {
+    left: 1.5rem;
+
+}
+
+.project-overview-list li ul ul li::before {
+    left: 3rem;
+}
+
+.overview-item-text {
+    display: inline-block;
+    padding-left: 12px; 
+}
+
+.comment-icon {
+    vertical-align: middle;
+    margin-left: 5px;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+.comment-icon:hover {
+    color: var(--secondary-color);
+}
+
+/* Style for graphical view placeholder */
+.overview-container-graphical {
+    background-color: var(--background-color);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.7;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

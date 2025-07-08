@@ -1,0 +1,31 @@
+/* static/css/theme_variables.css */
+
+/* Grundlegende Stile und Variablen (Standard: Dark Mode) */
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #50e3c2;
+    --background-color: #1a1a1a; /* Standardmäßig Dark Mode Hintergrund */
+    --surface-color: #2c2c2c;    /* Standardmäßig Dark Mode Oberfläche */
+    --text-color: #f0f0f0;       /* Standardmäßig Dark Mode Text */
+    --border-color: #444444;     /* Standardmäßig Dark Mode Rahmen */
+    --font-family: 'Inter', sans-serif;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Dunklerer Schatten für Dark Mode */
+    --border-radius: 8px;
+    /* Farben für Farbmodus im Dark Mode */
+    --phase-bg-color: rgba(74, 144, 226, 0.15);
+    --task-bg-color: rgba(80, 227, 194, 0.15);
+    --subtask-bg-color: rgba(255, 165, 0, 0.15);
+}
+
+/* Light Mode Variablen (Überschreiben Dark Mode Defaults) */
+body.light-mode {
+    --background-color: #f4f7f9;
+    --surface-color: #ffffff;
+    --text-color: #333333;
+    --border-color: #e0e0e0;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hellerer Schatten für Light Mode */
+    /* Farben für Farbmodus im Light Mode */
+    --phase-bg-color: rgba(74, 144, 226, 0.08);
+    --task-bg-color: rgba(80, 227, 194, 0.08);
+    --subtask-bg-color: rgba(255, 165, 0, 0.08);
+}

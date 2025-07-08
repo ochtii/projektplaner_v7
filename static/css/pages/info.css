@@ -1,0 +1,133 @@
+/* static/css/pages/info.css */
+
+/* Info page accordion styles */
+.info-page-container {
+    /* General container for info/AGB pages, can add padding/background if needed */
+}
+
+.info-card .accordion-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem; 
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem; 
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.info-card .accordion-toggle:hover {
+    background-color: var(--background-color);
+    border-color: var(--primary-color); 
+}
+
+.info-card .accordion-toggle h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-color);
+    flex-grow: 1;
+}
+
+.info-card .accordion-toggle .arrow {
+    transition: transform 0.3s ease;
+}
+
+.info-card .accordion-toggle.open .arrow {
+    transform: rotate(180deg);
+}
+
+.info-card-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; 
+    padding: 0 1.5rem; 
+    background-color: var(--background-color); 
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    margin-bottom: 0.5rem; 
+}
+
+.info-card-content.open {
+    max-height: 2000px; 
+    padding-top: 1rem; 
+    padding-bottom: 1.5rem; 
+}
+
+/* Support Formular Styling */
+.support-form {
+    background-color: var(--background-color); 
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); 
+    margin-top: 1.5rem;
+}
+
+.support-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.support-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.support-form .form-control {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.support-form .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); 
+    outline: none;
+}
+
+.support-form textarea.form-control {
+    resize: vertical; 
+    min-height: 80px;
+}
+
+.support-form .btn-primary {
+    width: auto; 
+    margin-top: 1rem;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+}
+/* Anleitung und FAQ Überschriften */
+.info-card-content h4.section-heading {
+    font-size: 1.3rem; 
+    color: var(--primary-color); 
+    margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border-color); 
+}
+
+/* FAQ Fragen und Antworten */
+.faq-list dt {
+    font-weight: 600; 
+    color: var(--text-color);
+    margin-top: 1rem; 
+    margin-bottom: 0.3rem;
+}
+
+.faq-list dd {
+    margin-left: 1.5rem; 
+    margin-bottom: 0.8rem; 
+    color: var(--text-color);
+    opacity: 0.9;
+}

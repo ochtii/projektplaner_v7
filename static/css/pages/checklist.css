@@ -1,0 +1,332 @@
+/* static/css/pages/checklist.css */
+
+.view-switcher {
+    margin-bottom: 2rem; /* Fügt Abstand unterhalb der Buttons hinzu */
+}
+
+/* New styles for the overall progress section container */
+.progress-section {
+    margin-top: 2rem; 
+    margin-bottom: 2rem; 
+    background-color: var(--surface-color); 
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.progress-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    gap: 0.5rem;
+}
+
+.progress-info-icon {
+    cursor: pointer;
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+
+.progress-info-icon:hover {
+    color: var(--secondary-color);
+}
+
+.checklist-progress-container {
+    width: 100%;
+    background-color: var(--border-color); 
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    padding: 3px; 
+}
+
+#checklist-progress-bar {
+    height: 25px;
+    background-color: var(--primary-color);
+    border-radius: calc(var(--border-radius) - 2px); 
+    text-align: center;
+    line-height: 25px;
+    color: white;
+    transition: width 0.5s ease-in-out, background-color 0.3s ease; 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+}
+
+#checklist-progress-percentage {
+    font-weight: 600;
+    text-shadow: 0 0 3px rgba(0,0,0,0.3); 
+}
+
+/* Checklist specific styles */
+.checklist-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.checklist-list ul {
+    list-style: none;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.checklist-item {
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.checklist-item .item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0;
+}
+
+.checklist-item .item-header label {
+    flex-grow: 1;
+    cursor: pointer;
+}
+
+.checklist-checkbox {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-right: 5px;
+    cursor: pointer;
+    accent-color: var(--primary-color); 
+}
+
+.checklist-checkbox:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Strikethrough for completed items */
+.checklist-checkbox:checked + label {
+    text-decoration: line-through;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Styles for comments within the checklist items */
+.checklist-comment-preview {
+    margin-top: 0.2rem; 
+    margin-left: 1.5rem; 
+    font-size: 0.8em; 
+    color: var(--text-color);
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checklist-comment-preview strong {
+    font-weight: 500; 
+}
+
+.checklist-comment-preview .comment-icon {
+    font-size: 0.9em; 
+    margin-left: 0; 
+}
+
+/* Styles for the comment toggle switch */
+.comment-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto; 
+    padding-left: 1rem; 
+    margin-top: 1rem; 
+    margin-bottom: 1rem; 
+}
+
+/* Farbmodus für Checkliste */
+.checklist-container-text.color-mode-active .phase-item > .item-header {
+    background-color: var(--phase-bg-color);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+}
+
+.checklist-container-text.color-mode-active .task-item > .item-header {
+    background-color: var(--task-bg-color);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+}
+
+.checklist-container-text.color-mode-active .subtask-item > .item-header {
+    background-color: var(--subtask-bg-color);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+}
+
+/* NEUE Stile für das Einstellungsfeld der Checkliste */
+.settings-panel {
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius);
+    box-shadow: none; 
+    padding: 0 1.5rem; 
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out, box-shadow 0.3s ease;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.settings-panel:not(.hidden) {
+    max-height: 500px; 
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    box-shadow: var(--shadow); 
+    border: 1px solid var(--border-color); 
+}
+
+/* Anpassungen für die Anzeige-Einstellungen innerhalb des Panels */
+.settings-panel .setting-item {
+    margin-bottom: 1rem; 
+}
+
+.settings-panel .setting-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Zusätzlicher Stil für abhängige Einstellungen */
+.setting-item.dependent {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.setting-item.dependent.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none; 
+    height: 0; 
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+}
+
+/* NEUE Stile für die grafische Baumstruktur in der Checkliste */
+.graphical-tree-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    max-width: fit-content; 
+    margin: 0 auto; 
+}
+
+.graphical-node {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 0.8rem 1.2rem;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: background-color 0.2s, border-color 0.2s;
+    min-width: 200px; 
+}
+
+.graphical-node .node-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.graphical-node .node-title {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.graphical-node .node-status {
+    font-weight: bold;
+    color: var(--secondary-color); 
+    margin-left: 10px;
+}
+
+.graphical-node.completed {
+    background-color: rgba(var(--secondary-color), 0.1); 
+    border-color: var(--secondary-color);
+}
+
+.graphical-children {
+    margin-top: 1rem;
+    margin-left: 2rem; 
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    position: relative;
+    padding-left: 1rem; 
+}
+
+.graphical-children::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--border-color); 
+    border-radius: 1px;
+}
+
+.graphical-children .graphical-node {
+    position: relative;
+}
+
+.graphical-children .graphical-node::before {
+    content: '';
+    position: absolute;
+    left: -1rem; 
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 2px;
+    background-color: var(--border-color); 
+}
+
+/* Spezifische Farben/Stile für Phasen, Aufgaben, Subaufgaben in grafischer Ansicht */
+.graphical-phase {
+    border-color: var(--primary-color);
+}
+.graphical-phase.completed {
+    background-color: rgba(74, 144, 226, 0.1); 
+    border-color: var(--primary-color);
+}
+
+.graphical-task {
+    border-color: #888; 
+}
+.graphical-task.completed {
+    background-color: rgba(80, 227, 194, 0.1);
+    border-color: var(--secondary-color);
+}
+
+.graphical-subtask {
+    border-color: #aaa; 
+}
+.graphical-subtask.completed {
+    background-color: rgba(80, 227, 194, 0.1); 
+    border-color: var(--secondary-color);
+}
+
+
+/* NEUE Stile für den erweiterten Projektdetails-Bereich in der Checkliste */
+.project-details-expanded {
+    max-height: 0; 
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding-left: 1rem; 
+    border-top: 1px dashed var(--border-color); 
+    margin-top: 1rem; 
+}
+
+.project-details-expanded:not(.hidden) {
+    max-height: 500px; 
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}

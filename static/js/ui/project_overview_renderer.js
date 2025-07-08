@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/ui/project_overview_renderer.js
 "use strict";
 
 // =================================================================
@@ -6,6 +7,8 @@
 // Dieses Modul ist für das Rendern der Textansicht der Projektübersicht zuständig.
 
 import * as GlobalUI from './global_ui.js'; // Importiere GlobalUI für Header-Updates
+import { showInfoModal } from './modals.js'; // showInfoModal hinzugefügt
+
 
 /**
  * Richtet die Projektübersichtsseite ein.
@@ -93,7 +96,7 @@ export function renderProjectOverviewTextView(projectData, container) {
             if (commentIcon) {
                 commentIcon.addEventListener('click', (e) => {
                     e.stopPropagation(); // Verhindert, dass Klick-Events an übergeordnete Elemente weitergegeben werden
-                    window.showCommentsDetailModal(phase.comments, phase.phaseName);
+                    showCommentsDetailModal(phase.comments, phase.phaseName); // window. entfernt
                 });
             }
         }
@@ -113,7 +116,7 @@ export function renderProjectOverviewTextView(projectData, container) {
                     if (commentIcon) {
                         commentIcon.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            window.showCommentsDetailModal(task.comments, task.taskName);
+                            showCommentsDetailModal(task.comments, task.taskName); // window. entfernt
                         });
                     }
                 }
@@ -133,7 +136,7 @@ export function renderProjectOverviewTextView(projectData, container) {
                             if (commentIcon) {
                                 commentIcon.addEventListener('click', (e) => {
                                     e.stopPropagation();
-                                    window.showCommentsDetailModal(subtask.comments, subtask.subtaskName);
+                                    showCommentsDetailModal(subtask.comments, subtask.subtaskName); // window. entfernt
                                 });
                             }
                         }
@@ -234,5 +237,5 @@ export function showCommentsDetailModal(comments, itemName) {
     }
 
     // Ruft die globale showInfoModal Funktion auf
-    window.showInfoModal(`Kommentare zu: ${itemName}`, `<div style="max-height: 300px; overflow-y: auto; padding-right: 10px;">${commentsHtml}</div>`);
+    showInfoModal(`Kommentare zu: ${itemName}`, `<div style="max-height: 300px; overflow-y: auto; padding-right: 10px;">${commentsHtml}</div>`); // window. entfernt
 }

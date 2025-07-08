@@ -1,0 +1,35 @@
+/* static/css/pages/dashboard.css */
+
+.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.project-card { 
+    background-color: var(--surface-color); 
+    padding: 1.5rem; 
+    border-radius: var(--border-radius); 
+    box-shadow: var(--shadow); 
+    transition: transform 0.2s, box-shadow 0.2s; 
+    display: flex; 
+    flex-direction: column; 
+}
+.project-card:hover { transform: translateY(-5px); box-shadow: 0 8px 12px rgba(0,0,0,0.1); }
+.project-card h3 { margin-bottom: auto; }
+.project-card-actions { 
+    margin-top: 1rem; 
+    display: flex; 
+    gap: 0.5rem; 
+    flex-wrap: wrap; 
+}
+.project-card-progress {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+.project-card-progress .progress-bar-container {
+    height: 20px; 
+}
+.project-card-progress .progress-bar-container div {
+    line-height: 20px;
+    font-size: 0.8em;
+}
+.project-card-actions .btn.btn-sm {
+    padding: 0.3rem 0.6rem; 
+    font-size: 0.75rem; 
+}

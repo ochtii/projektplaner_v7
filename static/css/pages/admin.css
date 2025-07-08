@@ -1,0 +1,31 @@
+/* static/css/pages/admin.css */
+
+/* Admin-Seite: User Management Symbole */
+#user-table .action-buttons { display: flex; gap: 0.75rem; align-items: center; justify-content: center; } 
+
+/* Struktur-Check Anzeige */
+.structure-display-container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+.structure-display-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+#structure-output {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+}

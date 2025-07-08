@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Info & Hilfe{% endblock %}
-
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/info.css') }}">
+{% endblock %}
 {% block content %}
 <div class="page-header">
     <h2>Informationen & Anleitung</h2>

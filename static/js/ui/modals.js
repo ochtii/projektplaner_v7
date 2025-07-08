@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/ui/modals.js
 "use strict";
 
 // =================================================================
@@ -13,6 +14,10 @@
  */
 export function showInfoModal(title, message, onOk) {
     const container = document.getElementById('modal-container');
+    if (!container) { // NEU: Prüfung auf container
+        console.error("Modal-Fehler: 'modal-container' Element nicht gefunden.");
+        return; 
+    }
     container.innerHTML = `
         <div class="modal-backdrop visible">
             <div class="modal">
@@ -22,12 +27,16 @@ export function showInfoModal(title, message, onOk) {
             </div>
         </div>`;
     const backdrop = container.querySelector('.modal-backdrop');
+    if (!backdrop) { // NEU: Prüfung auf backdrop
+        console.error("Modal-Fehler: 'modal-backdrop' Element nicht gefunden nach Rendern.");
+        return;
+    }
     const closeModal = () => {
         backdrop.classList.remove('visible');
         setTimeout(() => { container.innerHTML = ''; if(onOk) onOk(); }, 300);
     };
-    container.querySelector('.modal-ok-btn').addEventListener('click', closeModal);
-    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
+    container.querySelector('.modal-ok-btn')?.addEventListener('click', closeModal); // Optional chaining für Robustheit
+    container.querySelector('.modal-close-btn')?.addEventListener('click', closeModal); // Optional chaining
     backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
 }
 
@@ -39,6 +48,10 @@ export function showInfoModal(title, message, onOk) {
  */
 export function showConfirmationModal(title, message, onConfirm) {
     const container = document.getElementById('modal-container');
+    if (!container) { // NEU: Prüfung
+        console.error("Modal-Fehler: 'modal-container' Element nicht gefunden.");
+        return; 
+    }
     container.innerHTML = `
         <div class="modal-backdrop visible">
             <div class="modal">
@@ -48,10 +61,14 @@ export function showConfirmationModal(title, message, onConfirm) {
             </div>
         </div>`;
     const backdrop = container.querySelector('.modal-backdrop');
+    if (!backdrop) { // NEU: Prüfung
+        console.error("Modal-Fehler: 'modal-backdrop' Element nicht gefunden nach Rendern.");
+        return;
+    }
     const closeModal = () => { backdrop.classList.remove('visible'); setTimeout(() => container.innerHTML = '', 300); };
-    container.querySelector('.modal-confirm-btn').addEventListener('click', () => { onConfirm(); closeModal(); });
-    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-    container.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
+    container.querySelector('.modal-confirm-btn')?.addEventListener('click', () => { onConfirm(); closeModal(); });
+    container.querySelector('.modal-close-btn')?.addEventListener('click', closeModal);
+    container.querySelector('.modal-cancel-btn')?.addEventListener('click', closeModal);
     backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
 }
 
@@ -64,6 +81,10 @@ export function showConfirmationModal(title, message, onConfirm) {
  */
 export function showUserEditModal(username, email, isAdmin, callback) {
     const container = document.getElementById('modal-container');
+    if (!container) { // NEU: Prüfung
+        console.error("Modal-Fehler: 'modal-container' Element nicht gefunden.");
+        return; 
+    }
     container.innerHTML = `
         <div class="modal-backdrop visible">
             <div class="modal">
@@ -95,22 +116,26 @@ export function showUserEditModal(username, email, isAdmin, callback) {
         </div>`;
 
     const backdrop = container.querySelector('.modal-backdrop');
+    if (!backdrop) { // NEU: Prüfung
+        console.error("Modal-Fehler: 'modal-backdrop' Element nicht gefunden nach Rendern.");
+        return;
+    }
     const form = document.getElementById('user-edit-form');
     const closeModal = () => { backdrop.classList.remove('visible'); setTimeout(() => container.innerHTML = '', 300); };
 
-    form.addEventListener('submit', (e) => {
+    form?.addEventListener('submit', (e) => { // Optional chaining
         e.preventDefault();
-        const newUsername = document.getElementById('edit-username').value.trim();
-        const newEmail = document.getElementById('edit-email').value.trim();
-        const newIsAdmin = document.getElementById('edit-is-admin').checked;
+        const newUsername = document.getElementById('edit-username')?.value.trim();
+        const newEmail = document.getElementById('edit-email')?.value.trim();
+        const newIsAdmin = document.getElementById('edit-is-admin')?.checked;
         if (newUsername && newEmail) {
             callback(newUsername, newEmail, newIsAdmin);
             closeModal();
         }
     });
 
-    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-    container.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
+    container.querySelector('.modal-close-btn')?.addEventListener('click', closeModal); // Optional chaining
+    container.querySelector('.modal-cancel-btn')?.addEventListener('click', closeModal); // Optional chaining
     backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
 }
 
@@ -123,6 +148,10 @@ export function showUserEditModal(username, email, isAdmin, callback) {
  */
 export function showPromptModal(title, message, defaultValue, callback) {
     const container = document.getElementById('modal-container');
+    if (!container) { // NEU: Prüfung
+        console.error("Modal-Fehler: 'modal-container' Element nicht gefunden.");
+        return; 
+    }
     container.innerHTML = `
         <div class="modal-backdrop visible">
             <div class="modal">
@@ -137,8 +166,12 @@ export function showPromptModal(title, message, defaultValue, callback) {
                 </div>
             </div>
         </div>`;
-    
+
     const backdrop = container.querySelector('.modal-backdrop');
+    if (!backdrop) { // NEU: Prüfung
+        console.error("Modal-Fehler: 'modal-backdrop' Element nicht gefunden nach Rendern.");
+        return;
+    }
     const promptInput = document.getElementById('prompt-input');
 
     const closeModal = (result = null) => {
@@ -146,18 +179,18 @@ export function showPromptModal(title, message, defaultValue, callback) {
         setTimeout(() => { container.innerHTML = ''; if(callback) callback(result); }, 300);
     };
 
-    container.querySelector('.modal-ok-btn').addEventListener('click', () => {
-        const value = promptInput.value.trim();
+    container.querySelector('.modal-ok-btn')?.addEventListener('click', () => { // Optional chaining
+        const value = promptInput?.value.trim(); // Optional chaining
         closeModal(value);
     });
-    container.querySelector('.modal-cancel-btn').addEventListener('click', () => closeModal(null));
-    container.querySelector('.modal-close-btn').addEventListener('click', () => closeModal(null));
+    container.querySelector('.modal-cancel-btn')?.addEventListener('click', () => closeModal(null)); // Optional chaining
+    container.querySelector('.modal-close-btn')?.addEventListener('click', () => closeModal(null)); // Optional chaining
     backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(null); });
 
-    promptInput.focus(); // Fokus auf das Eingabefeld
-    promptInput.addEventListener('keypress', (e) => {
+    promptInput?.focus(); // Optional chaining
+    promptInput?.addEventListener('keypress', (e) => { // Optional chaining
         if (e.key === 'Enter') {
-            container.querySelector('.modal-ok-btn').click();
+            container.querySelector('.modal-ok-btn')?.click(); // Optional chaining
         }
     });
 }
@@ -170,6 +203,10 @@ export function showPromptModal(title, message, defaultValue, callback) {
  */
 export function showTemplateSelectionModal(title, templates, callback) {
     const container = document.getElementById('modal-container');
+    if (!container) { // NEU: Prüfung
+        console.error("Modal-Fehler: 'modal-container' Element nicht gefunden.");
+        return; 
+    }
     let templateOptionsHtml = templates.map(t => `
         <label class="template-option">
             <input type="radio" name="template-choice" value="${t.id}">
@@ -207,16 +244,20 @@ export function showTemplateSelectionModal(title, templates, callback) {
         </div>`;
 
     const backdrop = container.querySelector('.modal-backdrop');
+    if (!backdrop) { // NEU: Prüfung
+        console.error("Modal-Fehler: 'modal-backdrop' Element nicht gefunden nach Rendern.");
+        return;
+    }
     const closeModal = (result = null) => {
         backdrop.classList.remove('visible');
         setTimeout(() => { container.innerHTML = ''; if(callback) callback(result); }, 300);
     };
 
-    container.querySelector('.modal-select-btn').addEventListener('click', () => {
+    container.querySelector('.modal-select-btn')?.addEventListener('click', () => { // Optional chaining
         const selectedRadio = container.querySelector('input[name="template-choice"]:checked');
         closeModal(selectedRadio ? selectedRadio.value : null);
     });
-    container.querySelector('.modal-cancel-btn').addEventListener('click', () => closeModal(null));
-    container.querySelector('.modal-close-btn').addEventListener('click', () => closeModal(null));
+    container.querySelector('.modal-cancel-btn')?.addEventListener('click', () => closeModal(null)); // Optional chaining
+    container.querySelector('.modal-close-btn')?.addEventListener('click', () => closeModal(null)); // Optional chaining
     backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(null); });
 }

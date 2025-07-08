@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/core/guest_db.js
 "use strict";
 
 // =================================================================
@@ -13,9 +14,12 @@ export const guestDb = {
      */
     _getProjects() {
         try {
-            return JSON.parse(localStorage.getItem('guestProjects') || '{}');
+            const projects = JSON.parse(localStorage.getItem('guestProjects') || '{}');
+            window.debugLog("GuestDB: Projekte aus LocalStorage geladen.", projects);
+            return projects;
         } catch (e) {
             console.error("Fehler beim Parsen von guestProjects aus LocalStorage:", e);
+            window.debugLog("GuestDB: Fehler beim Parsen von guestProjects aus LocalStorage.", e);
             return {};
         }
     },
@@ -26,6 +30,7 @@ export const guestDb = {
      */
     _saveProjects(p) {
         localStorage.setItem('guestProjects', JSON.stringify(p));
+        window.debugLog("GuestDB: Projekte in LocalStorage gespeichert.", p);
     },
 
     /**
@@ -35,12 +40,14 @@ export const guestDb = {
      */
     async getProjects() {
         const projects = this._getProjects();
-        return Object.values(projects).map(p => ({
+        const formattedProjects = Object.values(projects).map(p => ({
             ...p,
             id: p.projectId,
             name: p.projectName,
             progress: this._calculateProgress(p)
         }));
+        window.debugLog("GuestDB: Alle Projekte (formatiert) abgerufen.", formattedProjects);
+        return formattedProjects;
     },
 
     /**
@@ -49,7 +56,9 @@ export const guestDb = {
      * @returns {Promise<object|null>} Das Projektobjekt oder null, wenn nicht gefunden.
      */
     async getProject(id) {
-        return this._getProjects()[id] || null;
+        const project = this._getProjects()[id] || null;
+        window.debugLog(`GuestDB: Projekt '${id}' abgerufen.`, project);
+        return project;
     },
 
     /**
@@ -62,6 +71,7 @@ export const guestDb = {
         const projects = this._getProjects();
         projects[id] = data;
         this._saveProjects(projects);
+        window.debugLog(`GuestDB: Projekt '${id}' gespeichert.`, data);
         return { ok: true };
     },
 
@@ -73,13 +83,14 @@ export const guestDb = {
      */
     async createProject(data) {
         const projects = this._getProjects();
-        // Gast-Limits werden über `window.globalSettings` abgerufen, da `globalSettings` eine Konstante ist
         if (Object.keys(projects).length >= (window.globalSettings?.guest_limits?.projects || 1)) {
             window.showInfoModal('Limit erreicht', `Als Gast können Sie maximal ${window.globalSettings.guest_limits.projects} Projekte erstellen.`);
+            window.debugLog("GuestDB: Projekterstellung fehlgeschlagen, Gast-Limit erreicht.");
             return { ok: false };
         }
         projects[data.projectId] = data;
         this._saveProjects(projects);
+        window.debugLog(`GuestDB: Projekt '${data.projectId}' erstellt.`, data);
         return { ok: true, json: async () => data };
     },
 
@@ -92,6 +103,7 @@ export const guestDb = {
         const projects = this._getProjects();
         delete projects[id];
         this._saveProjects(projects);
+        window.debugLog(`GuestDB: Projekt '${id}' gelöscht.`);
         return { ok: true };
     },
 
@@ -109,7 +121,9 @@ export const guestDb = {
                 completed += items.filter(i => i.done).length;
             });
         });
-        return total > 0 ? Math.round((completed / total) * 100) : 0;
+        const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+        window.debugLog(`GuestDB: Fortschritt für Projekt '${project.projectName}' berechnet: ${progress}%`);
+        return progress;
     },
 
     /**
@@ -117,7 +131,9 @@ export const guestDb = {
      * @returns {Promise<object>} Die Benutzereinstellungen.
      */
     async getSettings() {
-        return { theme: localStorage.getItem('theme') || 'light' };
+        const themeSetting = localStorage.getItem('theme') || 'dark'; // Standard ist 'dark'
+        window.debugLog(`GuestDB: Theme-Einstellung abgerufen: '${themeSetting}'`);
+        return { theme: themeSetting };
     },
 
     /**
@@ -127,6 +143,7 @@ export const guestDb = {
      */
     async saveSettings(s) {
         localStorage.setItem('theme', s.theme);
+        window.debugLog(`GuestDB: Theme-Einstellung gespeichert: '${s.theme}'`);
         return { ok: true };
     },
 
@@ -136,6 +153,7 @@ export const guestDb = {
      */
     async resetAllData() {
         localStorage.removeItem('guestProjects');
+        window.debugLog("GuestDB: Alle Gast-Projekte aus LocalStorage gelöscht.");
         return { ok: true };
     },
 
@@ -144,6 +162,7 @@ export const guestDb = {
      * @returns {Promise<Array>} Ein leeres Array.
      */
     async getTemplates() {
+        window.debugLog("GuestDB: Vorlagen-Anfrage (nicht unterstützt für Gäste).");
         return [];
     },
 
@@ -152,6 +171,7 @@ export const guestDb = {
      * @returns {Promise<object>} Ein Fehlerobjekt.
      */
     async getTemplateContent(templateId) {
+        window.debugLog(`GuestDB: Vorlageninhalt-Anfrage für '${templateId}' (nicht unterstützt für Gäste).`);
         return { error: "Guests cannot access templates." };
     },
 
@@ -160,6 +180,7 @@ export const guestDb = {
      * @returns {Promise<object>} Das Beispielprojekt.
      */
     async getInitialProjectContent() {
+        window.debugLog("GuestDB: Initialer Projektinhalt für Gast abgerufen.");
         return {
             projectId: "bsp_guest",
             projectName: "Beispielprojekt (Gast)",

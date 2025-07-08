@@ -5,7 +5,7 @@
     "tasks_per_phase": 10,
     "subtasks_per_task": 10
   },
-  "general_debug_mode": false,
   "registration_enabled": true,
-  "maintenance_mode": false
+  "maintenance_mode": false,
+  "general_debug_mode": true
 }

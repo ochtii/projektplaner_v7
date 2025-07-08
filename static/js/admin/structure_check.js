@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/admin/structure_check.js
 "use strict";
 
 // =================================================================
@@ -14,6 +15,7 @@ export function setupStructureCheckPage() {
     const runCheckBtn = document.getElementById('run-check-btn');
     const runGenerateBtn = document.getElementById('run-generate-btn');
     const checkLogOutput = document.getElementById('check-log-output');
+    const structureDisplayContainer = document.querySelector('.structure-display-container'); // NEU: Container für Log-Feld
 
     const viewStructureBtn = document.getElementById('view-structure-btn');
     const exportTxtBtn = document.getElementById('export-structure-txt-btn');
@@ -22,12 +24,30 @@ export function setupStructureCheckPage() {
 
     let currentStructureData = null; // Speichert die geladene Struktur für den Export
 
+    // NEU: Logik zur Sichtbarkeit des Log-Felds und der Struktur-Anzeige
+    if (!window.globalSettings?.general_debug_mode) {
+        if (checkLogOutput) checkLogOutput.classList.add('hidden');
+        if (runCheckBtn) runCheckBtn.classList.add('hidden');
+        if (runGenerateBtn) runGenerateBtn.classList.add('hidden');
+        // Den gesamten Container für das Logfeld ausblenden, wenn Debug-Modus deaktiviert
+        if (structureDisplayContainer) structureDisplayContainer.classList.add('hidden');
+        window.debugLog("Admin: Debug-Modus ist deaktiviert, Log-Feld und Buttons ausgeblendet.");
+    } else {
+        window.debugLog("Admin: Debug-Modus ist aktiv.");
+        if (checkLogOutput) checkLogOutput.classList.remove('hidden');
+        if (runCheckBtn) runCheckBtn.classList.remove('hidden');
+        if (runGenerateBtn) runGenerateBtn.classList.remove('hidden');
+        if (structureDisplayContainer) structureDisplayContainer.classList.remove('hidden');
+    }
+
+
     /**
      * Führt den Struktur-Check oder die Generierung über die API aus.
      * @param {string} flag Das Kommando-Flag (--check oder --generate).
      */
     const runCheck = async (flag) => {
-        checkLogOutput.textContent = 'Befehl wird ausgeführt...';
+        if (checkLogOutput) checkLogOutput.textContent = 'Befehl wird ausgeführt...';
+        window.debugLog(`Admin: Führe Struktur-Check aus mit Flag: ${flag}`);
         try {
             const response = await fetch('/api/admin/run-check', {
                 method: 'POST',
@@ -35,10 +55,12 @@ export function setupStructureCheckPage() {
                 body: JSON.stringify({ flag: flag })
             });
             const result = await response.json();
-            checkLogOutput.textContent = result.log;
+            if (checkLogOutput) checkLogOutput.textContent = result.log;
+            window.debugLog(`Admin: Struktur-Check Ergebnis für ${flag}:`, result.log);
         } catch (error) {
-            checkLogOutput.textContent = 'Fehler bei der Ausführung des Checks.';
+            if (checkLogOutput) checkLogOutput.textContent = 'Fehler bei der Ausführung des Checks.';
             console.error("Fehler beim Ausführen des Struktur-Checks:", error);
+            window.debugLog(`Admin: Fehler beim Ausführen des Struktur-Checks für ${flag}:`, error);
         }
     };
 
@@ -65,47 +87,35 @@ export function setupStructureCheckPage() {
      * Lädt und zeigt die aktuelle Struktur aus `structure.json` an.
      */
     const viewStructure = async () => {
-        structureOutput.innerHTML = '<p>Lade Struktur...</p>';
-        structureOutput.classList.remove('hidden');
+        if (structureOutput) {
+            structureOutput.innerHTML = '<p>Lade Struktur...</p>';
+            structureOutput.classList.remove('hidden');
+        }
+        window.debugLog("Admin: Lade Struktur aus structure.json...");
         try {
             const response = await fetch('/api/admin/get-structure');
             const data = await response.json();
             currentStructureData = data; // Daten für den Export speichern
 
             if(data.error) {
-                structureOutput.textContent = data.error;
-                exportTxtBtn.classList.add('hidden');
-                exportJsonBtn.classList.add('hidden');
+                if (structureOutput) structureOutput.textContent = data.error;
+                if (exportTxtBtn) exportTxtBtn.classList.add('hidden');
+                if (exportJsonBtn) exportJsonBtn.classList.add('hidden');
+                window.debugLog("Admin: Fehler beim Laden der Struktur:", data.error);
                 return;
             }
 
-            structureOutput.textContent = formatStructureAsText(data);
-            exportTxtBtn.classList.remove('hidden');
-            exportJsonBtn.classList.remove('hidden');
+            if (structureOutput) structureOutput.textContent = formatStructureAsText(data);
+            if (exportTxtBtn) exportTxtBtn.classList.remove('hidden');
+            if (exportJsonBtn) exportJsonBtn.classList.remove('hidden');
+            window.debugLog("Admin: Struktur erfolgreich geladen und angezeigt.");
         } catch(e) {
-            structureOutput.textContent = "Fehler beim Laden der Struktur.";
-            exportTxtBtn.classList.add('hidden');
-            exportJsonBtn.classList.add('hidden');
+            if (structureOutput) structureOutput.textContent = "Fehler beim Laden der Struktur.";
+            if (exportTxtBtn) exportTxtBtn.classList.add('hidden');
+            if (exportJsonBtn) exportJsonBtn.classList.add('hidden');
             console.error("Fehler beim Anzeigen der Struktur:", e);
+            window.debugLog("Admin: Fehler beim Anzeigen der Struktur:", e);
         }
-    };
-
-    /**
-     * Lädt eine Datei mit dem gegebenen Inhalt herunter.
-     * @param {string} filename Der Name der Datei.
-     * @param {string} content Der Inhalt der Datei.
-     * @param {string} mimeType Der MIME-Typ der Datei.
-     */
-    const downloadFile = (filename, content, mimeType) => {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
     };
 
     if (viewStructureBtn) viewStructureBtn.addEventListener('click', viewStructure);
@@ -113,12 +123,19 @@ export function setupStructureCheckPage() {
         if(currentStructureData) {
             const textContent = formatStructureAsText(currentStructureData);
             downloadFile('structure.txt', textContent, 'text/plain;charset=utf-8');
+            window.debugLog("Admin: Struktur als Text exportiert.");
         }
     });
     if (exportJsonBtn) exportJsonBtn.addEventListener('click', () => {
         if(currentStructureData) {
             const jsonContent = JSON.stringify(currentStructureData, null, 2);
             downloadFile('structure.json', jsonContent, 'application/json;charset=utf-8');
+            window.debugLog("Admin: Struktur als JSON exportiert.");
         }
     });
+
+    // NEU: Initial die Struktur anzeigen, wenn Debug-Modus aktiv ist
+    if (window.globalSettings?.general_debug_mode) {
+        viewStructure();
+    }
 }

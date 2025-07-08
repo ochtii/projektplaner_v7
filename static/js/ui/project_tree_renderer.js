@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/ui/project_tree_renderer.js
 "use strict";
 
 // =================================================================
@@ -43,8 +44,7 @@ export function showDetailsInEditor(item, type) {
         <div class="form-group">
             <label for="editor-item-comment" style="display: block; margin-bottom: 0.5rem;">Kommentare</label>
             <div id="comments-section" style="border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--border-radius); max-height: 200px; overflow-y: auto; margin-bottom: 0.5rem;">
-                <!-- Kommentare werden hier dynamisch eingefügt -->
-            </div>
+                </div>
             <textarea id="new-comment-input" class="form-control" rows="2" placeholder="Neuen Kommentar hinzufügen..." style="width: 100%; padding: 0.5rem; border-radius: var(--border-radius); border: 1px solid var(--border-color);"></textarea>
             <button class="btn btn-secondary btn-sm" id="add-comment-btn" style="margin-top: 0.5rem;">Kommentar hinzufügen</button>
         </div>
@@ -131,7 +131,7 @@ export function renderProjectTree(projectData, container) {
             const taskId = draggedItem.closest('.task-item')?.dataset.itemId;
             let parentTask = null;
             for (const phase of window.currentProjectData.phases) {
-                parentTask = phase.tasks.find(t => t.taskId === taskId);
+                task = phase.tasks.find(t => t.taskId === taskId);
                 if (parentTask) break;
             }
             if (parentTask) {
@@ -422,3 +422,6 @@ export function renderProjectTree(projectData, container) {
     // Event Listener für den gesamten Baum, um dragend zu fangen, falls außerhalb abgelegt
     container.addEventListener('dragend', handleDragEnd);
 }
+
+// Exportiere renderProjectTree global, damit es von main.js aufgerufen werden kann
+window.renderProjectTree = renderProjectTree;

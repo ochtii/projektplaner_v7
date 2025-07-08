@@ -1,6 +1,9 @@
-<!-- templates/dashboard.html -->
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/dashboard.css') }}">
+{% endblock %}
 {% block content %}
 <div class="page-header">
     <h2>Meine Projekte</h2>

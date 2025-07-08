@@ -1,3 +1,4 @@
+<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -7,7 +8,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme_variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <!-- Page-specific styles will be added in individual templates via blocks -->
+    {% block head %}{% endblock %}
+
+    <!-- WICHTIG: Inline-Skript zur sofortigen Theme-Anwendung (gegen Flimmern) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else if (!savedTheme) {
+                // Wenn kein Theme gespeichert ist, Standard auf Dark setzen
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark'); // Auch im localStorage speichern
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="app-container">
@@ -53,6 +72,8 @@
                     <span id="current-page-header-title" class="page-title"></span> {# Seitentitel zuerst #}
                     <span id="header-title-separator" class="separator hidden">|</span> {# Trenner #}
                     <h2 id="current-project-header-title"></h2> {# Projekttitel danach #}
+                    <!-- NEU: Debug-Indikator im Header -->
+                    <span id="debug-indicator" class="debug-indicator hidden" title="Debug-Modus aktiv">🐞</span>
                 </div>
                 <div id="header-actions" class="header-actions"></div>
             </header>

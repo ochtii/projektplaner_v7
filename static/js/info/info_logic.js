@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/info/info_logic.js
 "use strict";
 
 // =================================================================
@@ -5,6 +6,8 @@
 // =================================================================
 // Dieses Modul enthält die Logik für die Info-Seite.
 // Es verwaltet die Akkordeon-Funktionalität für die Info-Karten.
+
+import { showInfoModal } from '../ui/modals.js'; // showInfoModal hinzugefügt
 
 /**
  * Richtet die Info-Seite ein.
@@ -44,7 +47,7 @@ export function setupInfoPage() {
             e.preventDefault();
             // Hier würde die Logik zum Senden des Formulars an ein Backend stehen
             // Für dieses Beispiel zeigen wir nur ein Info-Modal
-            window.showInfoModal('Support-Anfrage gesendet', 'Vielen Dank für Ihre Nachricht! Wir werden uns in Kürze bei Ihnen melden.');
+            showInfoModal('Support-Anfrage gesendet', 'Vielen Dank für Ihre Nachricht! Wir werden uns in Kürze bei Ihnen melden.'); // window. entfernt
             supportForm.reset();
         });
     }

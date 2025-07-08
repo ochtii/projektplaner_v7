@@ -1,11 +1,13 @@
-<!-- templates/project_overview.html -->
 {% extends "base.html" %}
 {% block title %}Projektübersicht{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/project_overview.css') }}">
+{% endblock %}
 {% block content %}
 <div class="page-header">
     <h2 id="projectName">Wird geladen...</h2>
     <div class="project-actions">
-        <!-- Buttons zum schnellen Wechsel zwischen den Ansichten -->
         <a href="#" id="go-to-editor-btn" class="btn btn-secondary">&#9998; Zum Editor</a>
         <a href="#" id="go-to-checklist-btn" class="btn btn-secondary">Zur Checkliste</a>
     </div>
@@ -14,7 +16,6 @@
     <button class="btn btn-primary" id="text-view-btn">Textansicht</button>
     <button class="btn btn-secondary" id="graphical-view-btn">Grafische Ansicht</button>
     
-    <!-- Neues Dropdown-Menü für grafische Ansichten -->
     <select id="graphical-view-selector" class="form-control hidden" style="width: auto; margin-left: 1rem;">
         <option value="overview_chart">Übersichtsdiagramm</option>
         <option value="gantt_chart" disabled>Gantt-Diagramm (bald)</option>

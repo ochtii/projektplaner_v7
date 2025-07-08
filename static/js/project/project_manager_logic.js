@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/project/project_manager_logic.js
 "use strict";
 
 // =================================================================
@@ -7,9 +8,11 @@
 // Phasen, Aufgaben und Unteraufgaben.
 
 // Importiere den ChecklistRenderer direkt
-import { renderChecklistTextView } from '../ui/checklist_renderer.js';
+import { renderChecklistTextView, renderGraphicalChecklistView } from '../ui/checklist_renderer.js';
 import * as GlobalUI from '../ui/global_ui.js'; // Importiere GlobalUI für Header-Updates
 import { renderProjectTree } from '../ui/project_tree_renderer.js'; // NEU: Direkter Import von renderProjectTree
+// NEU: Importiere Modal-Funktionen direkt, um "window." Präfixe zu vermeiden
+import { showPromptModal, showInfoModal, showConfirmationModal } from '../ui/modals.js';
 
 
 /**
@@ -57,6 +60,7 @@ export async function setupProjectChecklistPage() {
     const projectData = await window.db.getProject(window.currentProjectId);
     const checklistTextViewContainer = document.getElementById('checklist-text-view-content');
     const checklistGraphicalViewContainer = document.getElementById('checklist-graphical-view-content');
+    const graphicalViewSelector = document.getElementById('graphical-view-selector'); // Das Dropdown, falls es eine ähnliche in der Checkliste gibt
 
     if (projectData) {
         window.currentProjectData = projectData;
@@ -80,15 +84,31 @@ export async function setupProjectChecklistPage() {
         document.getElementById('checklist-text-view-btn')?.addEventListener('click', () => {
             if (checklistTextViewContainer) checklistTextViewContainer.classList.remove('hidden');
             if (checklistGraphicalViewContainer) checklistGraphicalViewContainer.classList.add('hidden');
+            // Hier können Sie auch das graphicalViewSelector ausblenden, falls es in der Checklist.html existiert
+            if (graphicalViewSelector) graphicalViewSelector.classList.add('hidden');
         });
+
         document.getElementById('checklist-graphical-view-btn')?.addEventListener('click', () => {
             if (checklistTextViewContainer) checklistTextViewContainer.classList.add('hidden');
             if (checklistGraphicalViewContainer) {
                 checklistGraphicalViewContainer.classList.remove('hidden');
-                // TODO: Grafische Checklistenansicht hier implementieren
-                checklistGraphicalViewContainer.innerHTML = '<p>Grafische Checklistenansicht wird hier geladen...</p>';
+                // Standard-Grafikansicht rendern oder die zuletzt ausgewählte
+                // HINWEIS: Es gibt kein graphical-view-selector in project_checklist.html, daher direkt 'overview_chart'
+                renderGraphicalChecklistView(projectData, checklistGraphicalViewContainer, 'overview_chart');
             }
+            // Hier können Sie auch das graphicalViewSelector einblenden, falls es in der Checklist.html existiert
+            if (graphicalViewSelector) graphicalViewSelector.classList.remove('hidden');
         });
+
+        // Event Listener für das Dropdown der grafischen Ansichten (falls vorhanden)
+        // Dies würde nur funktionieren, wenn ein #graphical-view-selector in project_checklist.html vorhanden wäre.
+        // Da es nicht der Fall ist, ist dieser Teil nicht funktional, kann aber für zukünftige Erweiterungen behalten werden.
+        if (graphicalViewSelector) {
+            graphicalViewSelector.addEventListener('change', (event) => {
+                const selectedViewType = event.target.value;
+                renderGraphicalChecklistView(projectData, checklistGraphicalViewContainer, selectedViewType);
+            });
+        }
 
     } else {
         // Korrigierte ID für die Fehlermeldung
@@ -107,12 +127,12 @@ export async function editProjectName() {
     if (!window.currentProjectData) return;
 
     // Ruft showPromptModal auf
-    window.showPromptModal('Projektnamen bearbeiten', 'Neuer Projektname:', window.currentProjectData.projectName, async (newName) => {
+    showPromptModal('Projektnamen bearbeiten', 'Neuer Projektname:', window.currentProjectData.projectName, async (newName) => {
         if (newName === null || newName.trim() === window.currentProjectData.projectName) {
             return; // Benutzer hat abgebrochen oder Name ist unverändert
         }
         if (!newName.trim()) {
-            window.showInfoModal('Info', 'Projektname darf nicht leer sein.');
+            showInfoModal('Info', 'Projektname darf nicht leer sein.');
             return;
         }
 
@@ -121,9 +141,9 @@ export async function editProjectName() {
         if (response.ok) {
             document.getElementById('page-main-title').textContent = `Projekt: ${window.currentProjectData.projectName}`;
             GlobalUI.updateHeaderTitles(window.currentProjectData.projectName, 'Editor'); // Aktualisiere Header
-            window.showInfoModal('Erfolg', 'Projektname erfolgreich aktualisiert.');
+            showInfoModal('Erfolg', 'Projektname erfolgreich aktualisiert.');
         } else {
-            window.showInfoModal('Fehler', 'Projektname konnte nicht aktualisiert werden.');
+            showInfoModal('Fehler', 'Projektname konnte nicht aktualisiert werden.');
         }
     });
 }
@@ -135,12 +155,12 @@ export async function deleteCurrentProject() {
     if (!window.currentProjectData) return;
 
     // Ruft showConfirmationModal auf
-    window.showConfirmationModal('Projekt löschen', `Möchten Sie das Projekt "${window.currentProjectData.projectName}" wirklich endgültig löschen?`, async () => {
+    showConfirmationModal('Projekt löschen', `Möchten Sie das Projekt "${window.currentProjectData.projectName}" wirklich endgültig löschen?`, async () => {
         const response = await window.db.deleteProject(window.currentProjectId);
         if (response.ok) {
             window.location.href = '/dashboard'; // Zurück zum Dashboard
         } else {
-            window.showInfoModal('Fehler', 'Das Projekt konnte nicht gelöscht werden.');
+            showInfoModal('Fehler', 'Das Projekt konnte nicht gelöscht werden.');
         }
     });
 }
@@ -155,10 +175,10 @@ export async function addNewItem(type, parentId = null) {
     const promptMessage = `Name für neue(s/n) ${type}:`;
 
     // Ruft showPromptModal auf
-    window.showPromptModal(promptTitle, promptMessage, '', async (name) => {
+    showPromptModal(promptTitle, promptMessage, '', async (name) => {
         if (!name || name.trim() === '') {
             if (name !== null) { // Benutzer hat nicht nur abgebrochen
-                window.showInfoModal('Info', 'Name darf nicht leer sein.');
+                showInfoModal('Info', 'Name darf nicht leer sein.');
             }
             return;
         }
@@ -191,7 +211,7 @@ export async function addNewItem(type, parentId = null) {
                 }
                 phase.tasks.push(newItem);
             } else {
-                window.showInfoModal('Fehler', 'Übergeordnete Phase nicht gefunden.');
+                showInfoModal('Fehler', 'Übergeordnete Phase nicht gefunden.');
                 return;
             }
         } else if (type === 'subtask') {
@@ -212,7 +232,7 @@ export async function addNewItem(type, parentId = null) {
                 }
                 task.subtasks.push(newItem);
             } else {
-                window.showInfoModal('Fehler', 'Übergeordnete Aufgabe nicht gefunden.');
+                showInfoModal('Fehler', 'Übergeordnete Aufgabe nicht gefunden.');
                 return;
             }
         }
@@ -220,9 +240,9 @@ export async function addNewItem(type, parentId = null) {
         const response = await window.db.saveProject(window.currentProjectId, window.currentProjectData);
         if (response.ok) {
             window.renderProjectTree(window.currentProjectData, document.getElementById('projectTree'));
-            window.showInfoModal('Erfolg', `${type} erfolgreich hinzugefügt.`);
+            showInfoModal('Erfolg', `${type} erfolgreich hinzugefügt.`);
         } else {
-            window.showInfoModal('Fehler', `Das ${type} konnte nicht hinzugefügt werden.`);
+            showInfoModal('Fehler', `Das ${type} konnte nicht hinzugefügt werden.`);
         }
     });
 }
@@ -249,7 +269,7 @@ export async function saveItemDetails(item, type, newName) {
     const response = await window.db.saveProject(window.currentProjectId, window.currentProjectData);
     if (response.ok) {
         window.renderProjectTree(window.currentProjectData, document.getElementById('projectTree'));
-        window.showInfoModal('Erfolg', `${type} "${originalName}" wurde in "${newName}" umbenannt.`);
+        showInfoModal('Erfolg', `${type} "${originalName}" wurde in "${newName}" umbenannt.`);
         // Nach dem Speichern den Editor leeren und Hinweis anzeigen
         const editorContent = document.getElementById('editor-content');
         const editorEmptyHint = document.getElementById('editor-empty-hint');
@@ -264,6 +284,9 @@ export async function saveItemDetails(item, type, newName) {
         window.currentlySelectedItem = null;
         window.currentlySelectedType = null;
     } else {
-        window.showInfoModal('Fehler', `${type} konnte nicht aktualisiert werden.`);
+        showInfoModal('Fehler', `${type} konnte nicht aktualisiert werden.`);
     }
 }
+
+// Exportiere addNewItem global, damit es von project_tree_renderer.js aufgerufen werden kann
+window.addNewItem = addNewItem;

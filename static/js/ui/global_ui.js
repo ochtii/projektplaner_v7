@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/ui/global_ui.js
 "use strict";
 
 // =================================================================
@@ -84,6 +85,18 @@ export function setupGlobalUI(session) {
         const adminMenu = document.getElementById('admin-menu');
         if (adminMenu) adminMenu.classList.remove('hidden');
     }
+
+    // NEU: Debug-Indikator anzeigen, wenn Debug-Modus aktiv UND Admin
+    const debugIndicator = document.getElementById('debug-indicator');
+    if (debugIndicator) {
+        if (window.globalSettings?.general_debug_mode && session.isAdmin) {
+            debugIndicator.classList.remove('hidden');
+            window.debugLog("Globaler Debug-Modus ist aktiv.");
+        } else {
+            debugIndicator.classList.add('hidden');
+        }
+    }
+
 
     // Sprachauswahl Logik (falls auf der Seite vorhanden)
     const languageSelect = document.getElementById('language-select');

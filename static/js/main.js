@@ -1,3 +1,4 @@
+// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/main.js
 "use strict";
 
 // =================================================================
@@ -18,10 +19,29 @@ window.currentlySelectedItem = currentlySelectedItem;
 window.currentlySelectedType = currentlySelectedType;
 window.db = db;
 window.currentUser = currentUser;
+window.globalSettings = globalSettings; // NEU: globalSettings exponiert
 window.hasInitialProjectBeenLoaded = hasInitialProjectBeenLoaded; // Expose this flag
 
 // =================================================================
-// DATABASE ABSTRACTION
+// GLOBALE DEBUG-FUNKTION (NEU)
+// =================================================================
+/**
+ * Führt eine Debug-Log-Meldung aus, wenn der globale Debug-Modus aktiv
+ * und der aktuelle Benutzer ein Administrator ist.
+ * @param {string} message Die zu protokollierende Nachricht.
+ * @param {*} data Optional zusätzliche Daten.
+ */
+window.debugLog = function(message, data) {
+    // Prüfe, ob globalSettings und currentUser bereits geladen sind
+    // und ob der Debug-Modus aktiv und der Benutzer Admin ist.
+    if (window.globalSettings?.general_debug_mode && window.currentUser?.isAdmin) {
+        console.log(`[DEBUG] ${message}`, data || '');
+    }
+};
+
+
+// =================================================================
+// DATABASE ABSTRAKTION
 // =================================================================
 const apiDb = {
     async getProjects() { return (await fetch('/api/projects')).json(); },
@@ -53,8 +73,8 @@ const guestDb = {
     },
     async createProject(data) {
         const projects = this._getProjects();
-        if (Object.keys(projects).length >= (globalSettings?.guest_limits?.projects || 1)) {
-            window.showInfoModal('Limit erreicht', `Als Gast können Sie maximal ${globalSettings.guest_limits.projects} Projekte erstellen.`);
+        if (Object.keys(projects).length >= (window.globalSettings?.guest_limits?.projects || 1)) {
+            window.showInfoModal('Limit erreicht', `Als Gast können Sie maximal ${window.globalSettings.guest_limits.projects} Projekte erstellen.`);
             return { ok: false };
         }
         projects[data.projectId] = data;
@@ -78,7 +98,7 @@ const guestDb = {
         });
         return total > 0 ? Math.round((completed / total) * 100) : 0;
     },
-    async getSettings() { return { theme: localStorage.getItem('theme') || 'light' }; },
+    async getSettings() { return { theme: localStorage.getItem('theme') || 'dark' }; },
     async saveSettings(s) {
         localStorage.setItem('theme', s.theme);
         return { ok: true };
@@ -113,46 +133,50 @@ const guestDb = {
 // =================================================================
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const [session, settings] = await Promise.all([
+        // Lade Session und globale Einstellungen parallel
+        const [session, globalSettingsData] = await Promise.all([
             fetch('/api/session').then(res => res.json()),
             fetch('/api/global-settings').then(res => res.json())
         ]);
 
         currentUser = session;
-        globalSettings = settings;
+        globalSettings = globalSettingsData; // Weise die geladenen globalen Einstellungen zu
         db = session.is_guest ? guestDb : apiDb;
 
         // Update global window objects
         window.db = db;
         window.currentUser = currentUser;
+        window.globalSettings = globalSettings; // Sicherstellen, dass die globale Variable aktualisiert wird
+
+        // Debug-Log, um zu sehen, ob globalSettings korrekt geladen wurde
+        window.debugLog("main.js: Globale Einstellungen geladen:", window.globalSettings);
+        window.debugLog("main.js: Aktueller Benutzer geladen:", window.currentUser);
+
 
         const publicPages = ['/', '/login', '/register', '/info', '/agb'];
         const path = window.location.pathname;
         if (!session.logged_in && !session.is_guest && !publicPages.some(p => path.startsWith(p))) {
+            window.debugLog("main.js: Nicht angemeldet und nicht Gast, leite zu Login um.");
             window.location.href = '/login';
             return;
         }
 
-        await applyTheme();
+        // NEU: applyTheme direkt nach dem Laden der Einstellungen aufrufen
+        applyTheme();
+        window.debugLog("main.js: Theme nach Initialisierung angewendet.");
+
         runPageSpecificSetup();
+        window.debugLog("main.js: Seiten-spezifisches Setup ausgeführt.");
 
     } catch (error) {
         console.error("Initialization failed:", error);
+        window.debugLog("main.js: Initialisierung fehlgeschlagen!", error);
     }
 });
 
-async function applyTheme() {
-    const settings = await db.getSettings();
-    const isDark = settings.theme === 'dark';
-    document.body.classList.toggle('dark-mode', isDark);
 
-    const themeSwitcher = document.getElementById('themeSwitcher');
-    if (themeSwitcher) {
-        themeSwitcher.checked = isDark;
-    }
-}
-
-
+// NEU: applyTheme Funktion aus theme.js importieren
+import { applyTheme } from './ui/theme.js';
 // NEU: Direkter Import von setupGlobalUI
 import { setupGlobalUI, updateHeaderTitles } from './ui/global_ui.js';
 // Importiere spezifische Setup-Funktionen direkt
@@ -166,7 +190,7 @@ import { setupProjectOverviewPage } from './ui/project_overview_renderer.js';
 
 function runPageSpecificSetup() {
     // Direkter Aufruf der importierten Funktion
-    setupGlobalUI(currentUser);
+    setupGlobalUI(currentUser); // NEU: setupGlobalUI hier aufrufen, damit es die globalSettings nutzen kann
     const path = window.location.pathname;
 
     const projectPageMatch = path.match(/^\/project(?:-overview|-checklist)?\/([a-zA-Z0-9_]+)/);
@@ -198,6 +222,7 @@ function runPageSpecificSetup() {
             document.getElementById('current-project-checklist-link').href = `/project-checklist/${window.currentProjectId}`;
             projectMenu.querySelector('.submenu-toggle').classList.add('open');
             projectMenu.querySelector('.submenu').classList.add('open');
+            window.debugLog("main.js: Projektmenü aktiviert.");
         }
 
         // Setze Navigationsbuttons für Projektansichten
@@ -239,6 +264,7 @@ function runPageSpecificSetup() {
             '/admin/structure-check': 'Struktur-Check'
         };
         pageTitle = adminPageTitles[path] || 'Admin Bereich';
+        window.debugLog(`main.js: Admin-Seite erkannt: ${path}`);
 
     } else { // Default for index page
         pageTitle = 'Willkommen';
@@ -253,4 +279,5 @@ function runPageSpecificSetup() {
     }
     // Direkter Aufruf der importierten Funktion
     updateHeaderTitles(projectTitle, pageTitle);
+    window.debugLog(`main.js: Header-Titel aktualisiert: Seite='${pageTitle}', Projekt='${projectTitle}'`);
 }
