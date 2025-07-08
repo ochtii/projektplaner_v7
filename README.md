@@ -15,41 +15,59 @@ Stellen Sie sicher, dass die folgende Software auf Ihrem System installiert ist:
 
 Folgen Sie diesen Schritten, um das Projekt einzurichten.
 
-### Schritt 1: Ordnerstruktur erstellen
+### Schritt 1: Ordnerstruktur
 
-Öffnen Sie ein Terminal (Eingabeaufforderung oder PowerShell unter Windows) und erstellen Sie die benötigte Ordnerstruktur.
+Die Anwendung verwendet die folgende Ordnerstruktur:
 
-**Für PowerShell:**
+```
+/projektplaner/
+|
+├── app.py                   # Flask-Anwendung (Backend)
+|
+├── static/                  # Statische Dateien (CSS, JS, Daten)
+|   ├── css/style.css        # Stylesheets
+|   ├── js/main.js           # Frontend-Logik
+|   └── data/
+|       ├── bsp.json         # Datenbank-Datei (wird zur Laufzeit erstellt/gelesen)
+|       └── templates/       # Projekt-Vorlagen (*.json)
+|
+└── templates/               # HTML-Vorlagen für Flask
+    ├── base.html
+    ├── dashboard.html
+    └── ... (weitere .html Dateien)
+```
+
+-   **`app.py`**: Das Herz der Anwendung, enthält die gesamte Backend-Logik und die Routen.
+-   **`static/`**: Enthält alle Dateien, die direkt an den Browser gesendet werden.
+    -   **`css/`**: Enthält die Stylesheet-Dateien.
+    -   **`js/`**: Enthält die JavaScript-Dateien für die Frontend-Logik.
+    -   **`data/`**: Dient als Speicher für die JSON-basierte "Datenbank" und die Projektvorlagen.
+-   **`templates/`**: Enthält die HTML-Dateien, die von Flask gerendert werden.
+
+### Schritt 2: Ordnerstruktur erstellen
+
+Öffnen Sie ein Terminal und verwenden Sie den für Ihr Betriebssystem passenden Befehl, um die gesamte Ordnerstruktur auf einmal zu erstellen.
+
+**Für Linux (Ubuntu, Debian, etc.) oder macOS:**
+```bash
+mkdir -p projektplaner/templates projektplaner/static/css projektplaner/static/js projektplaner/static/data/templates
+```
+
+**Für Windows (PowerShell):**
 ```powershell
 mkdir projektplaner\templates, projektplaner\static\css, projektplaner\static\js, projektplaner\static\data\templates
 ```
 
-**Für CMD (Eingabeaufforderung):**
-```bash
+**Für Windows (CMD):**
+```cmd
 mkdir projektplaner\templates && mkdir projektplaner\static\css && mkdir projektplaner\static\js && mkdir projektplaner\static\data\templates
 ```
 
-### Schritt 2: Dateien erstellen und Code einfügen
+### Schritt 3: Dateien erstellen und Code einfügen
 
-Erstellen Sie die folgenden leeren Dateien in den entsprechenden Ordnern und kopieren Sie den Code aus den vorherigen Antworten in jede Datei.
+Erstellen Sie die leeren Dateien gemäß der oben gezeigten Struktur und kopieren Sie den Code aus den bereitgestellten Canvas-Dokumenten in die jeweilige Datei.
 
-* `projektplaner/app.py`
-* `projektplaner/templates/base.html`
-* `projektplaner/templates/dashboard.html`
-* `projektplaner/templates/index.html`
-* `projektplaner/templates/info.html`
-* `projektplaner/templates/project_manager.html`
-* `projektplaner/templates/project_overview.html`
-* `projektplaner/templates/settings.html`
-* `projektplaner/static/css/style.css`
-* `projektplaner/static/js/main.js`
-* `projektplaner/static/data/bsp.json`
-* `projektplaner/static/data/templates/software.json`
-* `projektplaner/static/data/templates/marketing.json`
-* `projektplaner/static/data/templates/event_planning.json`
-* `projektplaner/static/data/templates/book_writing.json`
-
-### Schritt 3: Abhängigkeiten installieren
+### Schritt 4: Abhängigkeiten installieren
 
 Navigieren Sie im Terminal in das Hauptverzeichnis des Projekts (`projektplaner`) und installieren Sie die erforderliche Flask-Bibliothek:
 
