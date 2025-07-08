@@ -21,6 +21,7 @@ export async function applyTheme() {
     if (themeSwitcher) {
         themeSwitcher.checked = isDark;
     }
+    window.debugLog(`GlobalUI: Theme angewendet: ${isDark ? 'dark' : 'light'}.`, 'INFO', 'GlobalUI');
 }
 
 /**
@@ -28,14 +29,18 @@ export async function applyTheme() {
  * @param {object} session Das aktuelle Session-Objekt des Benutzers.
  */
 export function setupGlobalUI(session) {
+    window.debugLog("GlobalUI: Setup der globalen UI gestartet.", 'INFO', 'GlobalUI');
     const headerActions = document.getElementById('header-actions');
     if (headerActions) {
         if (session.logged_in) {
             headerActions.innerHTML = `<span>Willkommen, <strong>${session.username}</strong></span><a href="/logout" class="btn btn-secondary btn-sm">Logout</a>`;
+            window.debugLog(`GlobalUI: Benutzer angemeldet: ${session.username}.`, 'INFO', 'GlobalUI');
         } else if (session.is_guest) {
             headerActions.innerHTML = `<span><strong>Gast-Modus</strong></span><a href="/login" class="btn btn-primary btn-sm">Anmelden</a>`;
+            window.debugLog("GlobalUI: Gast-Modus aktiv.", 'INFO', 'GlobalUI');
         } else {
             headerActions.innerHTML = `<a href="/login" class="btn btn-secondary">Anmelden</a><a href="/register" class="btn btn-primary">Registrieren</a>`;
+            window.debugLog("GlobalUI: Nicht angemeldet (öffentlicher Modus).", 'INFO', 'GlobalUI');
         }
     }
 
@@ -49,14 +54,17 @@ export function setupGlobalUI(session) {
         mobileMenuButton.addEventListener('click', () => {
             mobileNav.classList.add('open');
             overlay.classList.add('visible');
+            window.debugLog("GlobalUI: Mobiles Menü geöffnet.", 'INFO', 'GlobalUI');
         });
         closeMobileNav.addEventListener('click', () => {
             mobileNav.classList.remove('open');
             overlay.classList.remove('visible');
+            window.debugLog("GlobalUI: Mobiles Menü geschlossen.", 'INFO', 'GlobalUI');
         });
         overlay.addEventListener('click', () => {
             mobileNav.classList.remove('open');
             overlay.classList.remove('visible');
+            window.debugLog("GlobalUI: Mobiles Menü über Overlay geschlossen.", 'INFO', 'GlobalUI');
         });
     }
 
@@ -68,6 +76,7 @@ export function setupGlobalUI(session) {
             if (submenu.classList.contains('open')) {
                 submenu.classList.remove('open');
                 toggle.classList.remove('open');
+                window.debugLog("GlobalUI: Submenü geschlossen.", 'INFO', 'GlobalUI');
             } else {
                 // Schließe alle anderen offenen Submenüs
                 document.querySelectorAll('.main-nav .submenu.open').forEach(openSubmenu => {
@@ -76,6 +85,7 @@ export function setupGlobalUI(session) {
                 });
                 submenu.classList.add('open');
                 toggle.classList.add('open');
+                window.debugLog("GlobalUI: Submenü geöffnet.", 'INFO', 'GlobalUI');
             }
         });
     });
@@ -83,7 +93,10 @@ export function setupGlobalUI(session) {
     // Admin-Menü nur anzeigen, wenn der Benutzer Admin ist
     if (session.isAdmin) {
         const adminMenu = document.getElementById('admin-menu');
-        if (adminMenu) adminMenu.classList.remove('hidden');
+        if (adminMenu) {
+            adminMenu.classList.remove('hidden');
+            window.debugLog("GlobalUI: Admin-Menü sichtbar gemacht.", 'INFO', 'GlobalUI');
+        }
     }
 
     // NEU: Debug-Indikator anzeigen, wenn Debug-Modus aktiv UND Admin
@@ -91,9 +104,10 @@ export function setupGlobalUI(session) {
     if (debugIndicator) {
         if (window.globalSettings?.general_debug_mode && session.isAdmin) {
             debugIndicator.classList.remove('hidden');
-            window.debugLog("Globaler Debug-Modus ist aktiv.");
+            window.debugLog("GlobalUI: Debug-Indikator sichtbar.", 'INFO', 'GlobalUI');
         } else {
             debugIndicator.classList.add('hidden');
+            window.debugLog("GlobalUI: Debug-Indikator versteckt.", 'INFO', 'GlobalUI');
         }
     }
 
@@ -104,13 +118,16 @@ export function setupGlobalUI(session) {
         const savedLanguage = localStorage.getItem('language');
         if (savedLanguage) {
             languageSelect.value = savedLanguage;
+            window.debugLog(`GlobalUI: Sprache aus LocalStorage geladen: ${savedLanguage}.`, 'INFO', 'GlobalUI');
         }
         languageSelect.addEventListener('change', () => {
             const selectedLanguage = languageSelect.value;
             localStorage.setItem('language', selectedLanguage);
+            window.debugLog(`GlobalUI: Sprache geändert zu: ${selectedLanguage}. Seite wird neu geladen.`, 'INFO', 'GlobalUI');
             location.reload(); // Seite neu laden, um Sprachänderung anzuwenden
         });
     }
+    window.debugLog("GlobalUI: Setup der globalen UI abgeschlossen.", 'INFO', 'GlobalUI');
 }
 
 /**
@@ -139,4 +156,5 @@ export function updateHeaderTitles(pageTitle, projectTitle) { // Reihenfolge der
     if (separator) {
         separator.classList.toggle('hidden', !pageTitle || !projectTitle);
     }
+    window.debugLog(`GlobalUI: Header-Titel aktualisiert. Seite: "${pageTitle}", Projekt: "${projectTitle}".`, 'INFO', 'GlobalUI');
 }

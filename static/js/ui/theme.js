@@ -21,7 +21,7 @@ export function applyTheme() {
     }
     // Debug-Log, wenn globaler Debug-Modus aktiv ist
     if (window.debugLog) {
-        window.debugLog(`Theme angewendet: ${savedTheme || 'dark'} (aus localStorage)`);
+        window.debugLog(`Theme angewendet: ${savedTheme || 'dark'} (aus localStorage)`, 'INFO', 'Theme');
     }
 }
 
@@ -53,16 +53,19 @@ export function initializeThemeSwitcher(initialSettings) {
                 try {
                     await window.db.saveSettings({ theme: newTheme });
                     if (window.debugLog) {
-                        window.debugLog(`Theme auf Server gespeichert: ${newTheme}`);
+                        window.debugLog(`Theme auf Server gespeichert: ${newTheme}`, 'INFO', 'Theme');
                     }
                 } catch (error) {
                     console.error("Fehler beim Speichern des Themes auf dem Server:", error);
                     if (window.showInfoModal) { // Prüfen, ob Modal-Funktion verfügbar ist
                         window.showInfoModal('Fehler', 'Theme konnte nicht auf dem Server gespeichert werden.');
                     }
+                    if (window.debugLog) {
+                        window.debugLog(`Fehler beim Speichern des Themes auf dem Server: ${error.message}`, 'ERROR', 'Theme', error);
+                    }
                 }
             } else if (window.debugLog) {
-                window.debugLog(`Theme nur lokal gespeichert (Gastmodus oder nicht angemeldet): ${newTheme}`);
+                window.debugLog(`Theme nur lokal gespeichert (Gastmodus oder nicht angemeldet): ${newTheme}`, 'INFO', 'Theme');
             }
         });
     }

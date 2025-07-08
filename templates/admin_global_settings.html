@@ -1,3 +1,4 @@
+<!-- templates/admin_global_settings.html -->
 {% extends "base.html" %}
 {% block title %}Globale Einstellungen{% endblock %}
 {% block head %}
@@ -9,10 +10,12 @@
 <div class="page-header">
     <h2>Globale Einstellungen</h2>
 </div>
-<div id="global-settings-form-container" class="settings-container">
+
+<div class="settings-container">
+    
     <div class="settings-card">
+        <h3>Gast-Limits</h3>
         <form id="global-settings-form">
-            <h3>Gast-Limits</h3>
             <div class="form-group">
                 <label for="guest-projects">Max. Projekte</label>
                 <input type="number" id="guest-projects" class="form-control">
@@ -29,36 +32,42 @@
                 <label for="guest-subtasks">Max. Subtasks / Aufgabe</label>
                 <input type="number" id="guest-subtasks" class="form-control">
             </div>
+            <div style="margin-top: 1.5rem;">
+                <button id="save-guest-limits-btn" class="btn btn-primary">Gast-Limits speichern</button>
+            </div>
         </form>
     </div>
+
     <div class="settings-card">
-        <form id="system-settings-form">
-            <h3>Systemeinstellungen</h3>
-            <div class="form-group-checkbox">
-                <label class="custom-checkbox">
-                    <input type="checkbox" id="registration-enabled">
-                    <span class="checkmark"></span>
-                    <span>Registrierung erlauben</span>
-                </label>
+        <h3>Systemeinstellungen</h3>
+        <div class="setting-item">
+            <div class="setting-item-label">
+                <h4>Registrierung erlauben</h4>
+                <p class="setting-item-hint">Steuert, ob sich neue Benutzer registrieren können.</p>
             </div>
-            <div class="form-group-checkbox">
-                <label class="custom-checkbox">
-                    <input type="checkbox" id="maintenance-mode">
-                    <span class="checkmark"></span>
-                    <span>Wartungsmodus aktivieren</span>
-                </label>
+            <div class="setting-item-control">
+                <button id="toggle-registration-enabled" class="btn btn-secondary toggle-btn" data-setting-key="registration_enabled">Aktivieren</button>
             </div>
-            <div class="form-group-checkbox">
-                <label class="custom-checkbox">
-                    <input type="checkbox" id="debug-mode">
-                    <span class="checkmark"></span>
-                    <span>Allgemeinen Debug-Modus aktivieren</span>
-                </label>
+        </div>
+        <div class="setting-item">
+            <div class="setting-item-label">
+                <h4>Wartungsmodus</h4>
+                <p class="setting-item-hint">Aktiviert den Wartungsmodus für die gesamte Anwendung (nur Admins können zugreifen).</p>
             </div>
-        </form>
+            <div class="setting-item-control">
+                <button id="toggle-maintenance-mode" class="btn btn-secondary toggle-btn" data-setting-key="maintenance_mode">Aktivieren</button>
+            </div>
+        </div>
+        <div class="setting-item">
+            <div class="setting-item-label">
+                <h4>Allgemeiner Debug-Modus</h4>
+                <p class="setting-item-hint">Aktiviert erweiterte Debug-Informationen und die Debug-Konsole für Administratoren.</p>
+            </div>
+            <div class="setting-item-control">
+                <button id="toggle-debug-mode" class="btn btn-secondary toggle-btn" data-setting-key="general_debug_mode">Aktivieren</button>
+            </div>
+        </div>
     </div>
-    <div class="settings-card" style="grid-column: 1 / -1;">
-        <button id="save-global-settings-btn" class="btn btn-primary">Einstellungen speichern</button>
-    </div>
+
 </div>
 {% endblock %}

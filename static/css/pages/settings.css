@@ -1,10 +1,63 @@
 /* static/css/pages/settings.css */
 
-.settings-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
-.settings-card { background-color: var(--surface-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 2rem; }
+.settings-container { 
+    display: flex; /* NEU: Flexbox für vertikale Anordnung */
+    flex-direction: column; /* NEU: Elemente untereinander anordnen */
+    gap: 2rem; /* Abstand zwischen den Karten */
+}
+.settings-card { 
+    background-color: var(--surface-color); 
+    border-radius: var(--border-radius); 
+    box-shadow: var(--shadow); 
+    padding: 2rem; 
+    /* margin-bottom: 2rem; Entfernt, da gap im Container das übernimmt */
+}
 .settings-card h3 { font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
 .setting-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .setting-item-label h4 { margin: 0 0 0.25rem 0; font-size: 1rem; }
 .setting-item-label p { margin: 0; font-size: 0.9rem; opacity: 0.7; }
 .danger-zone h3 { color: #e74c3c; }
 .danger-zone p { margin-bottom: 1rem; }
+
+/* NEU: Stil für die Toggle-Buttons in Systemeinstellungen */
+.setting-item-control .toggle-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9em;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    min-width: 120px; /* Einheitliche Breite für die Buttons */
+    text-align: center;
+}
+
+/* Standard (Deaktiviert) */
+.setting-item-control .toggle-btn:not(.active) {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+/* Aktiviert */
+.setting-item-control .toggle-btn.active {
+    background-color: var(--primary-color); /* Primärfarbe für Aktiviert */
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Hover-Effekt für beide Zustände */
+.setting-item-control .toggle-btn:hover {
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3); /* Leichter Schatten bei Hover */
+    border-color: var(--primary-color); /* Rahmenfarbe bei Hover */
+}
+
+/* Hover-Effekt für aktiven Button */
+.setting-item-control .toggle-btn.active:hover {
+    background-color: #357abd; /* Etwas dunkler bei Hover für aktive Buttons */
+}
+
+.setting-item-hint { /* Stil für die Hinweis-Texte */
+    font-size: 0.85em;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}

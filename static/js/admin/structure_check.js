@@ -12,6 +12,7 @@
  * Initialisiert Event-Listener für die Check- und Generierungs-Buttons.
  */
 export function setupStructureCheckPage() {
+    window.debugLog("Admin_StructureCheck: Setup der Struktur-Check-Seite gestartet.", 'INFO', 'Admin_StructureCheck');
     const runCheckBtn = document.getElementById('run-check-btn');
     const runGenerateBtn = document.getElementById('run-generate-btn');
     const checkLogOutput = document.getElementById('check-log-output');
@@ -25,15 +26,17 @@ export function setupStructureCheckPage() {
     let currentStructureData = null; // Speichert die geladene Struktur für den Export
 
     // NEU: Logik zur Sichtbarkeit des Log-Felds und der Struktur-Anzeige
-    if (!window.globalSettings?.general_debug_mode) {
+    // Diese Logik wird jetzt auch in main.js für die debug-console selbst ausgeführt,
+    // aber hier spezifisch für die Admin-Seite.
+    if (!window.globalSettings?.general_debug_mode || !window.currentUser?.isAdmin) {
         if (checkLogOutput) checkLogOutput.classList.add('hidden');
         if (runCheckBtn) runCheckBtn.classList.add('hidden');
         if (runGenerateBtn) runGenerateBtn.classList.add('hidden');
         // Den gesamten Container für das Logfeld ausblenden, wenn Debug-Modus deaktiviert
         if (structureDisplayContainer) structureDisplayContainer.classList.add('hidden');
-        window.debugLog("Admin: Debug-Modus ist deaktiviert, Log-Feld und Buttons ausgeblendet.");
+        window.debugLog("Admin_StructureCheck: Debug-Modus ist deaktiviert oder Benutzer ist kein Admin. Log-Feld und Buttons ausgeblendet.", 'INFO', 'Admin_StructureCheck');
     } else {
-        window.debugLog("Admin: Debug-Modus ist aktiv.");
+        window.debugLog("Admin_StructureCheck: Debug-Modus ist aktiv. Log-Feld und Buttons sichtbar gemacht.", 'INFO', 'Admin_StructureCheck');
         if (checkLogOutput) checkLogOutput.classList.remove('hidden');
         if (runCheckBtn) runCheckBtn.classList.remove('hidden');
         if (runGenerateBtn) runGenerateBtn.classList.remove('hidden');
@@ -47,7 +50,7 @@ export function setupStructureCheckPage() {
      */
     const runCheck = async (flag) => {
         if (checkLogOutput) checkLogOutput.textContent = 'Befehl wird ausgeführt...';
-        window.debugLog(`Admin: Führe Struktur-Check aus mit Flag: ${flag}`);
+        window.debugLog(`Admin_StructureCheck: Führe Struktur-Check aus mit Flag: ${flag}`, 'INFO', 'Admin_StructureCheck');
         try {
             const response = await fetch('/api/admin/run-check', {
                 method: 'POST',
@@ -56,11 +59,11 @@ export function setupStructureCheckPage() {
             });
             const result = await response.json();
             if (checkLogOutput) checkLogOutput.textContent = result.log;
-            window.debugLog(`Admin: Struktur-Check Ergebnis für ${flag}:`, result.log);
+            window.debugLog(`Admin_StructureCheck: Struktur-Check Ergebnis für ${flag}.`, 'INFO', 'Admin_StructureCheck', result.log);
         } catch (error) {
             if (checkLogOutput) checkLogOutput.textContent = 'Fehler bei der Ausführung des Checks.';
             console.error("Fehler beim Ausführen des Struktur-Checks:", error);
-            window.debugLog(`Admin: Fehler beim Ausführen des Struktur-Checks für ${flag}:`, error);
+            window.debugLog(`Admin_StructureCheck: Fehler beim Ausführen des Struktur-Checks für ${flag}.`, 'ERROR', 'Admin_StructureCheck', error);
         }
     };
 
@@ -91,7 +94,7 @@ export function setupStructureCheckPage() {
             structureOutput.innerHTML = '<p>Lade Struktur...</p>';
             structureOutput.classList.remove('hidden');
         }
-        window.debugLog("Admin: Lade Struktur aus structure.json...");
+        window.debugLog("Admin_StructureCheck: Lade Struktur aus structure.json...", 'INFO', 'Admin_StructureCheck');
         try {
             const response = await fetch('/api/admin/get-structure');
             const data = await response.json();
@@ -101,20 +104,20 @@ export function setupStructureCheckPage() {
                 if (structureOutput) structureOutput.textContent = data.error;
                 if (exportTxtBtn) exportTxtBtn.classList.add('hidden');
                 if (exportJsonBtn) exportJsonBtn.classList.add('hidden');
-                window.debugLog("Admin: Fehler beim Laden der Struktur:", data.error);
+                window.debugLog("Admin_StructureCheck: Fehler beim Laden der Struktur.", 'ERROR', 'Admin_StructureCheck', data.error);
                 return;
             }
 
             if (structureOutput) structureOutput.textContent = formatStructureAsText(data);
             if (exportTxtBtn) exportTxtBtn.classList.remove('hidden');
             if (exportJsonBtn) exportJsonBtn.classList.remove('hidden');
-            window.debugLog("Admin: Struktur erfolgreich geladen und angezeigt.");
+            window.debugLog("Admin_StructureCheck: Struktur erfolgreich geladen und angezeigt.", 'INFO', 'Admin_StructureCheck');
         } catch(e) {
             if (structureOutput) structureOutput.textContent = "Fehler beim Laden der Struktur.";
             if (exportTxtBtn) exportTxtBtn.classList.add('hidden');
             if (exportJsonBtn) exportJsonBtn.classList.add('hidden');
             console.error("Fehler beim Anzeigen der Struktur:", e);
-            window.debugLog("Admin: Fehler beim Anzeigen der Struktur:", e);
+            window.debugLog("Admin_StructureCheck: Fehler beim Anzeigen der Struktur.", 'ERROR', 'Admin_StructureCheck', e);
         }
     };
 
@@ -123,19 +126,20 @@ export function setupStructureCheckPage() {
         if(currentStructureData) {
             const textContent = formatStructureAsText(currentStructureData);
             downloadFile('structure.txt', textContent, 'text/plain;charset=utf-8');
-            window.debugLog("Admin: Struktur als Text exportiert.");
+            window.debugLog("Admin_StructureCheck: Struktur als Text exportiert.", 'INFO', 'Admin_StructureCheck');
         }
     });
     if (exportJsonBtn) exportJsonBtn.addEventListener('click', () => {
         if(currentStructureData) {
             const jsonContent = JSON.stringify(currentStructureData, null, 2);
             downloadFile('structure.json', jsonContent, 'application/json;charset=utf-8');
-            window.debugLog("Admin: Struktur als JSON exportiert.");
+            window.debugLog("Admin_StructureCheck: Struktur als JSON exportiert.", 'INFO', 'Admin_StructureCheck');
         }
     });
 
     // NEU: Initial die Struktur anzeigen, wenn Debug-Modus aktiv ist
-    if (window.globalSettings?.general_debug_mode) {
+    if (window.globalSettings?.general_debug_mode && window.currentUser?.isAdmin) {
         viewStructure();
     }
+    window.debugLog("Admin_StructureCheck: Setup der Struktur-Check-Seite abgeschlossen.", 'INFO', 'Admin_StructureCheck');
 }
