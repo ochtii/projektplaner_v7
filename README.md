@@ -26,12 +26,15 @@ Sie haben zwei Möglichkeiten, das Projekt zu installieren. Die Installation via
 git clone [https://github.com/ochtii/projektplaner_v7.git](https://github.com/ochtii/projektplaner_v7.git) projektplaner_v7
 ```
 
-#### Schritt 2: Abhängigkeiten installieren
-
-Navigieren Sie in das neu erstellte Verzeichnis und installieren Sie die notwendigen Pakete.
+#### Schritt 2: Verzeichnis wechseln
 
 ```bash
 cd projektplaner_v7
+```
+
+#### Schritt 3: Abhängigkeiten installieren
+
+```bash
 pip install Flask
 ```
 
@@ -73,14 +76,16 @@ Die Anwendung verwendet die folgende Ordnerstruktur:
 
 #### Schritt 2: Ordner- und Dateistruktur erstellen
 
-Öffnen Sie ein Terminal und verwenden Sie den für Ihr Betriebssystem passenden Befehl, um die gesamte Ordner- und Dateistruktur auf einmal zu erstellen.
+Öffnen Sie ein Terminal und verwenden Sie die für Ihr Betriebssystem passenden Befehle, um die gesamte Ordner- und Dateistruktur auf einmal zu erstellen.
 
 **Für Linux (Ubuntu, Debian, etc.) oder macOS:**
-```bash
-# Ordner erstellen
-mkdir -p projektplaner_v7/templates projektplaner_v7/static/css projektplaner_v7/static/js projektplaner_v7/static/data/templates
 
-# Leere Dateien erstellen
+Erstellen Sie zuerst die Ordner:
+```bash
+mkdir -p projektplaner_v7/templates projektplaner_v7/static/css projektplaner_v7/static/js projektplaner_v7/static/data/templates
+```
+Erstellen Sie dann die leeren Dateien:
+```bash
 touch projektplaner_v7/app.py \
       projektplaner_v7/README.md \
       projektplaner_v7/templates/base.html \
@@ -103,35 +108,53 @@ touch projektplaner_v7/app.py \
 ```
 
 **Für Windows (PowerShell):**
-```powershell
-# Ordner erstellen
-mkdir projektplaner_v7\templates, projektplaner_v7\static\css, projektplaner_v7\static\js, projektplaner_v7\static\data\templates
 
-# Leere Dateien erstellen
+Erstellen Sie zuerst die Ordner:
+```powershell
+mkdir projektplaner_v7\templates, projektplaner_v7\static\css, projektplaner_v7\static\js, projektplaner_v7\static\data\templates
+```
+Erstellen Sie dann die leeren Dateien:
+```powershell
 $files = "app.py", "README.md", "templates\base.html", "templates\dashboard.html", "templates\index.html", "templates\info.html", "templates\login.html", "templates\project_manager.html", "templates\project_overview.html", "templates\project_checklist.html", "templates\settings.html", "static\css\style.css", "static\js\main.js", "static\js\ui.js", "static\data\bsp.json", "static\data\templates\software.json", "static\data\templates\marketing.json", "static\data\templates\event_planning.json", "static\data\templates\book_writing.json"
 foreach ($file in $files) { New-Item -ItemType File -Path "projektplaner_v7\$file" }
 ```
 
-**Für Windows (CMD):**
-```cmd
-:: Ordner erstellen
-mkdir projektplaner_v7\templates && mkdir projektplaner_v7\static\css && mkdir projektplaner_v7\static\js && mkdir projektplaner_v7\static\data\templates
+**Für Windows (Batch-Datei):**
 
-:: Leere Dateien erstellen
+Erstellen Sie eine Datei mit dem Namen `projektplaner_v7_install.bat` und fügen Sie den folgenden Code ein. Führen Sie die Datei anschließend per Doppelklick aus.
+
+```batch
+@echo off
+echo Erstelle Ordnerstruktur...
+mkdir projektplaner_v7\templates
+mkdir projektplaner_v7\static\css
+mkdir projektplaner_v7\static\js
+mkdir projektplaner_v7\static\data\templates
+
+echo Erstelle leere Dateien...
 cd projektplaner_v7
 type nul > app.py
 type nul > README.md
-cd templates
-type nul > base.html && type nul > dashboard.html && type nul > index.html && type nul > info.html && type nul > login.html && type nul > project_manager.html && type nul > project_overview.html && type nul > project_checklist.html && type nul > settings.html
-cd ..\static\css
-type nul > style.css
-cd ..\js
-type nul > main.js && type nul > ui.js
-cd ..\data
-type nul > bsp.json
-cd templates
-type nul > software.json && type nul > marketing.json && type nul > event_planning.json && type nul > book_writing.json
-cd ..\..\..
+type nul > templates\base.html
+type nul > templates\dashboard.html
+type nul > templates\index.html
+type nul > templates\info.html
+type nul > templates\login.html
+type nul > templates\project_manager.html
+type nul > templates\project_overview.html
+type nul > templates\project_checklist.html
+type nul > templates\settings.html
+type nul > static\css\style.css
+type nul > static\js\main.js
+type nul > static\js\ui.js
+type nul > static\data\bsp.json
+type nul > static\data\templates\software.json
+type nul > static\data\templates\marketing.json
+type nul > static\data\templates\event_planning.json
+type nul > static\data\templates\book_writing.json
+cd ..
+echo Fertig!
+pause
 ```
 
 #### Schritt 3: Code einfügen
