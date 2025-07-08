@@ -25,6 +25,10 @@ TEMPLATES_DIR = os.path.join(DATA_ROOT, 'templates')
 os.makedirs(USER_DATA_DIR, exist_ok=True)
 os.makedirs(TEMPLATES_DIR, exist_ok=True) 
 
+# NEU: Standard-Profilbild und Profil-Datei-Pfade
+STANDARD_PROFILE_PICTURE = 'static/img/standard_profile_picture.png'
+PROFILE_FILE_NAME = 'profile.json'
+
 # --- Helper-Funktionen ---
 
 def _load_json(filepath, default_data={}):
@@ -65,6 +69,23 @@ def get_user_data_path(user_id, data_type="projects"):
     user_dir = os.path.join(USER_DATA_DIR, str(user_id))
     os.makedirs(user_dir, exist_ok=True)
     return os.path.join(user_dir, f"{data_type}.json")
+
+# NEU: Funktion zum Abrufen des Pfads für das Benutzerbildverzeichnis
+def get_user_img_path(user_id):
+    """Gibt den Pfad zum Bildverzeichnis des Benutzers zurück und erstellt es, falls nötig."""
+    if not user_id: return None
+    user_img_dir = os.path.join(USER_DATA_DIR, str(user_id), 'img')
+    os.makedirs(user_img_dir, exist_ok=True)
+    return user_img_dir
+
+# NEU: Funktion zum Abrufen des Pfads zur Profildatei
+def get_user_profile_path(user_id):
+    """Gibt den Pfad zur Profildatei des Benutzers zurück."""
+    if not user_id: return None
+    user_dir = os.path.join(USER_DATA_DIR, str(user_id))
+    os.makedirs(user_dir, exist_ok=True) # Sicherstellen, dass der Benutzerordner existiert
+    return os.path.join(user_dir, PROFILE_FILE_NAME)
+
 
 # --- Decorators ---
 
@@ -129,7 +150,7 @@ def get_initial_project():
         project_data = _load_json(bsp_path)
         return jsonify(project_data)
     except Exception:
-        return jsonify({"error": "Error loading initial project template."}), 500
+        return jsonify({"error": "Error loading initial project content."}), 500
 
 
 # --- Routen für Seiten ---
@@ -150,7 +171,33 @@ def guest_login():
 @app.route('/login', methods=['GET', 'POST'])
 def login_route():
     """Login-Seite für Benutzer."""
-    if 'user_id' in session: return redirect(url_for('dashboard'))
+    if 'user_id' in session: 
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        identifier = request.form.get('identifier') # Kann Benutzername oder E-Mail sein
+        password = request.form.get('password')
+        users = _load_json(USERS_FILE)
+
+        user_found = None
+        for username, user_data in users.items():
+            # Prüfe, ob Identifier Benutzername oder E-Mail ist
+            if identifier == username or identifier == user_data.get('email'):
+                user_found = user_data
+                user_found['username'] = username # Füge den Benutzernamen hinzu
+                break
+        
+        if user_found and user_found['password'] == password:
+            session.clear() # Alte Session-Daten löschen
+            session['user_id'] = user_found['id']
+            session['username'] = user_found['username']
+            session['isAdmin'] = user_found.get('isAdmin', False) # Standard auf False, falls nicht gesetzt
+            flash(f"Willkommen zurück, {session['username']}!", "success")
+            return redirect(url_for('dashboard'))
+        else:
+            flash("Ungültiger Benutzername/E-Mail oder Passwort.", "error")
+            return render_template('login.html', identifier=identifier) # Identifier wieder ins Formular füllen
+
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -191,6 +238,19 @@ def register_route():
             users[username] = {"id": new_user_id, "email": email, "password": password, "isAdmin": False}
             _save_json(USERS_FILE, users)
             
+            # NEU: Erstelle den 'img'-Ordner und die 'profile.json'-Datei für den neuen Benutzer
+            user_img_dir = get_user_img_path(new_user_id) # Erstellt den img-Ordner
+            user_profile_path = get_user_profile_path(new_user_id)
+            default_profile_data = {
+                "profilbild": STANDARD_PROFILE_PICTURE,
+                "alter": 0,
+                "wohnort": "",
+                "land": "",
+                "plz": "",
+                "aboutme": ""
+            }
+            _save_json(user_profile_path, default_profile_data) # Initialisiert profile.json
+
             _save_json(get_user_data_path(new_user_id, 'projects'), {})
             # ÄNDERUNG: Standard-Theme für neue Benutzer von 'light' zu 'dark'
             _save_json(get_user_data_path(new_user_id, 'settings'), {"theme": "dark"})
@@ -277,6 +337,141 @@ def admin_structure_check():
     return render_template('admin_run_check.html')
 
 # --- API-Endpunkte ---
+# NEUE API-Endpunkte für Benutzerverwaltung (Liste aller Benutzer)
+@app.route('/api/admin/users', methods=['GET'])
+@login_required
+@admin_required
+def admin_user_management_api():
+    """Gibt eine Liste aller Benutzer zurück (nur für Admins)."""
+    users = _load_json(USERS_FILE)
+    # Entferne Passwörter für die Frontend-Sicherheit
+    users_safe = []
+    for username, user_data in users.items():
+        user_copy = user_data.copy()
+        user_copy['username'] = username # Stelle sicher, dass der Benutzername enthalten ist
+        user_copy.pop('password', None) # Entferne das Passwort
+        users_safe.append(user_copy)
+    return jsonify(users_safe)
+
+# NEUE API-Endpunkte für Profil-Daten
+@app.route('/api/user/profile', methods=['GET'])
+@login_required
+def get_user_profile():
+    """Gibt die Profildaten des aktuellen Benutzers zurück."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Benutzer nicht angemeldet"}), 401
+    
+    profile_path = get_user_profile_path(user_id)
+    profile_data = _load_json(profile_path, {
+        "profilbild": STANDARD_PROFILE_PICTURE,
+        "alter": 0,
+        "wohnort": "",
+        "land": "",
+        "plz": "",
+        "aboutme": ""
+    })
+    return jsonify(profile_data)
+
+@app.route('/api/user/profile', methods=['POST'])
+@login_required
+def update_user_profile():
+    """Aktualisiert die Profildaten des aktuellen Benutzers."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Benutzer nicht angemeldet"}), 401
+    
+    if session.get('is_guest'):
+        return jsonify({"error": "Gäste können keine Profileinstellungen speichern"}), 403
+
+    profile_path = get_user_profile_path(user_id)
+    current_profile_data = _load_json(profile_path, {})
+    
+    updated_data = request.get_json()
+    current_profile_data.update(updated_data) # Aktualisiere bestehende Daten mit neuen
+    
+    _save_json(profile_path, current_profile_data)
+    return jsonify({"message": "Profile updated successfully"}), 200
+
+
+# NEUE API-Endpunkte für Projektverwaltung
+@app.route('/api/projects', methods=['GET'])
+@login_required
+def get_all_projects():
+    """Gibt alle Projekte des aktuellen Benutzers zurück."""
+    user_projects_path = get_user_data_path(session['user_id'], 'projects')
+    projects = _load_json(user_projects_path, {})
+    # Konvertiere das Diktat von Projekten in eine Liste
+    return jsonify(list(projects.values()))
+
+@app.route('/api/project/<project_id>', methods=['GET'])
+@login_required
+def get_single_project(project_id):
+    """Gibt ein spezifisches Projekt des aktuellen Benutzers zurück."""
+    user_projects_path = get_user_data_path(session['user_id'], 'projects')
+    projects = _load_json(user_projects_path, {})
+    project = projects.get(project_id)
+    if project:
+        return jsonify(project)
+    return jsonify({"error": "Project not found"}), 404
+
+@app.route('/api/project', methods=['POST'])
+@login_required
+def create_project():
+    """Erstellt ein neues Projekt für den aktuellen Benutzer."""
+    user_id = session.get('user_id')
+    is_guest = session.get('is_guest', False)
+    
+    if not user_id:
+        return jsonify({"error": "Benutzer nicht identifiziert."}), 400
+
+    new_project_data = request.get_json()
+    project_id = new_project_data.get('projectId', str(uuid.uuid4())) # Generiere ID, falls nicht vorhanden
+    
+    user_projects_path = get_user_data_path(user_id, 'projects')
+    projects = _load_json(user_projects_path, {})
+
+    # Gast-Limits überprüfen
+    if is_guest:
+        global_app_settings = _load_json(SETTINGS_FILE, {})
+        guest_limits = global_app_settings.get('guest_limits', {})
+        max_projects = guest_limits.get('projects', 1) # Standard 1 Projekt für Gast
+
+        if len(projects) >= max_projects:
+            return jsonify({"error": f"Als Gast können Sie maximal {max_projects} Projekte erstellen."}), 403
+
+    projects[project_id] = new_project_data
+    _save_json(user_projects_path, projects)
+    return jsonify({"message": "Project created successfully", "projectId": project_id}), 201
+
+@app.route('/api/project/<project_id>', methods=['POST']) # Diese Route behandelt auch das Speichern (PUT-ähnlich)
+@login_required
+def save_project(project_id):
+    """Speichert ein bestehendes Projekt des aktuellen Benutzers."""
+    user_projects_path = get_user_data_path(session['user_id'], 'projects')
+    projects = _load_json(user_projects_path, {})
+    
+    if project_id not in projects:
+        return jsonify({"error": "Project not found"}), 404
+    
+    updated_project_data = request.get_json()
+    projects[project_id] = updated_project_data
+    _save_json(user_projects_path, projects)
+    return jsonify({"message": "Project saved successfully"}), 200
+
+@app.route('/api/project/<project_id>', methods=['DELETE'])
+@login_required
+def delete_project(project_id):
+    """Löscht ein Projekt des aktuellen Benutzers."""
+    user_projects_path = get_user_data_path(session['user_id'], 'projects')
+    projects = _load_json(user_projects_path, {})
+    
+    if project_id in projects:
+        del projects[project_id]
+        _save_json(user_projects_path, projects)
+        return jsonify({"message": "Project deleted successfully"}), 200
+    return jsonify({"error": "Project not found"}), 404
+
 @app.route('/api/session', methods=['GET'])
 def get_session():
     """Gibt die aktuelle Benutzersession-Informationen zurück."""

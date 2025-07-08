@@ -7,23 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme_variables.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"> {# NEU: Favicon-Link #}
     {% block head %}{% endblock %}
 
-    <script>
-        (function() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-            } else if (!savedTheme) {
-                // Wenn kein Theme gespeichert ist, Standard auf Dark setzen
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark'); // Auch im localStorage speichern
-            }
-        })();
-    </script>
 </head>
 <body>
     <div class="app-container">
@@ -79,18 +69,31 @@
                         <span id="debug-mode-text">Bug-Slayer Mode Active</span>
                     </div>
                     <div class="debug-menu-right">
-                        <div class="debug-log-filter">
-                            <span>Logs:</span>
-                            <button id="filter-log-info-btn" class="btn btn-secondary btn-sm filter-btn active" data-log-level="INFO">INFO</button>
-                            <button id="filter-log-warn-btn" class="btn btn-secondary btn-sm filter-btn active" data-log-level="WARN">WARN</button>
-                            <button id="filter-log-error-btn" class="btn btn-secondary btn-sm filter-btn active" data-log-level="ERROR">ERROR</button>
+                        <div class="debug-control-item">
+                            <label for="toggle-gangster-dev-mode-switch" class="control-label">Gangster Dev Mode</label>
+                            <label class="theme-switch" for="toggle-gangster-dev-mode-switch">
+                                <input type="checkbox" id="toggle-gangster-dev-mode-switch" />
+                                <div class="slider round"></div>
+                            </label>
                         </div>
-                        <button id="toggle-debug-console-visibility-btn" class="btn btn-secondary btn-sm toggle-btn active">Konsole</button>
+
+                        <div class="debug-control-item">
+                            <label for="toggle-debug-console-visibility-switch" class="control-label">Konsole</label>
+                            <label class="theme-switch" for="toggle-debug-console-visibility-switch">
+                                <input type="checkbox" id="toggle-debug-console-visibility-switch" />
+                                <div class="slider round"></div>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <button id="toggle-debug-menu-btn" class="debug-menu-toggle-btn">
-                    <svg class="arrow-icon arrow-down" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    <svg class="arrow-icon arrow-up hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    <svg class="arrow-icon arrow-down" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <svg class="arrow-icon arrow-up hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
                 </button>
             </div>
             <main>
@@ -108,24 +111,45 @@
             <div id="debug-console" class="debug-console hidden">
                 <div class="debug-header">
                     <h3>Debug-Logs</h3>
-                    <span id="resize-debug-logs-handle" class="debug-icon-btn resize-handle" title="Größe verändern">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up-down"><line x1="12" y1="17" x2="12" y2="3"></line><polyline points="6 8 12 3 18 8"></polyline><line x1="12" y1="21" x2="12" y2="7"></line><polyline points="18 16 12 21 6 16"></polyline></svg>
-                    </span>
                     <div class="debug-controls">
-                        <span id="toggle-fix-debug-logs-btn" class="debug-icon-btn" title="Fixieren">
-                            <svg class="lock-icon lock-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
-                            <svg class="lock-icon lock-closed hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        </span>
                         <button id="toggle-auto-scroll-btn" class="btn btn-secondary btn-sm">Auto-Scroll</button>
                         <button id="toggle-reverse-logs-btn" class="btn btn-secondary btn-sm">Logs umkehren</button>
                         <button id="export-debug-logs-btn" class="btn btn-secondary btn-sm">Logs exportieren</button>
                         <button id="clear-debug-logs-btn" class="btn btn-secondary btn-sm">Logs löschen</button>
+                        <span id="toggle-fix-debug-logs-btn" class="debug-icon-btn" title="Fixieren">
+                            <svg class="lock-icon lock-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                            <svg class="lock-icon lock-closed hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </span>
                     </div>
                 </div>
                 <div class="debug-log-entries" id="debug-log-entries">
                     </div>
             </div>
         </div>
+        
+        {# NEU: User-Bereich am rechten Rand #}
+        <aside class="user-sidebar">
+            <div class="profile-summary">
+                <img src="/static/img/standard_profile_picture.png" alt="Profilbild" class="profile-pic" id="user-profile-pic">
+                <span class="username-display" id="user-profile-username">Gast</span>
+                {# NEU: Toggle-Button für User-Menü #}
+                <button id="toggle-user-menu-btn" class="user-menu-toggle-btn">
+                    <svg class="arrow-icon arrow-down" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <svg class="arrow-icon arrow-up hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                </button>
+            </div>
+            {# NEU: Wrapper für den Menü-Inhalt #}
+            <div id="user-nav-content" class="user-nav-content collapsed"> {# Startet eingeklappt #}
+                <nav class="user-nav">
+                    <a href="{{ url_for('dashboard') }}">Mein Profil</a> {# Aktuell nur zum Dashboard #}
+                    <a href="#">Profil bearbeiten</a>
+                    <a href="#">Freunde finden</a>
+                    <a href="#">Meine Freunde</a>
+                    <a href="#">Account Einstellungen</a>
+                    <a href="#">Privatsphäre und Sicherheit</a>
+                </nav>
+            </div>
+        </aside>
     </div>
     <div id="modal-container"></div>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>

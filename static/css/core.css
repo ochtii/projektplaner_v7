@@ -15,7 +15,7 @@ body {
     color: var(--text-color); 
     line-height: 1.6; 
 }
-/* transition auf body entfernen, da Theme-Wechsel jetzt sofort über JS erfolgt */
+/* transition auf body entfernen, da Theme-Wechsel jetzt sofort erfolgt */
 body { transition: color 0.3s; } /* Nur Textfarbe animieren, Hintergrund sofort */
 body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light Mode wieder alles animieren */
 
@@ -37,6 +37,121 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
 .sidebar-footer { margin-top: auto; font-size: 0.8rem; opacity: 0.7; }
 .main-content { flex-grow: 1; display: flex; flex-direction: column; }
 
+/* NEU: User-Sidebar am rechten Rand */
+.user-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background-color: var(--surface-color);
+    border-left: 1px solid var(--border-color);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.profile-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative; /* Für absolute Positionierung des Toggle-Buttons */
+    padding-bottom: 0.5rem; /* Platz für den Toggle-Button */
+    border-bottom: 1px solid var(--border-color); /* Trennlinie */
+    margin-bottom: 0.5rem; /* Abstand zum Menü-Inhalt */
+}
+
+.profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+    border: 2px solid var(--primary-color);
+}
+
+.username-display {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.user-nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-nav a {
+    display: block;
+    padding: 0.75rem 0;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.user-nav a:hover {
+    background-color: var(--background-color);
+}
+
+/* NEU: Styles für User-Menü Toggle */
+.user-menu-toggle-btn {
+    position: absolute;
+    bottom: -15px; /* Halb außerhalb des unteren Rands der Zusammenfassung */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+    z-index: 10;
+}
+
+.user-menu-toggle-btn:hover {
+    background-color: var(--background-color);
+    border-color: var(--primary-color);
+    transform: translateX(-50%) scale(1.1);
+}
+
+.user-menu-toggle-btn .arrow-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--text-color);
+    transition: transform 0.2s;
+}
+
+/* NEU: User-Menü Inhalt (ausklappbar) */
+.user-nav-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+    padding-top: 0; /* Standardmäßig kein Padding */
+}
+
+.user-nav-content.expanded {
+    max-height: 500px; /* Ausreichend Platz für die Links */
+    padding-top: 0.5rem; /* Padding, wenn ausgeklappt */
+}
+
+/* Regeln für Pfeil-Icons in User-Menü Toggle */
+.user-menu-toggle-btn .arrow-up {
+    display: none; /* Standardmäßig Pfeil nach oben verstecken */
+}
+/* Wenn das Menü expandiert ist, zeige den Pfeil nach oben und verstecke den nach unten */
+.user-nav-content.expanded ~ .profile-summary .user-menu-toggle-btn .arrow-down {
+    display: none;
+}
+.user-nav-content.expanded ~ .profile-summary .user-menu-toggle-btn .arrow-up {
+    display: block;
+}
+
+
 /* Moderner Header */
 .main-header { 
     display: flex; 
@@ -53,8 +168,8 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
     align-items: center;
     gap: 1rem;
     flex-grow: 1; /* Allows it to take available space */
-    flex-direction: row-reverse; /* NEU: Tauscht die Reihenfolge der Elemente */
-    justify-content: flex-end; /* NEU: Schiebt die Elemente nach rechts */
+    flex-direction: row-reverse; /* Tauscht die Reihenfolge der Elemente */
+    justify-content: flex-end; /* Schiebt die Elemente nach rechts */
 }
 
 .header-left h2 {
@@ -75,10 +190,9 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
     font-weight: 600;
 }
 
-/* NEU: Debug-Indikator (weiß, pulsierend) */
+/* Debug-Indikator (weiß, pulsierend) */
 .debug-indicator {
     font-size: 1.5rem; /* Größe des Käfersymbols */
-    /* margin-right: 1rem; Entfernt, da es jetzt im debug-menu ist */
     color: white; /* Weiß für Dark Mode */
     text-shadow: 0 0 5px rgba(255,255,255,0.5); /* Leichter weißer Schatten */
     animation: pulse-white 1.5s infinite; /* Leichte Puls-Animation */
@@ -115,7 +229,11 @@ body.light-mode .debug-indicator {
     font-size: 0.95rem;
 }
 
-main { padding: 2rem; flex-grow: 1; }
+/* Revert padding-right, as user-sidebar now fills the space */
+main { 
+    padding: 2rem; /* Padding ist jetzt gleichmäßig auf allen Seiten */
+    flex-grow: 1; 
+}
 
 /* Allgemeine Komponenten */
 .btn { padding: 0.6rem 1.2rem; border: 1px solid transparent; border-radius: var(--border-radius); cursor: pointer; font-weight: 500; transition: background-color 0.2s, transform 0.1s, border-color 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
@@ -126,7 +244,7 @@ main { padding: 2rem; flex-grow: 1; }
 .btn-secondary:hover { background-color: var(--background-color); }
 .btn-danger { background-color: #e74c3c; color: white; }
 .btn-danger:hover { background-color: #c0392b; }
-/* NEU: debug-icon-btn für Symbole im Debug-Header */
+/* debug-icon-btn für Symbole im Debug-Header */
 .debug-icon-btn {
     background: none;
     border: none;
@@ -153,7 +271,7 @@ main { padding: 2rem; flex-grow: 1; }
 
 .hidden { display: none !important; }
 
-/* NEU: Debug-Menü unter dem Header */
+/* Debug-Menü unter dem Header */
 .debug-menu {
     background-color: var(--surface-color);
     border-bottom: 1px solid var(--border-color);
@@ -168,22 +286,22 @@ main { padding: 2rem; flex-grow: 1; }
     z-index: 950; /* Über main-content, aber unter Modals */
     flex-shrink: 0; /* Verhindert Schrumpfen */
     position: relative; /* Für absolute Positionierung des Toggle-Buttons */
-    /* NEU: Für Ein-/Ausklapp-Animation */
+    /* Für Ein-/Ausklapp-Animation */
     max-height: 60px; /* Ausreichend für ausgeklappten Inhalt + Padding */
     overflow: hidden;
     transition: max-height 0.3s ease-in-out;
 }
 .debug-menu.collapsed {
-    max-height: 30px; /* NEU: Stärker einklappen, nur der obere Teil des Buttons ist sichtbar */
+    max-height: 30px; /* Stärker einklappen, nur der obere Teil des Buttons ist sichtbar */
     padding-bottom: 0; /* Padding entfernen, wenn eingeklappt */
 }
 
-.debug-menu-content { /* NEU: Wrapper für den Inhalt des Menüs */
+.debug-menu-content { /* Wrapper für den Inhalt des Menüs */
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    /* NEU: Für Ein-/Ausklapp-Animation des Inhalts */
+    /* Für Ein-/Ausklapp-Animation des Inhalts */
     opacity: 1;
     transition: opacity 0.2s ease-in-out;
 }
@@ -206,23 +324,24 @@ main { padding: 2rem; flex-grow: 1; }
     gap: 1rem;
 }
 
+/* Styles für Schiebeschalter im Debug-Menü (zusätzlich zu components.css) */
+.debug-control-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Abstand zwischen Label und Schalter */
+}
+
+.debug-control-item .control-label {
+    font-size: 0.85em; /* Etwas kleiner als Standardtext */
+    color: var(--text-color); /* Textfarbe vom Theme */
+    margin-right: 0.5rem; /* Abstand zwischen Label und Schalter selbst */
+    white-space: nowrap; /* Verhindert Zeilenumbruch des Labels */
+}
+
 .debug-log-filter {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-
-/* NEU: Stil für die neuen Filter-Buttons und Konsolen-Toggle-Button */
-.debug-log-filter .filter-btn,
-.debug-menu-right .toggle-btn { 
-    padding: 0.2rem 0.6rem; /* Kleineres Padding */
-    font-size: 0.8em; /* Kleinere Schrift */
-    border-radius: var(--border-radius);
-    background-color: var(--background-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; /* Transition für Hover */
 }
 
 /* Visuelle Rückmeldung für aktive Buttons */
@@ -231,7 +350,7 @@ main { padding: 2rem; flex-grow: 1; }
     background-color: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.5); /* Leichter Schatten, wenn aktiv */
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.5);
 }
 
 /* Hover-Effekt: Nur Rahmen und leichten Schatten ändern, Farbe nicht */
@@ -245,12 +364,12 @@ main { padding: 2rem; flex-grow: 1; }
 }
 
 
-/* NEU: Toggle Button für Debug-Konsole (zentriert und ausklappbar) */
+/* Toggle Button für Debug-Konsole (zentriert und ausklappbar) */
 .debug-menu-toggle-btn { /* ID geändert von toggle-debug-console-btn */
     position: absolute;
-    bottom: -15px; /* Halb außerhalb des Menüs */
+    top: -15px; /* Positioniert Button zur Hälfte über dem oberen Rand des Debug-Menüs */
     left: 50%;
-    transform: translateX(-50%); /* Horizontal zentrieren */
+    transform: translateX(-50%); /* Exakte horizontale Zentrierung */
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
     border-radius: 50%; /* Rund machen */
@@ -267,7 +386,7 @@ main { padding: 2rem; flex-grow: 1; }
 .debug-menu-toggle-btn:hover {
     background-color: var(--background-color);
     border-color: var(--primary-color);
-    transform: translateX(-50%) translateY(-2px); /* Leichter Hover-Effekt */
+    transform: translateX(-50%) scale(1.1); /* Leichter Hover-Effekt mit Skalierung */
 }
 
 .debug-menu-toggle-btn .arrow-icon {
@@ -277,7 +396,7 @@ main { padding: 2rem; flex-grow: 1; }
     transition: transform 0.2s;
 }
 
-/* NEU: Debug-Konsole */
+/* Debug-Konsole */
 .debug-console {
     background-color: var(--surface-color);
     border-top: 1px solid var(--border-color);
@@ -318,36 +437,19 @@ main { padding: 2rem; flex-grow: 1; }
     color: var(--text-color);
 }
 
-.debug-console .debug-controls { /* NEU: Für Buttons */
+.debug-console .debug-controls { /* Für Buttons */
     display: flex;
     gap: 0.5rem;
     align-items: center; /* Vertikale Zentrierung der Icons/Buttons */
+    flex-wrap: wrap; /* Ermöglicht Umbruch auf kleineren Bildschirmen */
+    justify-content: flex-end; /* Rechtsbündig ausrichten */
 }
 
-/* NEU: Spezifischer Stil für das Resize-Handle */
-.debug-console .resize-handle {
-    cursor: ns-resize; /* Mauszeiger für vertikale Größenänderung */
-    padding: 0.5rem; /* Etwas mehr Padding für bessere Klickbarkeit */
-    border-radius: var(--border-radius);
-    background-color: var(--background-color); /* Leichter Hintergrund */
-    position: absolute; /* Absolut positionieren */
-    left: 50%; /* Horizontal zentrieren */
-    transform: translateX(-50%); /* Exakte Zentrierung */
-    top: 50%; /* Vertikal zentrieren */
-    transform: translate(-50%, -50%); /* Exakte Zentrierung */
-    z-index: 1; /* Über anderen Elementen im Header */
-}
-.debug-console .resize-handle:hover {
-    background-color: var(--border-color);
-}
-
-/* NEU: Zentrierung und Größe des Pfeilsymbols */
-.debug-console .resize-handle svg {
-    width: 1.8em; /* Etwas größer machen */
-    height: 1.8em;
-    display: block; /* Stellt sicher, dass es ein Block-Element ist */
-    margin: 0 auto; /* Zentriert das SVG horizontal */
-}
+/* Spezifischer Stil für das Resize-Handle (jetzt nicht mehr als eigenes Element, sondern an Kante) */
+/* Die folgenden Regeln sind nun obsolet, da der Handle-Span entfernt wurde. */
+/* .debug-console .resize-handle { ... } */
+/* .debug-console .resize-handle:hover { ... } */
+/* .debug-console .resize-handle svg { ... } */
 
 
 .debug-console .debug-log-entry {
@@ -378,7 +480,7 @@ main { padding: 2rem; flex-grow: 1; }
     flex-shrink: 0;
 }
 
-.log-message { /* NEU: Globale Definition für Log-Nachrichten */
+.log-message { /* Globale Definition für Log-Nachrichten */
     flex-grow: 1; /* Nimmt den restlichen Platz ein */
 }
 
@@ -393,7 +495,7 @@ main { padding: 2rem; flex-grow: 1; }
     font-size: 0.7em;
 }
 
-/* NEU: Schloss-Icons */
+/* Schloss-Icons */
 .debug-icon-btn .lock-icon {
     display: none; /* Standardmäßig alle Icons ausblenden */
 }

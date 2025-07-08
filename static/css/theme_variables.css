@@ -29,3 +29,74 @@ body.light-mode {
     --task-bg-color: rgba(80, 227, 194, 0.08);
     --subtask-bg-color: rgba(255, 165, 0, 0.08);
 }
+
+/* Gangster Dev Mode Variablen (Überschreiben andere Themes) */
+body.hacker-mode {
+    --primary-color: #00ff00; /* Neon Grün */
+    --secondary-color: #00cc00; /* Dunkleres Grün */
+    --background-color: #000000; /* Schwarz */
+    --surface-color: #0a0a0a;    /* Sehr dunkles Grau */
+    --text-color: #00ff00;       /* Neon Grün Text */
+    --border-color: #008800;     /* Dunklerer grüner Rahmen */
+    --shadow: 0 0 15px rgba(0, 255, 0, 0.4); /* Grüner Glüh-Schatten */
+
+    /* Hintergrundbild und Eigenschaften */
+    background-image: url('../img/matrix_background.gif');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    
+    font-family: 'Press Start 2P', monospace; /* Hacker Schriftart */
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.6); /* Leichter Grüner Text-Schatten */
+}
+
+/* Optional: Semi-transparenter Overlay für bessere Lesbarkeit über dem GIF */
+body.hacker-mode::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparente schwarze Ebene */
+    z-index: -1; /* Hinter dem Inhalt, aber über dem Hintergrundbild */
+    pointer-events: none; /* Sorgt dafür, dass Klicks durchgehen */
+}
+
+/* Anpassungen für Elemente im Hacker-Modus, die vom Hintergrundbild beeinflusst werden könnten */
+body.hacker-mode .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.8); /* Etwas dunkler für Modals im Hacker-Modus */
+}
+body.hacker-mode .modal {
+    box-shadow: 0 10px 25px rgba(0, 255, 0, 0.3); /* Grüner Schatten für Modals */
+}
+
+/* NEU: Button-Kontrast im Hacker-Modus (angepasste Selektoren) */
+body.hacker-mode .debug-controls .btn-secondary, /* Alle btn-secondary in debug-controls */
+body.hacker-mode .debug-log-filter .filter-btn, /* Filter Buttons */
+body.hacker-mode .debug-menu-right .toggle-btn { /* Gangster Dev Mode & Konsole Schalter */
+    background-color: var(--surface-color); /* Dunkler als Hintergrund, aber sichtbar */
+    color: white; /* Textfarbe auf Weiß für bessere Lesbarkeit */
+    border-color: var(--border-color); /* Grüner Rahmen */
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.3); /* Leichter grüner Glüh-Effekt */
+}
+
+body.hacker-mode .debug-controls .btn-secondary:hover,
+body.hacker-mode .debug-log-filter .filter-btn:hover,
+body.hacker-mode .debug-menu-right .toggle-btn:hover {
+    background-color: #1a1a1a; /* Noch dunkler bei Hover */
+    border-color: var(--primary-color); /* Helle grüne Umrandung */
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.6); /* Stärkerer Glüh-Effekt bei Hover */
+}
+
+/* NEU: Aktive Buttons im Hacker-Modus (angepasste Selektoren) */
+body.hacker-mode .debug-controls .btn-secondary.active,
+body.hacker-mode .debug-log-filter .filter-btn.active,
+body.hacker-mode .debug-menu-right .toggle-btn.active {
+    background-color: var(--surface-color); /* Hintergrund bleibt dunkel (wie normaler Button) */
+    color: white; /* Textfarbe auf Weiß */
+    border: 2px solid var(--primary-color); /* Dickere grüne Umrandung */
+    box-shadow: 0 0 15px 5px rgba(0, 255, 0, 0.9); /* Starker, ausgeprägter Glüh-Effekt */
+    transform: scale(1.05); /* Leichte Vergrößerung */
+}

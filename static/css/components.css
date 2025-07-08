@@ -97,3 +97,17 @@ input:checked + .slider:before { transform: translateX(24px); }
     border-bottom-right-radius: var(--border-radius); margin-bottom: 0.5rem;
 }
 .info-card-content.open { max-height: 2000px; padding-top: 1rem; padding-bottom: 1.5rem; }
+
+/* NEU: Styles für Schiebeschalter im Debug-Menü */
+.debug-control-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Abstand zwischen Label und Schalter */
+}
+
+.debug-control-item .control-label {
+    font-size: 0.85em; /* Etwas kleiner als Standardtext */
+    color: var(--text-color); /* Textfarbe vom Theme */
+    margin-right: 0.5rem; /* Abstand zwischen Label und Schalter selbst */
+    white-space: nowrap; /* Verhindert Zeilenumbruch des Labels */
+}

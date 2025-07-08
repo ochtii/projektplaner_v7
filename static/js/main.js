@@ -33,6 +33,7 @@ const DEBUG_CONSOLE_REVERSE_ORDER_KEY = 'debugConsoleReverseOrder'; // NEU: Key 
 const DEBUG_CONSOLE_AUTO_SCROLL_KEY = 'debugConsoleAutoScroll'; // NEU: Key für Auto-Scroll
 const DEBUG_LOG_FILTER_KEY = 'debugLogFilter'; // NEU: Key für Log-Filter
 const DEBUG_MENU_HIDDEN_KEY = 'debugMenuHidden'; // NEU: Key für Menü-Sichtbarkeit
+const HACKER_MODE_KEY = 'hackerModeEnabled'; // NEU: Key für Gangster Dev Mode
 
 /**
  * Führt eine Debug-Log-Meldung aus, wenn der globale Debug-Modus aktiv
@@ -174,9 +175,9 @@ function loadDebugLogsFromLocalStorage() {
         // Automatisch nach unten/oben scrollen
         if (autoScrollEnabled) { // NEU: Nur scrollen, wenn Auto-Scroll aktiv
             if (reverseOrder) {
-                logEntriesContainer.scrollTop = 0;
+                logEntriesContainer.scrollTop = 0; // Nach oben scrollen
             } else {
-                logEntriesContainer.scrollTop = logEntriesContainer.scrollHeight;
+                logEntriesContainer.scrollTop = logEntriesContainer.scrollHeight; // Nach unten scrollen
             }
         }
     }
@@ -257,13 +258,12 @@ function exportDebugLogs() {
  */
 function initializeDebugConsoleResizing() {
     const debugConsole = document.getElementById('debug-console');
-    const resizeHandle = document.getElementById('resize-debug-logs-handle'); // NEU: Handle für Größenänderung
     const toggleFixBtn = document.getElementById('toggle-fix-debug-logs-btn');
     const exportLogsBtn = document.getElementById('export-debug-logs-btn');
     const clearLogsBtn = document.getElementById('clear-debug-logs-btn');
-    const toggleReverseLogsBtn = document.getElementById('toggle-reverse-logs-btn'); // NEU
-    const toggleAutoScrollBtn = document.getElementById('toggle-auto-scroll-btn'); // NEU
-
+    const toggleReverseLogsBtn = document.getElementById('toggle-reverse-logs-btn');
+    const toggleAutoScrollBtn = document.getElementById('toggle-auto-scroll-btn');
+    
 
     if (!debugConsole) {
         window.debugLog("DebugConsole: Debug-Konsole Element nicht gefunden.", 'WARN', 'DebugConsole');
@@ -271,153 +271,186 @@ function initializeDebugConsoleResizing() {
     }
 
     let isResizing = false;
-    let startY;
-    let startHeight;
-
-    // Lade gespeicherte Höhe und Fixierungsstatus
-    const savedHeight = localStorage.getItem(DEBUG_CONSOLE_HEIGHT_KEY);
-    let isFixed = localStorage.getItem(DEBUG_CONSOLE_FIXED_KEY) === 'true';
-    let reverseOrder = localStorage.getItem(DEBUG_CONSOLE_REVERSE_ORDER_KEY) === 'true'; // NEU
-    let autoScrollEnabled = localStorage.getItem(DEBUG_CONSOLE_AUTO_SCROLL_KEY) === 'true'; // NEU
-
-    // Setze Initialzustand basierend auf gespeicherten Werten
-    if (isFixed) {
-        debugConsole.classList.add('fixed');
-        if (savedHeight) {
-            debugConsole.style.setProperty('--fixed-debug-height', savedHeight); // Setze CSS-Variable
-            debugConsole.style.height = savedHeight;
-            debugConsole.style.maxHeight = 'none';
-        }
-        if (toggleFixBtn) toggleFixBtn.innerHTML = '<svg class="lock-icon lock-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
-        if (resizeHandle) resizeHandle.classList.add('hidden'); // Resize-Handle ausblenden, wenn fixiert
-    } else {
-        debugConsole.classList.remove('fixed');
-        // NEU: Höhe nicht zurücksetzen, wenn nicht fixiert, damit manuelle Größenänderung erhalten bleibt
-        if (savedHeight) { // Nur wenn eine Höhe gespeichert war, diese als Startwert setzen
-            debugConsole.style.height = savedHeight;
-            debugConsole.style.maxHeight = 'none'; // Muss 'none' sein, damit height wirkt
-        } else {
-            debugConsole.style.height = ''; // Oder Standard-CSS greifen lassen
-            debugConsole.style.maxHeight = '250px'; // Standard max-height wiederherstellen
-        }
-        if (toggleFixBtn) toggleFixBtn.innerHTML = '<svg class="lock-icon lock-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>';
-        if (resizeHandle) resizeHandle.classList.remove('hidden'); // Resize-Handle einblenden, wenn nicht fixiert
-    }
-
-    // NEU: Initialisiere Toggle-Button für umgekehrte Reihenfolge
-    if (toggleReverseLogsBtn) {
-        toggleReverseLogsBtn.textContent = reverseOrder ? 'Logs normal' : 'Logs umkehren';
-        toggleReverseLogsBtn.addEventListener('click', () => {
-            reverseOrder = !reverseOrder;
-            localStorage.setItem(DEBUG_CONSOLE_REVERSE_ORDER_KEY, reverseOrder);
-            toggleReverseLogsBtn.textContent = reverseOrder ? 'Logs normal' : 'Logs umkehren';
-            loadDebugLogsFromLocalStorage(); // Logs neu laden in umgekehrter Reihenfolge
-            window.debugLog(`DebugConsole: Log-Reihenfolge umgeschaltet zu ${reverseOrder ? 'umgekehrt' : 'normal'}.`, 'INFO', 'DebugConsole');
-        });
-    }
-
-    // NEU: Initialisiere Toggle-Button für Auto-Scroll
-    if (toggleAutoScrollBtn) {
-        toggleAutoScrollBtn.textContent = autoScrollEnabled ? 'Auto-Scroll: AN' : 'Auto-Scroll: AUS';
-        toggleAutoScrollBtn.addEventListener('click', () => {
-            autoScrollEnabled = !autoScrollEnabled;
-            localStorage.setItem(DEBUG_CONSOLE_AUTO_SCROLL_KEY, autoScrollEnabled);
-            toggleAutoScrollBtn.textContent = autoScrollEnabled ? 'Auto-Scroll: AN' : 'Auto-Scroll: AUS';
-            window.debugLog(`DebugConsole: Auto-Scroll umgeschaltet zu ${autoScrollEnabled ? 'AN' : 'AUS'}.`, 'INFO', 'DebugConsole');
-            // Bei Aktivierung sofort scrollen
-            if (autoScrollEnabled) {
-                const logEntriesContainer = document.getElementById('debug-log-entries');
-                if (logEntriesContainer) {
-                    const reverse = localStorage.getItem(DEBUG_CONSOLE_REVERSE_ORDER_KEY) === 'true';
-                    if (reverse) {
-                        logEntriesContainer.scrollTop = 0;
-                    } else {
-                        logEntriesContainer.scrollTop = logEntriesContainer.scrollHeight;
-                    }
-                }
-            }
-        });
-    }
-
-
-    // Event Listener für Größenänderung (Manuell durch Drag)
-    if (resizeHandle) { // Listener auf das Handle übertragen
-        resizeHandle.addEventListener('mousedown', (e) => {
+    let bottomY; // Speichert die initiale Y-Position des unteren Rands der Konsole
+    
+    // Event-Listener für das Starten der Größenänderung an der oberen Kante der Konsole
+    debugConsole.addEventListener('mousedown', (e) => {
+        // Nur Größenänderung auslösen, wenn nicht fixiert und Klick nahe der oberen Kante (z.B. 10px Toleranz)
+        if (!debugConsole.classList.contains('fixed') && e.clientY - debugConsole.getBoundingClientRect().top < 10) {
             e.preventDefault();
             isResizing = true;
-            startY = e.clientY;
-            startHeight = debugConsole.offsetHeight;
+            bottomY = debugConsole.getBoundingClientRect().bottom; // Untere Kante der Konsole festhalten
             debugConsole.style.transition = 'none'; // Übergänge während des Resizing deaktivieren
-            document.body.style.cursor = 'ns-resize'; // Mauszeiger ändern
-            window.debugLog("DebugConsole: Größenänderung gestartet.", 'INFO', 'DebugConsole');
-        });
-    }
+            document.body.style.cursor = 'ns-resize'; // Mauszeiger für den Body ändern
+            window.debugLog("DebugConsole: Größenänderung von oben gestartet.", 'INFO', 'DebugConsole');
+        }
+    });
 
+    // Event-Listener für das Bewegen der Maus während der Größenänderung
     document.addEventListener('mousemove', (e) => {
         if (!isResizing) return;
-        const newHeight = startHeight - (e.clientY - startY);
-        // Sicherstellen, dass die Höhe nicht unter min-height fällt
-        debugConsole.style.height = `${Math.max(newHeight, 50)}px`; // min-height von 50px
-        debugConsole.style.maxHeight = 'none'; // Deaktiviere max-height, wenn manuell geändert
+        const newHeight = bottomY - e.clientY; // Neue Höhe berechnen (ziehen von oben)
+        debugConsole.style.height = `${Math.max(newHeight, 50)}px`; // Mindesthöhe von 50px
+        debugConsole.style.maxHeight = 'none'; // max-height deaktivieren, wenn manuell geändert
         localStorage.setItem(DEBUG_CONSOLE_HEIGHT_KEY, debugConsole.style.height); // Höhe speichern
     });
 
+    // Event-Listener für das Beenden der Größenänderung
     document.addEventListener('mouseup', () => {
         if (isResizing) {
             isResizing = false;
             document.body.style.cursor = ''; // Mauszeiger zurücksetzen
-            window.debugLog("DebugConsole: Größenänderung beendet.", 'INFO', 'DebugConsole');
+            window.debugLog("DebugConsole: Größenänderung von oben beendet.", 'INFO', 'DebugConsole');
         }
     });
+
+    // Mauszeiger anpassen, wenn der Mauszeiger nahe der oberen Kante ist und nicht fixiert
+    debugConsole.addEventListener('mousemove', (e) => {
+        if (!isResizing && !debugConsole.classList.contains('fixed')) {
+            if (e.clientY - debugConsole.getBoundingClientRect().top < 10) { // Wenn nahe der oberen Kante
+                debugConsole.style.cursor = 'ns-resize';
+            } else {
+                debugConsole.style.cursor = ''; // Standard-Mauszeiger
+            }
+        } else if (debugConsole.classList.contains('fixed')) {
+            debugConsole.style.cursor = ''; // Standard-Mauszeiger, wenn fixiert
+        }
+    });
+    // WICHTIG: Kein expliziter mouseleave-Listener für debugConsole.
+    // Der mousemove-Listener auf debugConsole setzt den Cursor auf '' zurück, wenn nicht nahe der Kante.
+
 
     // Event Listener für Fixieren/Loslösen
     if (toggleFixBtn) {
         toggleFixBtn.addEventListener('click', () => {
-            isFixed = !isFixed; // Status umschalten
-            if (isFixed) {
-                // Fixieren
-                const currentHeight = debugConsole.offsetHeight; // Aktuelle Höhe fixieren
-                debugConsole.classList.add('fixed');
-                debugConsole.style.setProperty('--fixed-debug-height', `${currentHeight}px`); // Setze CSS-Variable
-                debugConsole.style.height = `${currentHeight}px`; // Aktuelle Höhe fixieren
-                debugConsole.style.maxHeight = 'none'; // max-height deaktivieren
-                toggleFixBtn.innerHTML = '<svg class="lock-icon lock-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
-                if (resizeHandle) resizeHandle.classList.add('hidden'); // Resize-Handle ausblenden
-                localStorage.setItem(DEBUG_CONSOLE_FIXED_KEY, 'true');
-                localStorage.setItem(DEBUG_CONSOLE_HEIGHT_KEY, `${currentHeight}px`); // Fixierte Höhe speichern
-                window.debugLog(`DebugConsole: Fixiert auf Höhe: ${currentHeight}px.`, 'INFO', 'DebugConsole');
-            } else {
-                // Fixierung aufheben
+            let isFixed = debugConsole.classList.contains('fixed'); // Aktuellen Zustand prüfen
+            if (isFixed) { // Wenn fixiert, Loslösen
                 debugConsole.classList.remove('fixed');
-                // NEU: Höhe beibehalten, wenn sie zuvor manuell gesetzt wurde
+                // Höhe beibehalten, wenn sie zuvor manuell gesetzt wurde, sonst Standard
                 const storedHeight = localStorage.getItem(DEBUG_CONSOLE_HEIGHT_KEY);
                 if (storedHeight) {
                     debugConsole.style.height = storedHeight;
-                    debugConsole.style.maxHeight = 'none'; // Muss 'none' sein, damit height wirkt
+                    debugConsole.style.maxHeight = 'none';
                 } else {
-                    debugConsole.style.height = ''; // Standard-CSS greifen lassen
-                    debugConsole.style.maxHeight = '250px'; // Standard max-height wiederherstellen
+                    debugConsole.style.height = ''; 
+                    debugConsole.style.maxHeight = '250px';
                 }
                 toggleFixBtn.innerHTML = '<svg class="lock-icon lock-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>';
-                if (resizeHandle) resizeHandle.classList.remove('hidden'); // Resize-Handle einblenden
                 localStorage.setItem(DEBUG_CONSOLE_FIXED_KEY, 'false');
-                // localStorage.removeItem(DEBUG_CONSOLE_HEIGHT_KEY); // Entfernen, da Höhe beibehalten wird
                 window.debugLog("DebugConsole: Fixierung aufgehoben. Höhe wird beibehalten oder Standard angewendet.", 'INFO', 'DebugConsole');
+            } else { // Wenn nicht fixiert, Fixieren
+                const currentHeight = debugConsole.offsetHeight; // Aktuelle Höhe fixieren
+                debugConsole.classList.add('fixed');
+                debugConsole.style.setProperty('--fixed-debug-height', `${currentHeight}px`);
+                debugConsole.style.height = `${currentHeight}px`;
+                debugConsole.style.maxHeight = 'none';
+                toggleFixBtn.innerHTML = '<svg class="lock-icon lock-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
+                localStorage.setItem(DEBUG_CONSOLE_FIXED_KEY, 'true');
+                localStorage.setItem(DEBUG_CONSOLE_HEIGHT_KEY, `${currentHeight}px`);
+                window.debugLog(`DebugConsole: Fixiert auf Höhe: ${currentHeight}px.`, 'INFO', 'DebugConsole');
             }
         });
     }
 
-    // Event Listener für Export-Button
+    // Event Listener für Export-Button (bleibt hier, da es keine Schalter sind)
     if (exportLogsBtn) {
         exportLogsBtn.addEventListener('click', exportDebugLogs);
     }
 
-    // Event Listener für Clear-Button (bereits in clearDebugLogs definiert)
+    // Event Listener für Clear-Button (bleibt hier)
     if (clearLogsBtn) {
         clearLogsBtn.addEventListener('click', clearDebugLogs);
     }
+    
+    // Event Listener für Auto-Scroll und Reverse Logs Buttons (bleiben hier)
+    if (toggleAutoScrollBtn) {
+        toggleAutoScrollBtn.addEventListener('click', () => {
+            let autoScrollEnabled = localStorage.getItem(DEBUG_CONSOLE_AUTO_SCROLL_KEY) === 'true';
+            autoScrollEnabled = !autoScrollEnabled;
+            localStorage.setItem(DEBUG_CONSOLE_AUTO_SCROLL_KEY, autoScrollEnabled);
+            toggleAutoScrollBtn.classList.toggle('active', autoScrollEnabled); // Visuellen Zustand aktualisieren
+            window.debugLog(`DebugConsole: Auto-Scroll umgeschaltet zu ${autoScrollEnabled ? 'AN' : 'AUS'}.`, 'INFO', 'DebugConsole');
+            if (autoScrollEnabled) {
+                const logEntriesContainer = document.getElementById('debug-log-entries');
+                if (logEntriesContainer) {
+                    const reverse = localStorage.getItem(DEBUG_CONSOLE_REVERSE_ORDER_KEY) === 'true';
+                    if (reverse) { logEntriesContainer.scrollTop = 0; } else { logEntriesContainer.scrollTop = logEntriesContainer.scrollHeight; }
+                }
+            }
+        });
+        // Initialen Zustand des Auto-Scroll-Buttons setzen
+        const initialAutoScrollEnabled = localStorage.getItem(DEBUG_CONSOLE_AUTO_SCROLL_KEY) === 'true';
+        toggleAutoScrollBtn.classList.toggle('active', initialAutoScrollEnabled);
+    }
+
+    if (toggleReverseLogsBtn) {
+        toggleReverseLogsBtn.addEventListener('click', () => {
+            let reverseOrder = localStorage.getItem(DEBUG_CONSOLE_REVERSE_ORDER_KEY) === 'true';
+            reverseOrder = !reverseOrder;
+            localStorage.setItem(DEBUG_CONSOLE_REVERSE_ORDER_KEY, reverseOrder);
+            toggleReverseLogsBtn.classList.toggle('active', reverseOrder); // Visuellen Zustand aktualisieren
+            loadDebugLogsFromLocalStorage(); // Logs neu laden in umgekehrter Reihenfolge
+            window.debugLog(`DebugConsole: Log-Reihenfolge umgeschaltet zu ${reverseOrder ? 'umgekehrt' : 'normal'}.`, 'INFO', 'DebugConsole');
+        });
+        // Initialen Zustand des Reverse-Logs-Buttons setzen
+        const initialReverseOrder = localStorage.getItem(DEBUG_CONSOLE_REVERSE_ORDER_KEY) === 'true';
+        toggleReverseLogsBtn.classList.toggle('active', initialReverseOrder);
+    }
 
     window.debugLog("DebugConsole: Größenänderungs- und Fixierungslogik initialisiert.", 'INFO', 'DebugConsole');
+}
+
+/**
+ * Schaltet den Gangster Dev Mode um (Hacker-Outfit).
+ */
+function toggleGangsterDevMode() {
+    // Referenz auf den Schalter direkt in der Funktion holen, falls nicht global verfügbar
+    const toggleGangsterDevModeSwitch = document.getElementById('toggle-gangster-dev-mode-switch');
+    // Überprüfen des *aktuellen* Zustands vor dem Toggle
+    const isHackerModeActive = document.body.classList.contains('hacker-mode');
+
+    if (isHackerModeActive) { // Wenn der Hacker-Modus momentan AN ist, schalten wir ihn AUS
+        document.body.classList.remove('hacker-mode'); // Entferne die Hacker-Modus Klasse
+        localStorage.setItem(HACKER_MODE_KEY, 'false'); // Speichere den Zustand als AUS
+        if (toggleGangsterDevModeSwitch) {
+            toggleGangsterDevModeSwitch.checked = false; // Schalter auf OFF setzen
+        }
+        window.debugLog("Gangster Dev Mode deaktiviert.", 'INFO', 'HackerMode');
+    } else { // Wenn der Hacker-Modus momentan AUS ist, schalten wir ihn AN
+        document.body.classList.add('hacker-mode'); // Füge die Hacker-Modus Klasse hinzu
+        localStorage.setItem(HACKER_MODE_KEY, 'true'); // Speichere den Zustand als AN
+        if (toggleGangsterDevModeSwitch) {
+            toggleGangsterDevModeSwitch.checked = true; // Schalter auf ON setzen
+        }
+        window.debugLog("Gangster Dev Mode aktiviert! Willkommen im Matrix.", 'INFO', 'HackerMode');
+    }
+    // Stellen Sie sicher, dass applyTheme das Standard-Theme korrekt setzt oder aktualisiert
+    // Dies ist wichtig, da hacker-mode andere Farbvariablen überschreibt
+    applyTheme(); 
+}
+
+/**
+ * Schaltet die Sichtbarkeit der Debug-Konsole um.
+ */
+function toggleDebugConsoleVisibility() {
+    const debugConsole = document.getElementById('debug-console');
+    const toggleDebugConsoleVisibilitySwitch = document.getElementById('toggle-debug-console-visibility-switch');
+
+    if (debugConsole && toggleDebugConsoleVisibilitySwitch) {
+        // Schalte die 'hidden'-Klasse um, bevor der Zustand überprüft wird
+        debugConsole.classList.toggle('hidden'); 
+        
+        // Hole den *neuen* Zustand der Konsole (nach dem Umschalten)
+        const isNowHidden = debugConsole.classList.contains('hidden');
+        
+        // Speichere den NEUEN Zustand der Sichtbarkeit
+        localStorage.setItem('debugConsoleHidden', isNowHidden.toString()); 
+        
+        // Setze den Schalter auf den NEUEN Zustand (checked wenn sichtbar, d.h., NICHT hidden)
+        toggleDebugConsoleVisibilitySwitch.checked = !isNowHidden; 
+
+        window.debugLog(`DebugConsole: Konsole ${isNowHidden ? 'ausgeblendet' : 'angezeigt'}.`, 'INFO', 'DebugConsole');
+    }
 }
 
 
@@ -552,29 +585,16 @@ const guestDb = {
         return { ok: true };
     },
     async getTemplates() { 
-        window.debugLog("GuestDB: Vorlagen-Anfrage (nicht unterstützt für Gäste).", 'INFO', 'GuestDB');
-        return []; 
+        window.debugLog("API: Rufe Vorlagen ab.", 'INFO', 'API_DB');
+        return (await fetch('/api/templates')).json(); 
     },
     async getTemplateContent(templateId) { 
-        window.debugLog(`GuestDB: Vorlageninhalt-Anfrage für '${templateId}' (nicht unterstützt für Gäste).`, 'WARN', 'GuestDB');
-        return { error: "Guests cannot access templates." }; 
+        window.debugLog(`API: Rufe Vorlageninhalt für '${templateId}' ab.`, 'INFO', 'API_DB');
+        return (await fetch(`/api/template/${templateId}`)).json(); 
     },
-    async getInitialProjectContent() {
-        window.debugLog("GuestDB: Initialer Projektinhalt für Gast abgerufen.", 'INFO', 'GuestDB');
-        return {
-            projectId: "bsp_guest",
-            projectName: "Beispielprojekt (Gast)",
-            phases: [
-                {
-                    phaseId: "phase01",
-                    phaseName: "Erste Schritte",
-                    isExpanded: true,
-                    tasks: [
-                        { taskId: "task01", taskName: "App erkunden", subtasks: [] }
-                    ]
-                }
-            ]
-        };
+    async getInitialProjectContent() { 
+        window.debugLog("API: Rufe initialen Projektinhalt ab.", 'INFO', 'API_DB');
+        return (await fetch('/api/initial-project')).json(); 
     }
 };
 
@@ -607,16 +627,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const debugConsole = document.getElementById('debug-console');
         const clearLogsBtn = document.getElementById('clear-debug-logs-btn');
         const debugIndicator = document.getElementById('debug-indicator');
-        const resizeHandle = document.getElementById('resize-debug-logs-handle'); // NEU
-        const toggleFixBtn = document.getElementById('toggle-fix-debug-logs-btn'); // NEU
-        const exportLogsBtn = document.getElementById('export-debug-logs-btn'); // NEU
-        const toggleReverseLogsBtn = document.getElementById('toggle-reverse-logs-btn'); // NEU
-        const toggleAutoScrollBtn = document.getElementById('toggle-auto-scroll-btn'); // NEU
-        const toggleDebugConsoleVisibilityBtn = document.getElementById('toggle-debug-console-visibility-btn'); // NEU
-        const toggleDebugMenuBtn = document.getElementById('toggle-debug-menu-btn'); // NEU
-        const debugMenu = document.getElementById('debug-menu'); // NEU
-        const logFilterButtons = document.querySelectorAll('.debug-log-filter .filter-btn'); // NEU
+        const toggleFixBtn = document.getElementById('toggle-fix-debug-logs-btn');
+        const exportLogsBtn = document.getElementById('export-debug-logs-btn');
+        const toggleReverseLogsBtn = document.getElementById('toggle-reverse-logs-btn');
+        const toggleAutoScrollBtn = document.getElementById('toggle-auto-scroll-btn');
+        
+        // Schiebeschalter Elemente
+        const toggleDebugConsoleVisibilitySwitch = document.getElementById('toggle-debug-console-visibility-switch');
+        const toggleGangsterDevModeSwitch = document.getElementById('toggle-gangster-dev-mode-switch');
 
+        const toggleDebugMenuBtn = document.getElementById('toggle-debug-menu-btn');
+        const debugMenu = document.getElementById('debug-menu');
+        const logFilterButtons = document.querySelectorAll('.debug-log-filter .filter-btn'); // WIEDERHERGESTELLT
+        
 
         if (window.globalSettings?.general_debug_mode && window.currentUser?.isAdmin) {
             // Debug-Menü und Konsole initialisieren und Sichtbarkeit steuern
@@ -642,20 +665,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (debugIndicator) debugIndicator.classList.remove('hidden'); // Bug-Symbol im Menü
             
             // Konsole initial versteckt/sichtbar basierend auf gespeichertem Zustand
-            if (debugConsole) {
-                const isConsoleHidden = localStorage.getItem('debugConsoleHidden') === 'true';
-                if (isConsoleHidden) {
-                    debugConsole.classList.add('hidden');
-                    if (toggleDebugConsoleVisibilityBtn) toggleDebugConsoleVisibilityBtn.classList.remove('active'); // Button-Status
+            if (debugConsole && toggleDebugConsoleVisibilitySwitch) {
+                // Wenn debugConsoleHidden nicht gesetzt ist, standardmäßig anzeigen
+                let isConsoleHidden = localStorage.getItem('debugConsoleHidden');
+                if (isConsoleHidden === null) {
+                    isConsoleHidden = false; // Standardmäßig sichtbar
+                    localStorage.setItem('debugConsoleHidden', 'false');
                 } else {
-                    debugConsole.classList.remove('hidden');
-                    if (toggleDebugConsoleVisibilityBtn) toggleDebugConsoleVisibilityBtn.classList.add('active'); // Button-Status
+                    isConsoleHidden = (isConsoleHidden === 'true');
                 }
+                
+                if (isConsoleHidden) { // Wenn es true ist (versteckt)
+                    debugConsole.classList.add('hidden');
+                    toggleDebugConsoleVisibilitySwitch.checked = false; // Schalter auf OFF
+                } else { // Wenn es false ist (sichtbar)
+                    debugConsole.classList.remove('hidden');
+                    toggleDebugConsoleVisibilitySwitch.checked = true; // Schalter auf ON
+                }
+                
+                // Event-Listener für den Konsole-Schalter
+                toggleDebugConsoleVisibilitySwitch.addEventListener('change', toggleDebugConsoleVisibility);
             }
 
             loadDebugLogsFromLocalStorage(); // Logs laden, wenn Debug-Modus aktiv
             
-            // Event Listener für Debug-Konsole Buttons
+            // Event Listener für Debug-Konsole Buttons (die keine Schalter sind)
             if (clearLogsBtn) {
                 clearLogsBtn.addEventListener('click', clearDebugLogs);
             }
@@ -664,19 +698,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             initializeDebugConsoleResizing(); // NEU: Initialisiere Größenänderungslogik
-
-            // NEU: Toggle Debug-Konsole Sichtbarkeit (im Debug-Menü)
-            if (toggleDebugConsoleVisibilityBtn) {
-                toggleDebugConsoleVisibilityBtn.addEventListener('click', () => {
-                    if (debugConsole) {
-                        const isHidden = debugConsole.classList.contains('hidden');
-                        debugConsole.classList.toggle('hidden');
-                        localStorage.setItem('debugConsoleHidden', isHidden); // Zustand speichern
-                        toggleDebugConsoleVisibilityBtn.classList.toggle('active', !isHidden); // Button-Status
-                        window.debugLog(`DebugConsole: Konsole ${isHidden ? 'ausgeblendet' : 'angezeigt'}.`, 'INFO', 'DebugConsole');
-                    }
-                });
-            }
 
             // NEU: Toggle Debug-Menü Button (der runde Pfeil)
             if (toggleDebugMenuBtn) {
@@ -697,7 +718,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
 
-            // NEU: Log-Filter Buttons initialisieren
+            // NEU: Log-Filter Buttons initialisieren (WIEDERHERGESTELLT)
             const savedFilters = JSON.parse(localStorage.getItem(DEBUG_LOG_FILTER_KEY) || '["INFO", "WARN", "ERROR"]');
             logFilterButtons.forEach(button => {
                 if (savedFilters.includes(button.dataset.logLevel)) {
@@ -706,7 +727,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     button.classList.remove('active');
                 }
                 button.addEventListener('click', () => {
-                    button.classList.toggle('active');
+                    button.classList.toggle('active'); // This toggles 'active' class
                     let currentFilters = Array.from(document.querySelectorAll('.debug-log-filter .filter-btn.active')).map(btn => btn.dataset.logLevel);
                     localStorage.setItem(DEBUG_LOG_FILTER_KEY, JSON.stringify(currentFilters));
                     loadDebugLogsFromLocalStorage(); // Logs mit neuem Filter neu laden
@@ -726,6 +747,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.removeItem(DEBUG_MENU_HIDDEN_KEY); // Menü-Status löschen
             localStorage.removeItem('debugConsoleHidden'); // Konsolen-Status löschen
             window.debugLog("main.js: Debug-Modus ist deaktiviert oder Benutzer ist kein Admin.", 'INFO', 'main.js');
+        }
+
+        // NEU: Initialisiere Gangster Dev Mode Schalter
+        if (toggleGangsterDevModeSwitch) {
+            const isHackerModeEnabledOnLoad = localStorage.getItem(HACKER_MODE_KEY) === 'true';
+            if (isHackerModeEnabledOnLoad) { // Hacker-Modus ist AN beim Laden
+                document.body.classList.add('hacker-mode');
+                toggleGangsterDevModeSwitch.checked = true; // Schalter auf ON
+                window.debugLog("main.js: Gangster Dev Mode beim Start aktiviert.", 'INFO', 'main.js');
+            } else { // Hacker-Modus ist AUS beim Laden
+                document.body.classList.remove('hacker-mode'); // Sicherstellen, dass Klasse entfernt ist
+                toggleGangsterDevModeSwitch.checked = false; // Schalter auf OFF
+            }
+            // Event-Listener für den Gangster-Modus-Schalter
+            toggleGangsterDevModeSwitch.addEventListener('change', toggleGangsterDevMode);
         }
 
 
@@ -840,7 +876,8 @@ function runPageSpecificSetup() {
                     const userSettings = await window.db.getSettings();
                     initializeThemeSwitcher(userSettings);
                     window.debugLog("main.js: Theme-Switcher initialisiert mit Benutzereinstellungen.", 'INFO', 'main.js', userSettings);
-                } catch (error) {
+                }
+                catch (error) {
                     console.error("Fehler beim Laden der Benutzereinstellungen für Theme-Switcher:", error);
                     window.debugLog("main.js: Fehler beim Laden der Benutzereinstellungen für Theme-Switcher.", 'ERROR', 'main.js', error);
                 }

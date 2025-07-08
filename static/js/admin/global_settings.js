@@ -30,7 +30,7 @@ export async function setupGlobalSettingsPage() {
     const loadSettings = async () => {
         window.debugLog("Admin_GlobalSettings: Lade globale Einstellungen.", 'INFO', 'Admin_GlobalSettings');
         try {
-            const settings = await fetch('/api/admin/global-settings').then(res => res.json());
+            const settings = await fetch('/api/global-settings').then(res => res.json());
             window.globalSettings = settings; // Globale Variable aktualisieren
             
             // Gast-Limits füllen
