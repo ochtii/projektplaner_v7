@@ -14,7 +14,7 @@ USERS = {
     "user": "test"
 }
 
-DATA_FILE = os.path.join('static', 'data', 'bsp.json')
+DATA_FILE = os.path.join('static', 'data', 'temp_data.json')
 TEMPLATES_DIR = os.path.join('static', 'data', 'templates')
 
 # Define the default state for the data file

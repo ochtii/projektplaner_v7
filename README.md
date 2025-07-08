@@ -61,7 +61,7 @@ Die Anwendung verwendet die folgende Ordnerstruktur:
 |   |   ├── main.js
 |   |   └── ui.js
 |   └── data/
-|       ├── bsp.json         # Datenbank-Datei (wird zur Laufzeit erstellt/gelesen)
+|       ├── temp_data.json   # Datenbank-Datei
 |       └── templates/       # Projekt-Vorlagen (*.json)
 |
 └── templates/               # HTML-Vorlagen für Flask
@@ -107,7 +107,7 @@ Führen Sie die folgenden beiden Befehle nacheinander in Ihrem Terminal aus.
           projektplaner_v7/static/css/style.css \
           projektplaner_v7/static/js/main.js \
           projektplaner_v7/static/js/ui.js \
-          projektplaner_v7/static/data/bsp.json \
+          projektplaner_v7/static/data/temp_data.json \
           projektplaner_v7/static/data/templates/software.json \
           projektplaner_v7/static/data/templates/marketing.json \
           projektplaner_v7/static/data/templates/event_planning.json \
@@ -131,7 +131,7 @@ Führen Sie die folgenden beiden Befehle nacheinander in PowerShell aus.
 
 2.  **Leere Dateien erstellen:**
     ```powershell
-    $files = "app.py", "README.md", "templates\base.html", "templates\dashboard.html", "templates\index.html", "templates\info.html", "templates\login.html", "templates\project_manager.html", "templates\project_overview.html", "templates\project_checklist.html", "templates\settings.html", "static\css\style.css", "static\js\main.js", "static\js\ui.js", "static\data\bsp.json", "static\data\templates\software.json", "static\data\templates\marketing.json", "static\data\templates\event_planning.json", "static\data\templates\book_writing.json"
+    $files = "app.py", "README.md", "templates\base.html", "templates\dashboard.html", "templates\index.html", "templates\info.html", "templates\login.html", "templates\project_manager.html", "templates\project_overview.html", "templates\project_checklist.html", "templates\settings.html", "static\css\style.css", "static\js\main.js", "static\js\ui.js", "static\data\temp_data.json", "static\data\templates\software.json", "static\data\templates\marketing.json", "static\data\templates\event_planning.json", "static\data\templates\book_writing.json"
     foreach ($file in $files) { New-Item -ItemType File -Path "projektplaner_v7\$file" }
     ```
 
@@ -151,7 +151,7 @@ Führen Sie die folgenden Befehle nacheinander in der Eingabeaufforderung aus.
 
 3.  **Leere Dateien erstellen:**
     ```cmd
-    type nul > app.py && type nul > README.md && type nul > templates\base.html && type nul > templates\dashboard.html && type nul > templates\index.html && type nul > templates\info.html && type nul > templates\login.html && type nul > templates\project_manager.html && type nul > templates\project_overview.html && type nul > templates\project_checklist.html && type nul > templates\settings.html && type nul > static\css\style.css && type nul > static\js\main.js && type nul > static\js\ui.js && type nul > static\data\bsp.json && type nul > static\data\templates\software.json && type nul > static\data\templates\marketing.json && type nul > static\data\templates\event_planning.json && type nul > static\data\templates\book_writing.json
+    type nul > app.py && type nul > README.md && type nul > templates\base.html && type nul > templates\dashboard.html && type nul > templates\index.html && type nul > templates\info.html && type nul > templates\login.html && type nul > templates\project_manager.html && type nul > templates\project_overview.html && type nul > templates\project_checklist.html && type nul > templates\settings.html && type nul > static\css\style.css && type nul > static\js\main.js && type nul > static\js\ui.js && type nul > static\data\temp_data.json && type nul > static\data\templates\software.json && type nul > static\data\templates\marketing.json && type nul > static\data\templates\event_planning.json && type nul > static\data\templates\book_writing.json
     ```
 
 **Methode C: Batch-Datei (.bat)**
@@ -182,7 +182,7 @@ type nul > templates\settings.html
 type nul > static\css\style.css
 type nul > static\js\main.js
 type nul > static\js\ui.js
-type nul > static\data\bsp.json
+type nul > static\data\temp_data.json
 type nul > static\data\templates\software.json
 type nul > static\data\templates\marketing.json
 type nul > static\data\templates\event_planning.json
@@ -209,23 +209,68 @@ pip install Flask
 
 ## 3. Anwendung starten
 
-Unabhängig von der Installationsmethode, führen Sie die Hauptanwendungsdatei aus dem `projektplaner_v7`-Verzeichnis aus. Der Befehl startet einen lokalen Webserver, der für die Entwicklung gedacht ist.
+Unabhängig von der Installationsmethode, führen Sie die Hauptanwendungsdatei aus dem `projektplaner_v7`-Verzeichnis aus.
 
-```bash
+### Für Windows
+
+**Methode A: Eingabeaufforderung (CMD)**
+```cmd
 python app.py
 ```
 
-Sie sollten eine Ausgabe sehen, die in etwa so aussieht. Die URL ist die Adresse, unter der Sie die Anwendung in Ihrem Browser aufrufen können.
+**Methode B: PowerShell**
+```powershell
+py app.py
+```
 
+### Für Linux / macOS
+
+**Methode A: Normaler Start**
+```bash
+python3 app.py
 ```
- * Running on [http://127.0.0.1:5000/](http://127.0.0.1:5000/) (Press CTRL+C to quit)
- * Restarting with stat
- * Debugger is active!
-```
+
+**Methode B: Start in einer Screen-Session (läuft im Hintergrund weiter)**
+
+1.  **Screen-Session starten:**
+    ```bash
+    screen -S projektplaner
+    ```
+2.  **Anwendung starten:**
+    ```bash
+    python3 app.py
+    ```
+3.  **Session verlassen (Anwendung läuft weiter):** Drücken Sie `Strg + A`, dann `D`.
+4.  **Zurück zur Session:**
+    ```bash
+    screen -r projektplaner
+    ```
+
+**Methode C: Start mit Docker (Fortgeschritten)**
+
+1.  **Dockerfile erstellen:** Erstellen Sie eine Datei namens `Dockerfile` im Hauptverzeichnis `projektplaner_v7` mit folgendem Inhalt:
+    ```Dockerfile
+    FROM python:3.9-slim
+    WORKDIR /app
+    COPY . .
+    RUN pip install Flask
+    EXPOSE 5000
+    CMD ["python", "app.py"]
+    ```
+2.  **Docker-Image bauen:**
+    ```bash
+    docker build -t projektplaner-app .
+    ```
+3.  **Docker-Container starten:**
+    ```bash
+    docker run -p 5000:5000 projektplaner-app
+    ```
+
+---
 
 ## 4. Anwendung nutzen
 
-Öffnen Sie einen Webbrowser und navigieren Sie zu der folgenden Adresse:
+Nachdem Sie den Server gestartet haben, öffnen Sie einen Webbrowser und navigieren Sie zu der folgenden Adresse:
 
 [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 

@@ -40,18 +40,30 @@
           {
             "subtasks": [
               {
+                "comments": [],
                 "subtaskId": "subtask1751925074445",
-                "subtaskName": "asdasd",
-                "comments": []
+                "subtaskName": "asdasd"
               },
               {
+                "comments": [],
                 "subtaskId": "subtask1751925078614",
-                "subtaskName": "asdasd",
-                "comments": []
+                "subtaskName": "asdasd"
               }
             ],
             "taskId": "task_1_1",
-            "taskName": "Thema und Genre festlegen"
+            "taskName": "Thema und Genre festlegen",
+            "comments": [
+              {
+                "author": "Benutzer",
+                "text": "dsfsdf",
+                "timestamp": "1751938170610"
+              },
+              {
+                "author": "Benutzer",
+                "text": "sdfsdf",
+                "timestamp": "1751938174783"
+              }
+            ]
           },
           {
             "subtasks": [],
@@ -64,21 +76,21 @@
             "taskName": "Recherche durchführen"
           },
           {
-            "taskId": "task1751925086558",
-            "taskName": "qwedsc",
             "comments": [],
             "subtasks": [
               {
+                "comments": [],
                 "subtaskId": "subtask1751925095856",
-                "subtaskName": "1",
-                "comments": []
+                "subtaskName": "1"
               },
               {
+                "comments": [],
                 "subtaskId": "subtask1751925099942",
-                "subtaskName": "2",
-                "comments": []
+                "subtaskName": "2"
               }
-            ]
+            ],
+            "taskId": "task1751925086558",
+            "taskName": "qwedsc"
           }
         ]
       },
