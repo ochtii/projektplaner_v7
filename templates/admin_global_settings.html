@@ -4,9 +4,56 @@
 <div class="page-header">
     <h2>Globale Einstellungen</h2>
 </div>
-<div id="global-settings-form-container" class="info-card">
-    <div class="info-card-content open" style="max-height: none; padding-top: 1rem;">
-        <p>Lade Einstellungen...</p>
+<div id="global-settings-form-container" class="settings-container">
+    <div class="settings-card">
+        <form id="global-settings-form">
+            <h3>Gast-Limits</h3>
+            <div class="form-group">
+                <label for="guest-projects">Max. Projekte</label>
+                <input type="number" id="guest-projects" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="guest-phases">Max. Phasen / Projekt</label>
+                <input type="number" id="guest-phases" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="guest-tasks">Max. Aufgaben / Phase</label>
+                <input type="number" id="guest-tasks" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="guest-subtasks">Max. Subtasks / Aufgabe</label>
+                <input type="number" id="guest-subtasks" class="form-control">
+            </div>
+        </form>
+    </div>
+    <div class="settings-card">
+        <form id="system-settings-form">
+            <h3>Systemeinstellungen</h3>
+            <div class="form-group-checkbox">
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="registration-enabled">
+                    <span class="checkmark"></span>
+                    <span>Registrierung erlauben</span>
+                </label>
+            </div>
+            <div class="form-group-checkbox">
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="maintenance-mode">
+                    <span class="checkmark"></span>
+                    <span>Wartungsmodus aktivieren</span>
+                </label>
+            </div>
+            <div class="form-group-checkbox">
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="debug-mode">
+                    <span class="checkmark"></span>
+                    <span>Allgemeinen Debug-Modus aktivieren</span>
+                </label>
+            </div>
+        </form>
+    </div>
+    <div class="settings-card" style="grid-column: 1 / -1;">
+        <button id="save-global-settings-btn" class="btn btn-primary">Einstellungen speichern</button>
     </div>
 </div>
 {% endblock %}
