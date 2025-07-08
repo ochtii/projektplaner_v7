@@ -1,0 +1,234 @@
+{
+  "name": "projektplaner_v7",
+  "type": "project_root",
+  "children": [
+    {
+      "path": "README.md",
+      "type": "file"
+    },
+    {
+      "path": "app.py",
+      "type": "file"
+    },
+    {
+      "path": "check_structure.py",
+      "type": "file"
+    },
+    {
+      "path": "static",
+      "type": "directory",
+      "children": [
+        {
+          "path": "static/css",
+          "type": "directory",
+          "children": [
+            {
+              "path": "static/css/style.css",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "path": "static/data",
+          "type": "directory",
+          "children": [
+            {
+              "path": "static/data/temp_data.json",
+              "type": "file"
+            },
+            {
+              "path": "static/data/templates",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/data/templates/book_writing.json",
+                  "type": "file"
+                },
+                {
+                  "path": "static/data/templates/bsp.json",
+                  "type": "file"
+                },
+                {
+                  "path": "static/data/templates/event_planning.json",
+                  "type": "file"
+                },
+                {
+                  "path": "static/data/templates/marketing.json",
+                  "type": "file"
+                },
+                {
+                  "path": "static/data/templates/software.json",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "path": "static/data/user_data",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/data/user_data/3b52c4c3-9dbf-4275-940d-84afc4c0bac9",
+                  "type": "directory",
+                  "children": [
+                    {
+                      "path": "static/data/user_data/3b52c4c3-9dbf-4275-940d-84afc4c0bac9/logs.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/3b52c4c3-9dbf-4275-940d-84afc4c0bac9/projects.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/3b52c4c3-9dbf-4275-940d-84afc4c0bac9/settings.json",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "path": "static/data/user_data/7ab8a6e7-1e86-4728-b527-422d22095835",
+                  "type": "directory",
+                  "children": [
+                    {
+                      "path": "static/data/user_data/7ab8a6e7-1e86-4728-b527-422d22095835/logs.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/7ab8a6e7-1e86-4728-b527-422d22095835/projects.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/7ab8a6e7-1e86-4728-b527-422d22095835/settings.json",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                  "type": "directory",
+                  "children": [
+                    {
+                      "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/logs.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/projects.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/settings.json",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "path": "static/data/user_data/c334a2a1-6d71-4c67-ab13-f0426d3b2087",
+                  "type": "directory",
+                  "children": [
+                    {
+                      "path": "static/data/user_data/c334a2a1-6d71-4c67-ab13-f0426d3b2087/logs.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/c334a2a1-6d71-4c67-ab13-f0426d3b2087/projects.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/c334a2a1-6d71-4c67-ab13-f0426d3b2087/settings.json",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210",
+                  "type": "directory",
+                  "children": [
+                    {
+                      "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/logs.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/projects.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/settings.json",
+                      "type": "file"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "path": "static/data/users.json",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "path": "static/js",
+          "type": "directory",
+          "children": [
+            {
+              "path": "static/js/main.js",
+              "type": "file"
+            },
+            {
+              "path": "static/js/ui.js",
+              "type": "file"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "templates",
+      "type": "directory",
+      "children": [
+        {
+          "path": "templates/agb.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/base.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/dashboard.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/index.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/info.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/login.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/project_checklist.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/project_manager.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/project_overview.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/register.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/settings.html",
+          "type": "file"
+        }
+      ]
+    }
+  ]
+}

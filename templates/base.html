@@ -44,7 +44,18 @@
                 </div>
                 <div id="header-actions" class="header-actions"></div>
             </header>
-            <main>{% block content %}{% endblock %}</main>
+            <main>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages-container">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </main>
         </div>
     </div>
     <div class="mobile-nav" id="mobileNav"><button class="close-btn" id="closeMobileNav">&times;</button><nav></nav></div>

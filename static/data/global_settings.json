@@ -1,0 +1,8 @@
+{
+  "guest_limits": {
+    "projects": 3,
+    "phases_per_project": 5,
+    "tasks_per_phase": 10,
+    "subtasks_per_task": 10
+  }
+}

@@ -1,24 +1,10 @@
-<!-- templates/project_checklist.html -->
 {% extends "base.html" %}
 {% block title %}Projekt Checkliste{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2 id="projectName">Wird geladen...</h2>
-    <a href="#" id="go-to-editor-btn" class="btn btn-primary hidden">&#9998; Zum Editor</a>
+    <h2 id="page-main-title">Projekt Checkliste</h2>
 </div>
-<div id="checklist-progress-container" class="progress-bar-container large">
-    <div class="progress-bar-label">
-        <span>Gesamtfortschritt</span>
-        <span id="progress-percentage">0%</span>
-    </div>
-    <div class="progress-bar">
-        <div class="progress" id="progress-bar-fill" style="width: 0%;"></div>
-    </div>
-</div>
-<div id="checklist-container" class="checklist-container">
+<div id="checklist-container">
     <p>Lade Checkliste...</p>
-</div>
-<div class="checklist-actions">
-    <button id="save-checklist-btn" class="btn btn-primary">Änderungen speichern</button>
 </div>
 {% endblock %}

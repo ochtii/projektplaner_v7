@@ -2,12 +2,15 @@
 {% extends "base.html" %}
 {% block title %}Willkommen{% endblock %}
 {% block content %}
-<div class="hero-section">
-    <h2 id="welcome-title">Willkommen beim Projektplaner</h2>
-    <p id="welcome-subtitle">Organisieren Sie Ihre Projekte einfach und effizient. Von der ersten Idee bis zum Abschluss.</p>
-    <div class="cta-buttons" id="welcome-buttons">
-        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Als Gast fortfahren</a>
+<div class="hero-section" style="text-align: center; padding: 4rem 1rem;">
+    <h2 id="welcome-title" style="font-size: 2.5rem; margin-bottom: 1rem;">Willkommen beim Projektplaner</h2>
+    <p id="welcome-subtitle" style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem auto;">
+        Organisieren Sie Ihre Projekte einfach und effizient. Von der ersten Idee bis zum Abschluss.
+    </p>
+    <div class="cta-buttons" id="welcome-buttons" style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('register_route') }}" class="btn btn-primary">Jetzt kostenlos registrieren</a>
         <a href="{{ url_for('login_route') }}" class="btn btn-secondary">Anmelden</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Als Gast fortfahren</a>
     </div>
 </div>
 {% endblock %}
