@@ -81,6 +81,7 @@ Die Anwendung verwendet die folgende Ordnerstruktur:
 Wählen Sie die passende Anleitung für Ihr Betriebssystem.
 
 ---
+
 ##### **Für Linux (Ubuntu, Debian, etc.) oder macOS**
 
 Führen Sie die folgenden beiden Befehle nacheinander in Ihrem Terminal aus.
@@ -89,6 +90,7 @@ Führen Sie die folgenden beiden Befehle nacheinander in Ihrem Terminal aus.
     ```bash
     mkdir -p projektplaner_v7/templates projektplaner_v7/static/css projektplaner_v7/static/js projektplaner_v7/static/data/templates
     ```
+
 2.  **Leere Dateien erstellen:**
     ```bash
     touch projektplaner_v7/app.py \
@@ -113,9 +115,10 @@ Führen Sie die folgenden beiden Befehle nacheinander in Ihrem Terminal aus.
     ```
 
 ---
+
 ##### **Für Windows**
 
-Wählen Sie **eine** der folgenden Methoden (PowerShell oder Batch-Datei).
+Wählen Sie **eine** der folgenden Methoden: PowerShell, Eingabeaufforderung (CMD) oder eine Batch-Datei.
 
 **Methode A: PowerShell**
 
@@ -125,13 +128,33 @@ Führen Sie die folgenden beiden Befehle nacheinander in PowerShell aus.
     ```powershell
     mkdir projektplaner_v7\templates, projektplaner_v7\static\css, projektplaner_v7\static\js, projektplaner_v7\static\data\templates
     ```
+
 2.  **Leere Dateien erstellen:**
     ```powershell
     $files = "app.py", "README.md", "templates\base.html", "templates\dashboard.html", "templates\index.html", "templates\info.html", "templates\login.html", "templates\project_manager.html", "templates\project_overview.html", "templates\project_checklist.html", "templates\settings.html", "static\css\style.css", "static\js\main.js", "static\js\ui.js", "static\data\bsp.json", "static\data\templates\software.json", "static\data\templates\marketing.json", "static\data\templates\event_planning.json", "static\data\templates\book_writing.json"
     foreach ($file in $files) { New-Item -ItemType File -Path "projektplaner_v7\$file" }
     ```
 
-**Methode B: Batch-Datei (.bat)**
+**Methode B: Eingabeaufforderung (CMD)**
+
+Führen Sie die folgenden Befehle nacheinander in der Eingabeaufforderung aus.
+
+1.  **Hauptordner erstellen und hineinwechseln:**
+    ```cmd
+    mkdir projektplaner_v7 && cd projektplaner_v7
+    ```
+
+2.  **Unterordner erstellen:**
+    ```cmd
+    mkdir templates static\css static\js static\data\templates
+    ```
+
+3.  **Leere Dateien erstellen:**
+    ```cmd
+    type nul > app.py && type nul > README.md && type nul > templates\base.html && type nul > templates\dashboard.html && type nul > templates\index.html && type nul > templates\info.html && type nul > templates\login.html && type nul > templates\project_manager.html && type nul > templates\project_overview.html && type nul > templates\project_checklist.html && type nul > templates\settings.html && type nul > static\css\style.css && type nul > static\js\main.js && type nul > static\js\ui.js && type nul > static\data\bsp.json && type nul > static\data\templates\software.json && type nul > static\data\templates\marketing.json && type nul > static\data\templates\event_planning.json && type nul > static\data\templates\book_writing.json
+    ```
+
+**Methode C: Batch-Datei (.bat)**
 
 Erstellen Sie eine Datei mit dem Namen `projektplaner_v7_install.bat` und fügen Sie den folgenden Code ein. Führen Sie die Datei anschließend per Doppelklick aus.
 
