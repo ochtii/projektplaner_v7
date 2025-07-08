@@ -24,7 +24,6 @@
                         <a href="#" id="current-project-checklist-link">Checkliste</a>
                     </div>
                 </div>
-
                 <div class="info-menu">
                     <div class="submenu-toggle"><span>Info & Hilfe</span><span class="arrow">&#9662;</span></div>
                     <div class="submenu">
@@ -36,7 +35,6 @@
                 </div>
                 <a href="{{ url_for('settings') }}">Einstellungen</a>
 
-                <!-- Admin Menü (wird per JS ein- oder ausgeblendet) -->
                 <div id="admin-menu" class="hidden">
                      <div class="submenu-toggle"><span>Admin</span><span class="arrow">&#9662;</span></div>
                      <div class="submenu">
@@ -50,7 +48,6 @@
         </aside>
         <div class="main-content">
             <header class="main-header">
-                <!-- Header-Inhalt -->
                 <div id="header-actions" class="header-actions"></div>
             </header>
             <main>
@@ -68,6 +65,7 @@
         </div>
     </div>
     <div id="modal-container"></div>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

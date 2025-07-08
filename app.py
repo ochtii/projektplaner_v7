@@ -149,6 +149,18 @@ def dashboard():
 def project_manager(project_id):
     return render_template('project_manager.html', project_id=project_id)
 
+# +++ NEUE ROUTE +++
+@app.route('/project-overview/<project_id>')
+@login_required
+def project_overview(project_id):
+    return render_template('project_overview.html', project_id=project_id)
+
+# +++ NEUE ROUTE +++
+@app.route('/project-checklist/<project_id>')
+@login_required
+def project_checklist(project_id):
+    return render_template('project_checklist.html', project_id=project_id)
+
 @app.route('/settings')
 @login_required
 def settings():

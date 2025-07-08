@@ -151,3 +151,96 @@ function renderProjectTree(projectData, container) {
         container.appendChild(phaseLi);
     });
 }
+
+// =================================================================
+// MODALS and other UI components
+// =================================================================
+function showInfoModal(title, message, onOk) {
+    const container = document.getElementById('modal-container');
+    container.innerHTML = `
+        <div class="modal-backdrop visible">
+            <div class="modal">
+                <div class="modal-header"><h3>${title}</h3><button class="modal-close-btn">&times;</button></div>
+                <div class="modal-body">${message}</div>
+                <div class="modal-footer"><button type="button" class="btn btn-primary modal-ok-btn">OK</button></div>
+            </div>
+        </div>`;
+    const backdrop = container.querySelector('.modal-backdrop');
+    const closeModal = () => {
+        backdrop.classList.remove('visible');
+        setTimeout(() => { container.innerHTML = ''; if(onOk) onOk(); }, 300);
+    };
+    container.querySelector('.modal-ok-btn').addEventListener('click', closeModal);
+    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
+}
+
+function showConfirmationModal(title, message, onConfirm) {
+    const container = document.getElementById('modal-container');
+    container.innerHTML = `
+        <div class="modal-backdrop visible">
+            <div class="modal">
+                <div class="modal-header"><h3>${title}</h3><button class="modal-close-btn">&times;</button></div>
+                <div class="modal-body"><p>${message}</p></div>
+                <div class="modal-footer"><button type="button" class="btn modal-cancel-btn">Abbrechen</button><button type="button" class="btn btn-danger modal-confirm-btn">Bestätigen</button></div>
+            </div>
+        </div>`;
+    const backdrop = container.querySelector('.modal-backdrop');
+    const closeModal = () => { backdrop.classList.remove('visible'); setTimeout(() => container.innerHTML = '', 300); };
+    container.querySelector('.modal-confirm-btn').addEventListener('click', () => { onConfirm(); closeModal(); });
+    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
+    container.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
+}
+
+function showUserEditModal(username, email, isAdmin, callback) {
+    const container = document.getElementById('modal-container');
+    container.innerHTML = `
+        <div class="modal-backdrop visible">
+            <div class="modal">
+                <div class="modal-header"><h3>Benutzer bearbeiten</h3><button class="modal-close-btn">&times;</button></div>
+                <form id="user-edit-form">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="edit-username">Benutzername</label>
+                            <input type="text" id="edit-username" class="form-control" value="${username}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-email">E-Mail</label>
+                            <input type="email" id="edit-email" class="form-control" value="${email}" required>
+                        </div>
+                        <div class="form-group-checkbox">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="edit-is-admin" ${isAdmin ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                                <span>Ist Administrator</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn modal-cancel-btn">Abbrechen</button>
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                    </div>
+                </form>
+            </div>
+        </div>`;
+    
+    const backdrop = container.querySelector('.modal-backdrop');
+    const form = document.getElementById('user-edit-form');
+    const closeModal = () => { backdrop.classList.remove('visible'); setTimeout(() => container.innerHTML = '', 300); };
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newUsername = document.getElementById('edit-username').value.trim();
+        const newEmail = document.getElementById('edit-email').value.trim();
+        const newIsAdmin = document.getElementById('edit-is-admin').checked;
+        if (newUsername && newEmail) {
+            callback(newUsername, newEmail, newIsAdmin);
+            closeModal();
+        }
+    });
+
+    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
+    container.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
+}

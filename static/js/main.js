@@ -28,7 +28,7 @@ const apiDb = {
 const guestDb = {
     _getProjects() { try { return JSON.parse(localStorage.getItem('guestProjects') || '{}'); } catch (e) { return {}; } },
     _saveProjects(p) { localStorage.setItem('guestProjects', JSON.stringify(p)); },
-    async getProjects() { 
+    async getProjects() {
         const projects = this._getProjects();
         return Object.values(projects).map(p => ({ ...p, id: p.projectId, name: p.projectName, progress: this._calculateProgress(p) }));
     },
@@ -67,7 +67,7 @@ const guestDb = {
         return total > 0 ? Math.round((completed / total) * 100) : 0;
     },
     async getSettings() { return { theme: localStorage.getItem('theme') || 'light' }; },
-    async saveSettings(s) { 
+    async saveSettings(s) {
         localStorage.setItem('theme', s.theme);
         return { ok: true };
     },
@@ -86,17 +86,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             fetch('/api/session').then(res => res.json()),
             fetch('/api/global-settings').then(res => res.json())
         ]);
-        
+
         currentUser = session;
         globalSettings = settings;
         db = session.is_guest ? guestDb : apiDb;
 
         const publicPages = ['/', '/login', '/register', '/info', '/agb'];
-        if (!session.logged_in && !session.is_guest && !publicPages.includes(window.location.pathname)) {
+        const path = window.location.pathname;
+        if (!session.logged_in && !session.is_guest && !publicPages.some(p => path.startsWith(p))) {
             window.location.href = '/login';
             return;
         }
-        
+
         await applyTheme();
         runPageSpecificSetup();
 
@@ -109,8 +110,7 @@ async function applyTheme() {
     const settings = await db.getSettings();
     const isDark = settings.theme === 'dark';
     document.body.classList.toggle('dark-mode', isDark);
-    
-    // Update checkbox on settings page if it exists
+
     const themeSwitcher = document.getElementById('themeSwitcher');
     if (themeSwitcher) {
         themeSwitcher.checked = isDark;
@@ -121,9 +121,13 @@ async function applyTheme() {
 function runPageSpecificSetup() {
     setupGlobalUI(currentUser);
     const path = window.location.pathname;
-    if (path.startsWith('/project/')) {
-        const projectId = path.split('/')[2];
-        setupProjectManagerPage(projectId);
+    
+    // Prüfen, ob wir uns auf einer Projektseite befinden
+    const projectPageMatch = path.match(/^\/project(?:-overview|-checklist)?\/([a-zA-Z0-9_]+)/);
+
+    if (projectPageMatch) {
+        const projectId = projectPageMatch[1];
+        setupProjectPages(projectId, path);
     } else if (path.startsWith('/dashboard')) {
         setupDashboardPage();
     } else if (path.startsWith('/settings')) {
@@ -152,8 +156,19 @@ function setupGlobalUI(session) {
     document.querySelectorAll('.main-nav .submenu-toggle').forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             e.preventDefault();
-            toggle.classList.toggle('open');
-            toggle.nextElementSibling.classList.toggle('open');
+            const submenu = toggle.nextElementSibling;
+            if (submenu.classList.contains('open')) {
+                submenu.classList.remove('open');
+                toggle.classList.remove('open');
+            } else {
+                // Optional: Andere offene Menüs schließen
+                document.querySelectorAll('.main-nav .submenu.open').forEach(openSubmenu => {
+                    openSubmenu.classList.remove('open');
+                    openSubmenu.previousElementSibling.classList.remove('open');
+                });
+                submenu.classList.add('open');
+                toggle.classList.add('open');
+            }
         });
     });
     if (session.isAdmin) {
@@ -162,22 +177,50 @@ function setupGlobalUI(session) {
     }
 }
 
+// NEU: Bündelt das Setup für alle Projektseiten
+async function setupProjectPages(projectId, currentPath) {
+    currentProjectId = projectId;
+    const projectMenu = document.getElementById('current-project-menu');
+
+    // Menü anzeigen und Links setzen
+    if (projectMenu) {
+        projectMenu.classList.remove('hidden');
+        document.getElementById('current-project-overview-link').href = `/project-overview/${projectId}`;
+        document.getElementById('current-project-editor-link').href = `/project/${projectId}`;
+        document.getElementById('current-project-checklist-link').href = `/project-checklist/${projectId}`;
+        
+        // Menü standardmäßig öffnen
+        projectMenu.querySelector('.submenu-toggle').classList.add('open');
+        projectMenu.querySelector('.submenu').classList.add('open');
+    }
+
+    // Seitenspezifische Logik ausführen
+    if (currentPath.startsWith('/project/')) {
+        await setupProjectManagerPage();
+    }
+    // Hier könnten später die Setups für overview und checklist hin
+}
+
 async function setupDashboardPage() {
     document.getElementById('create-project-btn')?.addEventListener('click', createNewProject);
     renderProjectGrid();
 }
 
-async function setupProjectManagerPage(projectId) {
-    currentProjectId = projectId;
-    await loadProjectData(projectId);
-    document.getElementById('add-phase-btn')?.addEventListener('click', () => addNewItem(null, 'Phase'));
+async function setupProjectManagerPage() {
+    const projectData = await db.getProject(currentProjectId);
+    if (projectData) {
+        currentProjectData = projectData;
+        document.getElementById('page-main-title').textContent = `Projekt: ${projectData.projectName}`;
+        renderProjectTree(currentProjectData, document.getElementById('projectTree'));
+    }
+    document.getElementById('add-phase-btn')?.addEventListener('click', () => addNewItem('phase'));
     document.getElementById('delete-project-btn')?.addEventListener('click', deleteCurrentProject);
 }
+
 
 async function setupSettingsPage() {
     const themeSwitcher = document.getElementById('themeSwitcher');
     if (themeSwitcher) {
-        // Theme is already applied in applyTheme()
         themeSwitcher.addEventListener('change', async () => {
             const newTheme = themeSwitcher.checked ? 'dark' : 'light';
             document.body.classList.toggle('dark-mode', themeSwitcher.checked);
@@ -188,10 +231,10 @@ async function setupSettingsPage() {
     const deleteAppDataBtn = document.getElementById('delete-app-data-btn');
     if (deleteAppDataBtn) {
         deleteAppDataBtn.addEventListener('click', () => {
-            const message = currentUser.is_guest 
+            const message = currentUser.is_guest
                 ? 'Möchten Sie wirklich alle Ihre im Browser gespeicherten Projekte löschen?'
                 : 'Möchten Sie wirklich alle Ihre Projekte und Einstellungen auf dem Server unwiderruflich löschen?';
-            
+
             showConfirmationModal('Alle Daten löschen?', message, async () => {
                 await db.resetAllData();
                 showInfoModal('Erfolg', 'Alle Ihre Daten wurden gelöscht.', () => {
@@ -202,9 +245,83 @@ async function setupSettingsPage() {
     }
 }
 
-
 function setupInfoPage() {
     // Logic for info page if any
+}
+
+// =================================================================
+// PROJECT HANDLING
+// =================================================================
+async function renderProjectGrid() {
+    const grid = document.getElementById('project-grid');
+    if (!grid) return;
+    grid.innerHTML = '<p>Lade Projekte...</p>';
+    const projects = await db.getProjects();
+    if (!projects || projects.length === 0) {
+        grid.innerHTML = '<p>Sie haben noch keine Projekte erstellt. Klicken Sie oben auf "Neues Projekt erstellen", um loszulegen.</p>';
+        return;
+    }
+    grid.innerHTML = projects.map(p => `
+        <div class="project-card">
+            <h3>${p.name || p.projectName}</h3>
+            <div class="project-card-actions">
+                <a href="/project/${p.id || p.projectId}" class="btn btn-primary">Öffnen</a>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function createNewProject() {
+    const projectName = prompt('Wie soll Ihr neues Projekt heißen?');
+    if (!projectName || projectName.trim() === '') return;
+
+    const newProject = {
+        projectId: `proj_${Date.now()}`,
+        projectName: projectName.trim(),
+        phases: []
+    };
+
+    const response = await db.createProject(newProject);
+    if (response.ok) {
+        const createdProject = await response.json();
+        window.location.href = `/project/${createdProject.projectId}`;
+    } else {
+        showInfoModal('Fehler', 'Das Projekt konnte nicht erstellt werden.');
+    }
+}
+
+async function deleteCurrentProject() {
+    if (!currentProjectId) return;
+    showConfirmationModal('Projekt löschen', `Möchten Sie das Projekt "${currentProjectData.projectName}" wirklich endgültig löschen?`, async () => {
+        const response = await db.deleteProject(currentProjectId);
+        if (response.ok) {
+            window.location.href = '/dashboard';
+        } else {
+            showInfoModal('Fehler', 'Das Projekt konnte nicht gelöscht werden.');
+        }
+    });
+}
+
+// +++ KORRIGIERTE/NEUE FUNKTION +++
+async function addNewItem(type, parentId = null) {
+    const name = prompt(`Name für neue(s/n) ${type}:`);
+    if (!name || !name.trim()) return;
+
+    let newItem;
+
+    if (type === 'phase') {
+        newItem = {
+            phaseId: `phase_${Date.now()}`,
+            phaseName: name.trim(),
+            isExpanded: true,
+            tasks: []
+        };
+        currentProjectData.phases.push(newItem);
+    } 
+    // Hier können später 'task' und 'subtask' ergänzt werden
+
+    await db.saveProject(currentProjectId, currentProjectData);
+    renderProjectTree(currentProjectData, document.getElementById('projectTree'));
 }
 
 // =================================================================
@@ -246,7 +363,7 @@ async function setupUserManagementPage() {
         `).join('');
         attachUserManagementListeners();
     };
-    
+
     const loadUsers = async () => {
         tableBody.innerHTML = '<tr><td colspan="4">Lade Benutzer...</td></tr>';
         try {
@@ -257,7 +374,7 @@ async function setupUserManagementPage() {
             tableBody.innerHTML = '<tr><td colspan="4">Fehler beim Laden der Benutzer.</td></tr>';
         }
     };
-    
+
     await loadUsers();
 }
 
@@ -336,18 +453,18 @@ function setupStructureCheckPage() {
     const runCheckBtn = document.getElementById('run-check-btn');
     const runGenerateBtn = document.getElementById('run-generate-btn');
     const checkLogOutput = document.getElementById('check-log-output');
-    
+
     const viewStructureBtn = document.getElementById('view-structure-btn');
     const exportTxtBtn = document.getElementById('export-structure-txt-btn');
     const exportJsonBtn = document.getElementById('export-structure-json-btn');
     const structureOutput = document.getElementById('structure-output');
-    
+
     let currentStructureData = null;
 
     const runCheck = async (flag) => {
         checkLogOutput.textContent = 'Befehl wird ausgeführt...';
         try {
-            const response = await fetch('/api/admin/run-check', { 
+            const response = await fetch('/api/admin/run-check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ flag: flag })
@@ -361,9 +478,9 @@ function setupStructureCheckPage() {
 
     if (runCheckBtn) runCheckBtn.addEventListener('click', () => runCheck('--check'));
     if (runGenerateBtn) runGenerateBtn.addEventListener('click', () => runCheck('--generate'));
-    
+
     // --- New functionality for viewing structure ---
-    
+
     const formatStructureAsText = (node, indent = '') => {
         let output = `${indent}${node.type === 'directory' ? '📁' : '📄'} ${node.path}\n`;
         if (node.children) {
@@ -373,7 +490,7 @@ function setupStructureCheckPage() {
         }
         return output;
     };
-    
+
     const viewStructure = async () => {
         structureOutput.innerHTML = '<p>Lade Struktur...</p>';
         structureOutput.classList.remove('hidden');
@@ -381,14 +498,14 @@ function setupStructureCheckPage() {
             const response = await fetch('/api/admin/get-structure');
             const data = await response.json();
             currentStructureData = data;
-            
+
             if(data.error) {
                 structureOutput.textContent = data.error;
                 exportTxtBtn.classList.add('hidden');
                 exportJsonBtn.classList.add('hidden');
                 return;
             }
-            
+
             structureOutput.textContent = formatStructureAsText(data);
             exportTxtBtn.classList.remove('hidden');
             exportJsonBtn.classList.remove('hidden');
@@ -398,7 +515,7 @@ function setupStructureCheckPage() {
             exportJsonBtn.classList.add('hidden');
         }
     };
-    
+
     const downloadFile = (filename, content, mimeType) => {
         const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
@@ -424,99 +541,4 @@ function setupStructureCheckPage() {
             downloadFile('structure.json', jsonContent, 'application/json;charset=utf-8');
         }
     });
-}
-
-
-// =================================================================
-// MODALS and other UI components (mostly unchanged)
-// =================================================================
-// (Rest of the file is unchanged)
-function showInfoModal(title, message, onOk) {
-    const container = document.getElementById('modal-container');
-    container.innerHTML = `
-        <div class="modal-backdrop visible">
-            <div class="modal">
-                <div class="modal-header"><h3>${title}</h3><button class="modal-close-btn">&times;</button></div>
-                <div class="modal-body">${message}</div>
-                <div class="modal-footer"><button type="button" class="btn btn-primary modal-ok-btn">OK</button></div>
-            </div>
-        </div>`;
-    const backdrop = container.querySelector('.modal-backdrop');
-    const closeModal = () => {
-        backdrop.classList.remove('visible');
-        setTimeout(() => { container.innerHTML = ''; if(onOk) onOk(); }, 300);
-    };
-    container.querySelector('.modal-ok-btn').addEventListener('click', closeModal);
-    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
-}
-
-function showConfirmationModal(title, message, onConfirm) {
-    const container = document.getElementById('modal-container');
-    container.innerHTML = `
-        <div class="modal-backdrop visible">
-            <div class="modal">
-                <div class="modal-header"><h3>${title}</h3><button class="modal-close-btn">&times;</button></div>
-                <div class="modal-body"><p>${message}</p></div>
-                <div class="modal-footer"><button type="button" class="btn modal-cancel-btn">Abbrechen</button><button type="button" class="btn btn-danger modal-confirm-btn">Bestätigen</button></div>
-            </div>
-        </div>`;
-    const backdrop = container.querySelector('.modal-backdrop');
-    const closeModal = () => { backdrop.classList.remove('visible'); setTimeout(() => container.innerHTML = '', 300); };
-    container.querySelector('.modal-confirm-btn').addEventListener('click', () => { onConfirm(); closeModal(); });
-    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-    container.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
-    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
-}
-
-function showUserEditModal(username, email, isAdmin, callback) {
-    const container = document.getElementById('modal-container');
-    container.innerHTML = `
-        <div class="modal-backdrop visible">
-            <div class="modal">
-                <div class="modal-header"><h3>Benutzer bearbeiten</h3><button class="modal-close-btn">&times;</button></div>
-                <form id="user-edit-form">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="edit-username">Benutzername</label>
-                            <input type="text" id="edit-username" class="form-control" value="${username}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-email">E-Mail</label>
-                            <input type="email" id="edit-email" class="form-control" value="${email}" required>
-                        </div>
-                        <div class="form-group-checkbox">
-                            <label class="custom-checkbox">
-                                <input type="checkbox" id="edit-is-admin" ${isAdmin ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                                <span>Ist Administrator</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn modal-cancel-btn">Abbrechen</button>
-                        <button type="submit" class="btn btn-primary">Speichern</button>
-                    </div>
-                </form>
-            </div>
-        </div>`;
-    
-    const backdrop = container.querySelector('.modal-backdrop');
-    const form = document.getElementById('user-edit-form');
-    const closeModal = () => { backdrop.classList.remove('visible'); setTimeout(() => container.innerHTML = '', 300); };
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const newUsername = document.getElementById('edit-username').value.trim();
-        const newEmail = document.getElementById('edit-email').value.trim();
-        const newIsAdmin = document.getElementById('edit-is-admin').checked;
-        if (newUsername && newEmail) {
-            callback(newUsername, newEmail, newIsAdmin);
-            closeModal();
-        }
-    });
-
-    container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-    container.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
-    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
 }
