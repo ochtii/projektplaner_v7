@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Projektplaner{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h1 class="logo">Planer</h1></div>
+            <nav class="main-nav">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <div id="current-project-menu" class="hidden">
+                    <div class="submenu-toggle"><span>Aktuelles Projekt</span><span class="arrow">&#9662;</span></div>
+                    <div class="submenu">
+                        <a href="#" id="current-project-overview-link">Übersicht</a>
+                        <a href="#" id="current-project-editor-link">Editor</a>
+                        <a href="#" id="current-project-checklist-link">Checkliste</a>
+                    </div>
+                </div>
+                <div class="info-menu">
+                    <div class="submenu-toggle"><span>Info & Hilfe</span><span class="arrow">&#9662;</span></div>
+                    <div class="submenu">
+                        <a href="{{ url_for('info') }}#about">Über die App</a>
+                        <a href="{{ url_for('info') }}#anleitung">Anleitung</a>
+                        <a href="{{ url_for('info') }}#faq">FAQ</a>
+                        <a href="{{ url_for('info') }}#support">Support</a>
+                    </div>
+                </div>
+                <a href="{{ url_for('settings') }}">Einstellungen</a>
+            </nav>
+            <div class="sidebar-footer"><p>&copy; 2025 Projektplaner</p></div>
+        </aside>
+        <div class="main-content">
+            <header class="main-header">
+                <div class="header-title-container">
+                    <button class="mobile-menu-button" id="mobileMenuButton">&#9776;</button>
+                    <span id="header-page-title" class="header-page-title"></span>
+                </div>
+                <div id="header-actions" class="header-actions"></div>
+            </header>
+            <main>{% block content %}{% endblock %}</main>
+        </div>
+    </div>
+    <div class="mobile-nav" id="mobileNav"><button class="close-btn" id="closeMobileNav">&times;</button><nav></nav></div>
+    <div class="overlay" id="overlay"></div>
+    <div id="modal-container"></div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

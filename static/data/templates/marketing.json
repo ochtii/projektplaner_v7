@@ -1,0 +1,32 @@
+{
+  "name": "Marketingkampagne",
+  "description": "Strukturieren Sie Ihre nächste Marketingkampagne von der Strategie bis zur Analyse.",
+  "data": {
+    "phases": [
+      {
+        "phaseId": "phase_1",
+        "phaseName": "Strategie & Recherche",
+        "isExpanded": true,
+        "tasks": []
+      },
+      {
+        "phaseId": "phase_2",
+        "phaseName": "Content-Erstellung",
+        "isExpanded": true,
+        "tasks": []
+      },
+      {
+        "phaseId": "phase_3",
+        "phaseName": "Veröffentlichung & Promotion",
+        "isExpanded": true,
+        "tasks": []
+      },
+      {
+        "phaseId": "phase_4",
+        "phaseName": "Analyse & Reporting",
+        "isExpanded": true,
+        "tasks": []
+      }
+    ]
+  }
+}

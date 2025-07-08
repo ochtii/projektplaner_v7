@@ -1,0 +1,26 @@
+<!-- templates/project_manager.html -->
+{% extends "base.html" %}
+{% block title %}Projekt Manager{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <h2 id="page-main-title">Projekt: Wird geladen...</h2>
+        <span id="edit-project-name-btn" class="edit-icon" style="visibility: visible; font-size: 1.2rem; cursor: pointer;" title="Projektnamen bearbeiten">&#9998;</span>
+    </div>
+    <div class="project-actions">
+        <a href="#" id="go-to-overview-btn" class="btn btn-secondary hidden">&#8617; Zur Übersicht</a>
+        <button id="delete-project-btn" class="btn btn-danger">Projekt löschen</button>
+    </div>
+</div>
+<div class="project-layout">
+    <div class="project-tree-container">
+        <div class="tree-header"><h3>Projektstruktur</h3><button id="toggle-all-btn" class="btn btn-secondary btn-sm">Alle ausklappen</button></div>
+        <ul id="projectTree" class="project-tree"><li>Lade Projektdaten...</li></ul>
+        <button id="add-phase-btn" class="btn btn-secondary" style="margin-top: 1rem;">Neue Phase hinzufügen</button>
+    </div>
+    <div class="project-editor-container">
+        <h3>Details</h3>
+        <div id="editor-content"><p>Klicken Sie auf ein Element in der Struktur, um es zu bearbeiten.</p></div>
+    </div>
+</div>
+{% endblock %}

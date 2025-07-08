@@ -1,0 +1,234 @@
+{
+  "p1": {
+    "projectId": "p1",
+    "projectName": "Beispielprojekt",
+    "phases": [
+      {
+        "phaseId": "phase01",
+        "phaseName": "Planungsphase",
+        "isExpanded": true,
+        "tasks": [
+          {
+            "taskId": "task01",
+            "taskName": "Analyse",
+            "isExpanded": true,
+            "completed": false,
+            "subtasks": [
+              {
+                "subtaskId": "sub01",
+                "subtaskName": "Anforderungen definieren",
+                "completed": true
+              },
+              {
+                "subtaskId": "sub02",
+                "subtaskName": "Stakeholder befragen",
+                "completed": false
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "proj_1751925060418": {
+    "phases": [
+      {
+        "isExpanded": true,
+        "phaseId": "phase_1",
+        "phaseName": "Vorbereitung & Recherche",
+        "tasks": [
+          {
+            "subtasks": [
+              {
+                "subtaskId": "subtask1751925074445",
+                "subtaskName": "asdasd",
+                "comments": []
+              },
+              {
+                "subtaskId": "subtask1751925078614",
+                "subtaskName": "asdasd",
+                "comments": []
+              }
+            ],
+            "taskId": "task_1_1",
+            "taskName": "Thema und Genre festlegen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_1_2",
+            "taskName": "Gliederung (Exposé) erstellen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_1_3",
+            "taskName": "Recherche durchführen"
+          },
+          {
+            "taskId": "task1751925086558",
+            "taskName": "qwedsc",
+            "comments": [],
+            "subtasks": [
+              {
+                "subtaskId": "subtask1751925095856",
+                "subtaskName": "1",
+                "comments": []
+              },
+              {
+                "subtaskId": "subtask1751925099942",
+                "subtaskName": "2",
+                "comments": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "isExpanded": true,
+        "phaseId": "phase_2",
+        "phaseName": "Schreibphase (Rohentwurf)",
+        "tasks": [
+          {
+            "subtasks": [],
+            "taskId": "task_2_1",
+            "taskName": "Kapitel 1-5 schreiben"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_2_2",
+            "taskName": "Kapitel 6-10 schreiben"
+          }
+        ]
+      },
+      {
+        "isExpanded": true,
+        "phaseId": "phase_3",
+        "phaseName": "Überarbeitung",
+        "tasks": [
+          {
+            "subtasks": [],
+            "taskId": "task_3_1",
+            "taskName": "Erste Überarbeitung (inhaltlich)"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_3_2",
+            "taskName": "Lektorat beauftragen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_3_3",
+            "taskName": "Korrektorat (Rechtschreibung, Grammatik)"
+          }
+        ]
+      },
+      {
+        "isExpanded": true,
+        "phaseId": "phase_4",
+        "phaseName": "Veröffentlichung",
+        "tasks": [
+          {
+            "subtasks": [],
+            "taskId": "task_4_1",
+            "taskName": "Cover designen lassen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_4_2",
+            "taskName": "Marketingplan erstellen"
+          }
+        ]
+      }
+    ],
+    "projectId": "proj_1751925060418",
+    "projectName": "buch"
+  },
+  "proj_1751925281799": {
+    "phases": [
+      {
+        "isExpanded": true,
+        "phaseId": "phase_1",
+        "phaseName": "Konzept & Budget",
+        "tasks": [
+          {
+            "subtasks": [],
+            "taskId": "task_1_1",
+            "taskName": "Eventziele definieren"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_1_2",
+            "taskName": "Budget aufstellen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_1_3",
+            "taskName": "Zielgruppe analysieren"
+          }
+        ]
+      },
+      {
+        "isExpanded": true,
+        "phaseId": "phase_2",
+        "phaseName": "Location & Dienstleister",
+        "tasks": [
+          {
+            "subtasks": [],
+            "taskId": "task_2_1",
+            "taskName": "Location recherchieren und buchen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_2_2",
+            "taskName": "Catering anfragen und beauftragen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_2_3",
+            "taskName": "Technik (Ton, Licht) planen"
+          }
+        ]
+      },
+      {
+        "isExpanded": true,
+        "phaseId": "phase_3",
+        "phaseName": "Marketing & Einladungen",
+        "tasks": [
+          {
+            "subtasks": [],
+            "taskId": "task_3_1",
+            "taskName": "Einladungen gestalten und versenden"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_3_2",
+            "taskName": "Social-Media-Ankündigungen"
+          }
+        ]
+      },
+      {
+        "isExpanded": true,
+        "phaseId": "phase_4",
+        "phaseName": "Durchführung & Nachbereitung",
+        "tasks": [
+          {
+            "subtasks": [],
+            "taskId": "task_4_1",
+            "taskName": "Ablaufplan für den Event-Tag erstellen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_4_2",
+            "taskName": "Feedback einholen"
+          },
+          {
+            "subtasks": [],
+            "taskId": "task_4_3",
+            "taskName": "Erfolgsanalyse"
+          }
+        ]
+      }
+    ],
+    "projectId": "proj_1751925281799",
+    "projectName": "event"
+  }
+}

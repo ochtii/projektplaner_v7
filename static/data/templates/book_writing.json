@@ -1,0 +1,46 @@
+{
+  "name": "Buch schreiben",
+  "description": "Strukturieren Sie Ihren Schreibprozess vom ersten Entwurf bis zur Veröffentlichung.",
+  "data": {
+    "phases": [
+      {
+        "phaseId": "phase_1",
+        "phaseName": "Vorbereitung & Recherche",
+        "isExpanded": true,
+        "tasks": [
+          { "taskId": "task_1_1", "taskName": "Thema und Genre festlegen", "subtasks": [] },
+          { "taskId": "task_1_2", "taskName": "Gliederung (Exposé) erstellen", "subtasks": [] },
+          { "taskId": "task_1_3", "taskName": "Recherche durchführen", "subtasks": [] }
+        ]
+      },
+      {
+        "phaseId": "phase_2",
+        "phaseName": "Schreibphase (Rohentwurf)",
+        "isExpanded": true,
+        "tasks": [
+          { "taskId": "task_2_1", "taskName": "Kapitel 1-5 schreiben", "subtasks": [] },
+          { "taskId": "task_2_2", "taskName": "Kapitel 6-10 schreiben", "subtasks": [] }
+        ]
+      },
+      {
+        "phaseId": "phase_3",
+        "phaseName": "Überarbeitung",
+        "isExpanded": true,
+        "tasks": [
+          { "taskId": "task_3_1", "taskName": "Erste Überarbeitung (inhaltlich)", "subtasks": [] },
+          { "taskId": "task_3_2", "taskName": "Lektorat beauftragen", "subtasks": [] },
+          { "taskId": "task_3_3", "taskName": "Korrektorat (Rechtschreibung, Grammatik)", "subtasks": [] }
+        ]
+      },
+      {
+        "phaseId": "phase_4",
+        "phaseName": "Veröffentlichung",
+        "isExpanded": true,
+        "tasks": [
+          { "taskId": "task_4_1", "taskName": "Cover designen lassen", "subtasks": [] },
+          { "taskId": "task_4_2", "taskName": "Marketingplan erstellen", "subtasks": [] }
+        ]
+      }
+    ]
+  }
+}

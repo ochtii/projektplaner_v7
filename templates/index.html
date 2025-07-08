@@ -1,0 +1,13 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+{% block title %}Willkommen{% endblock %}
+{% block content %}
+<div class="hero-section">
+    <h2 id="welcome-title">Willkommen beim Projektplaner</h2>
+    <p id="welcome-subtitle">Organisieren Sie Ihre Projekte einfach und effizient. Von der ersten Idee bis zum Abschluss.</p>
+    <div class="cta-buttons" id="welcome-buttons">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Als Gast fortfahren</a>
+        <a href="{{ url_for('login_route') }}" class="btn btn-secondary">Anmelden</a>
+    </div>
+</div>
+{% endblock %}

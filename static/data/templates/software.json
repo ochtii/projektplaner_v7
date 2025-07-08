@@ -1,0 +1,49 @@
+{
+  "name": "Softwareentwicklung",
+  "description": "Eine klassische Vorlage für Softwareprojekte mit Phasen wie Planung, Entwicklung und Test.",
+  "data": {
+    "phases": [
+      {
+        "phaseId": "phase_1",
+        "phaseName": "Planung & Anforderungsanalyse",
+        "isExpanded": true,
+        "tasks": [
+          { "taskId": "task_1_1", "taskName": "Anforderungen definieren (Lastenheft)", "subtasks": [] },
+          { "taskId": "task_1_2", "taskName": "Architektur entwerfen", "subtasks": [] },
+          { "taskId": "task_1_3", "taskName": "Technologie-Stack auswählen", "subtasks": [] }
+        ]
+      },
+      {
+        "phaseId": "phase_2",
+        "phaseName": "Entwicklung (Sprints)",
+        "isExpanded": true,
+        "tasks": [
+          { "taskId": "task_2_1", "taskName": "Sprint 1: Kernfunktionen", "subtasks": [
+              { "subtaskId": "sub_2_1_1", "subtaskName": "Benutzerauthentifizierung implementieren" },
+              { "subtaskId": "sub_2_1_2", "subtaskName": "Datenbank-Setup" }
+          ]},
+          { "taskId": "task_2_2", "taskName": "Sprint 2: UI-Komponenten", "subtasks": [] }
+        ]
+      },
+      {
+        "phaseId": "phase_3",
+        "phaseName": "Test & QA",
+        "isExpanded": true,
+        "tasks": [
+          { "taskId": "task_3_1", "taskName": "Unit-Tests schreiben", "subtasks": [] },
+          { "taskId": "task_3_2", "taskName": "Integrationstests durchführen", "subtasks": [] },
+          { "taskId": "task_3_3", "taskName": "User-Acceptance-Testing (UAT)", "subtasks": [] }
+        ]
+      },
+      {
+        "phaseId": "phase_4",
+        "phaseName": "Deployment & Wartung",
+        "isExpanded": true,
+        "tasks": [
+          { "taskId": "task_4_1", "taskName": "Produktionsumgebung aufsetzen", "subtasks": [] },
+          { "taskId": "task_4_2", "taskName": "Release durchführen", "subtasks": [] }
+        ]
+      }
+    ]
+  }
+}

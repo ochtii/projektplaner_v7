@@ -1,0 +1,28 @@
+{
+  "p1": {
+    "projectId": "p1",
+    "projectName": "Beispielprojekt",
+    "ownerId": "user123",
+    "collaborators": [],
+    "phases": [
+      {
+        "phaseId": "phase01",
+        "phaseName": "1. Konzeption & Planung",
+        "isExpanded": true,
+        "tasks": [
+          {
+            "taskId": "task01",
+            "taskName": "Anforderungs-Workshop",
+            "isExpanded": true,
+            "subtasks": [
+              {
+                "subtaskId": "sub01",
+                "subtaskName": "Stakeholder einladen"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
