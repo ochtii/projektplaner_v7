@@ -17,7 +17,9 @@ USER_DATA_DIR = os.path.join(DATA_ROOT, 'user_data')
 USERS_FILE = os.path.join(DATA_ROOT, 'users.json')
 SETTINGS_FILE = os.path.join('api', 'global_settings.json')
 STRUCTURE_FILE = 'structure.json' # Hinzugefügt für den neuen Endpunkt
+TEMPLATES_DIR = os.path.join(DATA_ROOT, 'templates') # New: Templates directory
 os.makedirs(USER_DATA_DIR, exist_ok=True)
+os.makedirs(TEMPLATES_DIR, exist_ok=True) # Ensure templates dir exists
 
 # --- Helper-Funktionen ---
 
@@ -63,6 +65,48 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+
+# --- New API Endpoints for Templates ---
+@app.route('/api/templates', methods=['GET'])
+def get_templates():
+    templates = []
+    for filename in os.listdir(TEMPLATES_DIR):
+        if filename.endswith('.json') and filename != 'bsp.json': # Exclude bsp.json
+            template_path = os.path.join(TEMPLATES_DIR, filename)
+            try:
+                data = _load_json(template_path)
+                templates.append({
+                    'id': filename.replace('.json', ''),
+                    'name': data.get('name', filename.replace('.json', '')),
+                    'description': data.get('description', '')
+                })
+            except Exception:
+                continue # Skip malformed JSON files
+    return jsonify(templates)
+
+@app.route('/api/template/<template_id>', methods=['GET'])
+def get_template_content(template_id):
+    template_path = os.path.join(TEMPLATES_DIR, f"{template_id}.json")
+    if not os.path.exists(template_path) or template_id == 'bsp': # Ensure bsp.json can't be fetched directly
+        return jsonify({"error": "Template not found."}), 404
+    try:
+        template_data = _load_json(template_path)
+        return jsonify(template_data)
+    except Exception:
+        return jsonify({"error": "Error loading template content."}), 500
+
+# New endpoint to get the initial example project (bsp.json)
+@app.route('/api/initial-project', methods=['GET'])
+def get_initial_project():
+    bsp_path = os.path.join(TEMPLATES_DIR, 'bsp.json')
+    if not os.path.exists(bsp_path):
+        return jsonify({"error": "Initial project template not found."}), 404
+    try:
+        project_data = _load_json(bsp_path)
+        return jsonify(project_data)
+    except Exception:
+        return jsonify({"error": "Error loading initial project template."}), 500
+
 
 # --- Routen für Seiten (unverändert) ---
 @app.route('/')

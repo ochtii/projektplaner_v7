@@ -1,4 +1,3 @@
-<!-- templates/project_manager.html -->
 {% extends "base.html" %}
 {% block title %}Projekt Manager{% endblock %}
 {% block content %}
@@ -19,8 +18,12 @@
         <button id="add-phase-btn" class="btn btn-secondary" style="margin-top: 1rem;">Neue Phase hinzufügen</button>
     </div>
     <div class="project-editor-container">
-        <h3>Details</h3>
-        <div id="editor-content"><p>Klicken Sie auf ein Element in der Struktur, um es zu bearbeiten.</p></div>
+        <h3 id="editor-item-title">Details: <span id="selected-item-name"></span></h3>
+        <div id="editor-content-wrapper"> <div id="editor-empty-hint" class="editor-hint">
+                Klicken Sie auf ein Element in der Struktur oder auf das Bearbeiten-Symbol (&#9998;), um es zu bearbeiten.
+            </div>
+            <div id="editor-content" class="hidden"> </div>
+        </div>
     </div>
 </div>
 {% endblock %}
