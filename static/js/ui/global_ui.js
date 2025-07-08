@@ -99,3 +99,31 @@ export function setupGlobalUI(session) {
         });
     }
 }
+
+/**
+ * Aktualisiert den Titel im Header basierend auf dem aktuellen Projekt und der Seite.
+ * @param {string} projectTitle Der Titel des aktuellen Projekts.
+ * @param {string} pageTitle Der Titel der aktuellen Seite.
+ */
+export function updateHeaderTitles(pageTitle, projectTitle) { // Reihenfolge der Parameter geändert, um der neuen Anordnung zu entsprechen
+    const projectHeaderTitle = document.getElementById('current-project-header-title');
+    const pageHeaderTitle = document.getElementById('current-page-header-title');
+    const separator = document.getElementById('header-title-separator');
+
+    // Seitentitel zuerst
+    if (pageHeaderTitle) {
+        pageHeaderTitle.textContent = pageTitle;
+        pageHeaderTitle.classList.toggle('hidden', !pageTitle);
+    }
+
+    // Projekttitel danach
+    if (projectHeaderTitle) {
+        projectHeaderTitle.textContent = projectTitle;
+        projectHeaderTitle.classList.toggle('hidden', !projectTitle);
+    }
+
+    // Trenner nur anzeigen, wenn beide Titel vorhanden sind
+    if (separator) {
+        separator.classList.toggle('hidden', !pageTitle || !projectTitle);
+    }
+}

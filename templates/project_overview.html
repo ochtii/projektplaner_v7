@@ -4,11 +4,22 @@
 {% block content %}
 <div class="page-header">
     <h2 id="projectName">Wird geladen...</h2>
-    <a href="#" id="go-to-editor-btn" class="btn btn-primary hidden">&#9998; Zum Editor</a>
+    <div class="project-actions">
+        <!-- Buttons zum schnellen Wechsel zwischen den Ansichten -->
+        <a href="#" id="go-to-editor-btn" class="btn btn-secondary">&#9998; Zum Editor</a>
+        <a href="#" id="go-to-checklist-btn" class="btn btn-secondary">Zur Checkliste</a>
+    </div>
 </div>
 <div class="view-switcher">
     <button class="btn btn-primary" id="text-view-btn">Textansicht</button>
     <button class="btn btn-secondary" id="graphical-view-btn">Grafische Ansicht</button>
+    
+    <!-- Neues Dropdown-Menü für grafische Ansichten -->
+    <select id="graphical-view-selector" class="form-control hidden" style="width: auto; margin-left: 1rem;">
+        <option value="overview_chart">Übersichtsdiagramm</option>
+        <option value="gantt_chart" disabled>Gantt-Diagramm (bald)</option>
+        <option value="dependency_graph" disabled>Abhängigkeitsgraph (bald)</option>
+    </select>
 </div>
 <div id="text-view-content" class="overview-container-text"><p>Lade Projektübersicht...</p></div>
 <div id="graphical-view-content" class="overview-container-graphical hidden"></div>

@@ -1,3 +1,4 @@
+<!-- templates/project_manager.html -->
 {% extends "base.html" %}
 {% block title %}Projekt Manager{% endblock %}
 {% block content %}
@@ -7,7 +8,9 @@
         <span id="edit-project-name-btn" class="edit-icon" style="visibility: visible; font-size: 1.2rem; cursor: pointer;" title="Projektnamen bearbeiten">&#9998;</span>
     </div>
     <div class="project-actions">
-        <a href="#" id="go-to-overview-btn" class="btn btn-secondary hidden">&#8617; Zur Übersicht</a>
+        <!-- Buttons zum schnellen Wechsel zwischen den Ansichten -->
+        <a href="#" id="go-to-overview-btn" class="btn btn-secondary">&#8617; Zur Übersicht</a>
+        <a href="#" id="go-to-checklist-btn" class="btn btn-secondary">Zur Checkliste</a>
         <button id="delete-project-btn" class="btn btn-danger">Projekt löschen</button>
     </div>
 </div>
@@ -19,10 +22,13 @@
     </div>
     <div class="project-editor-container">
         <h3 id="editor-item-title">Details: <span id="selected-item-name"></span></h3>
-        <div id="editor-content-wrapper"> <div id="editor-empty-hint" class="editor-hint">
+        <div id="editor-content-wrapper"> <!-- New wrapper for hint -->
+            <div id="editor-empty-hint" class="editor-hint">
                 Klicken Sie auf ein Element in der Struktur oder auf das Bearbeiten-Symbol (&#9998;), um es zu bearbeiten.
             </div>
-            <div id="editor-content" class="hidden"> </div>
+            <div id="editor-content" class="hidden"> <!-- Content is hidden when hint is shown -->
+                <!-- Dynamic editor content will be loaded here -->
+            </div>
         </div>
     </div>
 </div>

@@ -95,19 +95,19 @@
                   ]
                 },
                 {
-                  "path": "static/data/user_data/7ab8a6e7-1e86-4728-b527-422d22095835",
+                  "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063",
                   "type": "directory",
                   "children": [
                     {
-                      "path": "static/data/user_data/7ab8a6e7-1e86-4728-b527-422d22095835/logs.json",
+                      "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/logs.json",
                       "type": "file"
                     },
                     {
-                      "path": "static/data/user_data/7ab8a6e7-1e86-4728-b527-422d22095835/projects.json",
+                      "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/projects.json",
                       "type": "file"
                     },
                     {
-                      "path": "static/data/user_data/7ab8a6e7-1e86-4728-b527-422d22095835/settings.json",
+                      "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/settings.json",
                       "type": "file"
                     }
                   ]
@@ -197,8 +197,118 @@
           "type": "directory",
           "children": [
             {
+              "path": "static/js/admin",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/js/admin/admin_main.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/admin/global_settings.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/admin/structure_check.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/admin/user_management.js",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "path": "static/js/core",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/js/core/api_db.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/core/globals.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/core/guest_db.js",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "path": "static/js/dashboard",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/js/dashboard/dashboard_logic.js",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "path": "static/js/info",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/js/info/info_logic.js",
+                  "type": "file"
+                }
+              ]
+            },
+            {
               "path": "static/js/main.js",
               "type": "file"
+            },
+            {
+              "path": "static/js/project",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/js/project/project_manager_logic.js",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "path": "static/js/settings",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/js/settings/settings_logic.js",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "path": "static/js/ui",
+              "type": "directory",
+              "children": [
+                {
+                  "path": "static/js/ui/checklist_renderer.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/ui/comments_manager.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/ui/global_ui.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/ui/modals.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/ui/project_overview_renderer.js",
+                  "type": "file"
+                },
+                {
+                  "path": "static/js/ui/project_tree_renderer.js",
+                  "type": "file"
+                }
+              ]
             },
             {
               "path": "static/js/ui.js",
@@ -207,6 +317,10 @@
           ]
         }
       ]
+    },
+    {
+      "path": "structure.bat",
+      "type": "file"
     },
     {
       "path": "templates",

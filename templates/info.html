@@ -17,28 +17,92 @@
             <p>
                 Der Projektplaner ist ein interaktives Werkzeug, das Ihnen hilft, komplexe Projekte einfach und visuell zu strukturieren. Gliedern Sie Ihre Vorhaben in Phasen, Aufgaben und Subaufgaben, um stets den Überblick zu behalten.
             </p>
+            <p>
+                Diese Version bietet erweiterte Funktionen zur Projektverwaltung, detaillierte Fortschrittsverfolgung und eine verbesserte Benutzerfreundlichkeit.
+            </p>
         </div>
     </div>
 
     <div class="info-card" id="anleitung">
         <h3 class="accordion-toggle">
-            <span>Anleitung</span>
+            <span>Anleitung: So nutzen Sie den Projektplaner</span>
             <span class="arrow">&#9662;</span>
         </h3>
         <div class="info-card-content">
-            <p>Detaillierte Anleitungen folgen in Kürze.</p>
+            <h4 class="section-heading">1. Projekte erstellen & verwalten</h4>
+            <ul>
+                <li><strong>Neues Projekt:</strong> Auf dem Dashboard klicken Sie auf "Neues Projekt erstellen". Wählen Sie, ob Sie ein leeres Projekt starten oder eine unserer Vorlagen (z.B. Softwareentwicklung, Marketingkampagne) nutzen möchten.</li>
+                <li><strong>Beispielprojekt:</strong> Beim ersten Start der App (als angemeldeter Benutzer) wird automatisch ein "Beispielprojekt" für Sie angelegt, um die Funktionen kennenzulernen.</li>
+                <li><strong>Übersicht:</strong> Auf dem Dashboard sehen Sie alle Ihre Projekte mit einem Fortschrittsbalken. Klicken Sie auf die Buttons, um direkt zur <strong>Übersicht</strong>, zum <strong>Editor</strong> oder zur <strong>Checkliste</strong> des jeweiligen Projekts zu gelangen.</li>
+            </ul>
+
+            <h4 class="section-heading">2. Projekt-Editor: Strukturieren & Bearbeiten</h4>
+            <p>Der Editor ist Ihr zentrales Werkzeug zur detaillierten Projektplanung.</p>
+            <ul>
+                <li><strong>Strukturansicht:</strong> Auf der linken Seite sehen Sie die hierarchische Gliederung Ihres Projekts in Phasen, Aufgaben und Unteraufgaben, inklusive automatischer Nummerierung (z.B. 1, 1.1, 1.1.1).</li>
+                <li><strong>Hinzufügen:</strong> Nutzen Sie das Plus-Symbol (<span style="font-weight: bold;">+</span>) neben einem Element, um neue Aufgaben oder Unteraufgaben hinzuzufügen.</li>
+                <li><strong>Bearbeiten:</strong> Klicken Sie auf das Bleistift-Symbol (<span style="font-weight: bold;">&#9998;</span>) neben einem Element, um dessen Namen und Kommentare im rechten Bereich zu bearbeiten.</li>
+                <li><strong>Kommentare:</strong> Fügen Sie Kommentare hinzu, bearbeiten oder löschen Sie diese direkt im Editor.</li>
+                <li><strong>Verschieben (Drag & Drop):</strong> Ordnen Sie Phasen, Aufgaben und Unteraufgaben per Drag & Drop neu an. Beachten Sie, dass Elemente nur innerhalb ihrer Hierarchieebene verschoben werden können. Die Nummerierung wird dabei automatisch aktualisiert.</li>
+                <li><strong>Speichern/Verwerfen:</strong> Nutzen Sie die Buttons "Speichern" oder "Verwerfen", um Ihre Änderungen zu sichern oder rückgängig zu machen.</li>
+            </ul>
+
+            <h4 class="section-heading">3. Projekt-Übersicht: Gesamtbild & Details</h4>
+            <p>Diese Ansicht bietet Ihnen verschiedene Perspektiven auf Ihr Projekt.</p>
+            <ul>
+                <li><strong>Textansicht:</strong> Eine klare, hierarchische Textdarstellung Ihrer Projektstruktur mit Nummerierung.</li>
+                <li><strong>Kommentare:</strong> Elemente mit Kommentaren sind mit einem Sprechblasensymbol (<span style="font-weight: bold;">💬</span>) gekennzeichnet. Klicken Sie darauf, um alle Kommentare in einem Popup-Fenster anzuzeigen.</li>
+                <li><strong>Grafische Ansicht:</strong> Wechseln Sie zur grafischen Ansicht, um eine visuelle Darstellung Ihres Projekts zu erhalten. Wählen Sie über das Dropdown-Menü verschiedene Diagrammtypen aus (z.B. Übersichtsdiagramm). Weitere Diagrammtypen sind in Entwicklung.</li>
+            </ul>
+
+            <h4 class="section-heading">4. Projekt-Checkliste: Fortschritt verfolgen</h4>
+            <p>Hier behalten Sie den Überblick über den Bearbeitungsstatus Ihrer Aufgaben.</p>
+            <ul>
+                <li><strong>Fortschrittsbalken:</strong> Ein prominenter Fortschrittsbalken zeigt den Gesamtfortschritt Ihres Projekts in Prozent an. Daneben finden Sie ein Info-Symbol (<span style="font-weight: bold;">ⓘ</span>), das bei Klick detaillierte Informationen zum Status jeder Phase (erledigte Aufgaben/Unteraufgaben) in einem Modal anzeigt.</li>
+                <li><strong>Interaktive Checkboxen:</strong> Markieren Sie Unteraufgaben als erledigt, indem Sie die Checkboxen aktivieren. Der Fortschritt von übergeordneten Aufgaben und Phasen wird automatisch berechnet:
+                    <ul>
+                        <li>Eine **Unteraufgabe** gilt als erledigt, wenn ihre Checkbox markiert ist.</li>
+                        <li>Eine **Aufgabe** gilt als erledigt, wenn alle ihre Unteraufgaben erledigt sind (oder wenn sie selbst markiert ist, falls sie keine Unteraufgaben hat).</li>
+                        <li>Eine **Phase** gilt als erledigt, wenn alle ihre Aufgaben erledigt sind (oder wenn sie selbst markiert ist, falls sie keine Aufgaben hat).</li>
+                    </ul>
+                </li>
+                <li><strong>Kommentare ein-/ausblenden:</strong> Nutzen Sie den Schalter im Kopfbereich der Checkliste, um die Kommentarvorschauen unter den Elementen ein- oder auszublenden.</li>
+            </ul>
+
+            <h4 class="section-heading">5. Admin-Bereich (nur für Administratoren)</h4>
+            <p>Als Administrator haben Sie Zugriff auf erweiterte Verwaltungsfunktionen:</p>
+            <ul>
+                <li><strong>Benutzerverwaltung:</strong> Bearbeiten Sie Benutzerdetails, setzen Sie Passwörter zurück oder löschen Sie Benutzerkonten über moderne Dialogfenster.</li>
+                <li><strong>Globale Einstellungen:</strong> Konfigurieren Sie anwendungsweite Parameter.</li>
+                <li><strong>Struktur-Check:</strong> Überprüfen oder generieren Sie die interne Dateistruktur der Anwendung.</li>
+            </ul>
         </div>
     </div>
 
     <div class="info-card" id="faq">
         <h3 class="accordion-toggle">
-            <span>FAQ</span>
+            <span>Häufig gestellte Fragen (FAQ)</span>
             <span class="arrow">&#9662;</span>
         </h3>
         <div class="info-card-content">
             <dl class="faq-list">
                 <dt>Was bedeuten die Limits im Gast-Modus?</dt>
-                <dd>Als Gast werden Ihre Daten nur im Browser gespeichert und sind nach dem Schließen des Fensters möglicherweise verloren. Die Anzahl der Projekte und deren Tiefe sind limitiert.</dd>
+                <dd>Als Gast werden Ihre Daten nur im Browser (im lokalen Speicher Ihres Browsers) gespeichert. Das bedeutet, dass Ihre Projekte verloren gehen können, wenn Sie den Browser-Cache leeren oder einen anderen Browser/Computer verwenden. Die Anzahl der Projekte, Phasen, Aufgaben und Unteraufgaben ist im Gast-Modus begrenzt, um Systemressourcen zu schonen und die Performance zu gewährleisten.</dd>
+
+                <dt>Kann ich meine Daten aus dem Gast-Modus speichern?</dt>
+                <dd>Derzeit ist keine direkte Exportfunktion aus dem Gast-Modus verfügbar. Um Ihre Projekte dauerhaft zu speichern und unbegrenzte Funktionen zu nutzen, empfehlen wir Ihnen, sich zu registrieren und anzumelden.</dd>
+
+                <dt>Wie kann ich ein Projekt löschen?</dt>
+                <dd>Sie können ein Projekt über den "Projekt löschen"-Button im Projekt-Editor entfernen. Beachten Sie, dass dies eine unwiderrufliche Aktion ist und alle zugehörigen Daten dauerhaft gelöscht werden.</dd>
+
+                <dt>Warum ist der Fortschrittsbalken meiner Phase/Aufgabe deaktiviert?</dt>
+                <dd>Phasen und Aufgaben, die Unterelemente (Aufgaben oder Unteraufgaben) enthalten, berechnen ihren Fortschritt automatisch basierend auf dem Status ihrer Unterelemente. Ihre Checkboxen sind daher deaktiviert, da sie nicht direkt manuell gesetzt werden können. Schließen Sie alle Unterelemente ab, damit sich der Status des übergeordneten Elements aktualisiert.</dd>
+
+                <dt>Kann ich Elemente zwischen verschiedenen Phasen oder Aufgaben verschieben?</dt>
+                <dd>Aktuell unterstützt die Drag & Drop-Funktion im Editor das Verschieben von Elementen nur innerhalb ihrer direkten Hierarchieebene. Das Verschieben von Aufgaben zwischen Phasen oder Unteraufgaben zwischen Aufgaben ist in dieser Version nicht möglich.</dd>
+
+                <dt>Was mache ich, wenn die App nicht richtig funktioniert?</dt>
+                <dd>Versuchen Sie zunächst, die Seite neu zu laden. Wenn das Problem weiterhin besteht, überprüfen Sie Ihre Internetverbindung. Im Admin-Bereich (falls Sie Administrator sind) können Sie den "Struktur-Check" ausführen, um mögliche Dateiprobleme zu identifizieren. Für weitere Hilfe nutzen Sie bitte das Support-Formular auf dieser Seite.</dd>
             </dl>
         </div>
     </div>

@@ -6,6 +6,9 @@
 // Dieses Modul enthält die Logik für die Dashboard-Seite,
 // einschließlich der Anzeige von Projekten und der Erstellung neuer Projekte.
 
+// Importiere Modal-Funktionen direkt
+import { showTemplateSelectionModal, showPromptModal } from '../ui/modals.js';
+
 /**
  * Richtet die Dashboard-Seite ein.
  * Initialisiert Event-Listener und rendert das Projekt-Grid.
@@ -42,35 +45,66 @@ export async function renderProjectGrid() {
         return;
     }
 
-    grid.innerHTML = projects.map(p => `
-        <div class="project-card">
-            <h3>${p.name || p.projectName}</h3>
-            <div class="project-card-actions">
-                <a href="/project/${p.id || p.projectId}" class="btn btn-primary">Öffnen</a>
-            </div>
-        </div>
-    `).join('');
+    grid.innerHTML = projects.map(p => {
+        // Berechne den Fortschritt für jedes Projekt
+        let totalItems = 0;
+        let completedItems = 0;
 
-    // Hinweis für das initiale Projekt anzeigen, wenn es gerade geladen wurde
+        (p.phases || []).forEach(phase => {
+            (phase.tasks || []).forEach(task => {
+                if (task.subtasks && task.subtasks.length > 0) {
+                    totalItems += task.subtasks.length;
+                    completedItems += task.subtasks.filter(subtask => subtask.completed).length;
+                } else {
+                    totalItems++;
+                    if (task.completed) {
+                        completedItems++;
+                    }
+                }
+            });
+        });
+        const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+        return `
+            <div class="project-card">
+                <h3>${p.name || p.projectName}</h3>
+                
+                <div class="project-card-progress" style="margin-top: 1rem; margin-bottom: 1rem;">
+                    <div class="progress-bar-container" style="width: 100%; background-color: var(--border-color); border-radius: var(--border-radius); overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="height: 20px; width: ${progressPercentage}%; background-color: var(--primary-color); border-radius: var(--border-radius); text-align: center; line-height: 20px; color: white; font-size: 0.8em; transition: width 0.5s ease-in-out;">
+                            ${progressPercentage}%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card-actions">
+                    <a href="/project-overview/${p.id || p.projectId}" class="btn btn-primary btn-sm">Übersicht</a>
+                    <a href="/project/${p.id || p.projectId}" class="btn btn-secondary btn-sm">Editor</a>
+                    <a href="/project-checklist/${p.id || p.projectId}" class="btn btn-secondary btn-sm">Checkliste</a>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Add initial project hint if "Beispielprojekt" is present and it was just loaded for the first time
     if (projects.some(p => p.projectName === "Beispielprojekt") && !window.currentUser.is_guest && window.hasInitialProjectBeenLoaded) {
         const dashboardMessageContainer = document.createElement('div');
-        dashboardMessageContainer.className = 'info-card dashboard-hint'; // Styling mit info-card
+        dashboardMessageContainer.className = 'info-card dashboard-hint'; // Use info-card for styling
         dashboardMessageContainer.innerHTML = `
             <h3>Willkommen beim Projektplaner!</h3>
             <p>Dies ist Ihr erstes Projekt, das "Beispielprojekt". Sie können es bearbeiten, um die Funktionen kennenzulernen,
             oder ein <a href="#" id="create-new-project-from-template-hint">neues Projekt aus einer Vorlage erstellen</a>
             oder ein <a href="#" id="create-blank-project-hint">leeres Projekt starten</a>.</p>
         `;
-        // Füge den Hinweis vor dem Projekt-Grid ein
         grid.parentNode.insertBefore(dashboardMessageContainer, grid);
 
         document.getElementById('create-new-project-from-template-hint')?.addEventListener('click', (e) => {
             e.preventDefault();
-            createNewProject(true); // Ruft createNewProject mit Vorlagenauswahl auf
+            createNewProject(true); // Call with flag for template selection
         });
         document.getElementById('create-blank-project-hint')?.addEventListener('click', (e) => {
             e.preventDefault();
-            createNewProject(false); // Ruft createNewProject für leeres Projekt auf
+            createNewProject(false); // Call with flag for blank project
         });
     }
 }
@@ -80,7 +114,6 @@ export async function renderProjectGrid() {
  */
 async function createInitialProject() {
     try {
-        // Ruft window.db auf
         const response = await window.db.getInitialProjectContent();
         if (response.error) {
             window.showInfoModal('Fehler', `Fehler beim Laden des Beispielprojekts: ${response.error}`);
@@ -88,9 +121,9 @@ async function createInitialProject() {
         }
 
         const initialProject = {
-            projectId: "initial_bsp_project", // Feste ID für das initiale Projekt
+            projectId: "initial_bsp_project", // Use a fixed ID for the initial project
             projectName: response.projectName || "Beispielprojekt",
-            phases: response.phases || [] // Phasen aus der Vorlage übernehmen
+            phases: response.data?.phases || response.phases || [] // Use phases from template
         };
 
         const createResponse = await window.db.createProject(initialProject);
@@ -98,27 +131,26 @@ async function createInitialProject() {
             window.showInfoModal('Fehler', 'Das initiale Beispielprojekt konnte nicht automatisch erstellt werden.');
         }
     } catch (error) {
-        console.error("Fehler beim Erstellen des initialen Projekts:", error);
+        console.error("Error creating initial project:", error);
         window.showInfoModal('Fehler', 'Ein Fehler ist beim automatischen Erstellen des Beispielprojekts aufgetreten.');
     }
 }
 
 /**
  * Startet den Projekterstellungsprozess, optional mit Vorlagenauswahl.
- * @param {boolean} [showTemplateSelection=false] Wenn true, wird das Modal zur Vorlagenauswahl angezeigt.
+ * @param {boolean} [showTemplateSelection=false] If true, shows template selection modal.
  */
 export async function createNewProject(showTemplateSelection = false) {
     if (showTemplateSelection) {
-        // Ruft window.db auf
         const templates = await window.db.getTemplates();
         if (templates.error) {
             window.showInfoModal('Fehler', `Vorlagen konnten nicht geladen werden: ${templates.error}`);
             return;
         }
 
-        // Ruft showTemplateSelectionModal auf
-        window.showTemplateSelectionModal('Neues Projekt erstellen', templates, async (selectedOption) => {
-            if (!selectedOption) return; // Benutzer hat abgebrochen
+        // Direkter Aufruf der importierten Funktion
+        showTemplateSelectionModal('Neues Projekt erstellen', templates, async (selectedOption) => {
+            if (!selectedOption) return; // User cancelled
 
             let newProjectData = {};
             let projectNamePrompt = '';
@@ -127,7 +159,6 @@ export async function createNewProject(showTemplateSelection = false) {
                 projectNamePrompt = 'Wie soll Ihr neues leeres Projekt heißen?';
                 newProjectData.phases = [];
             } else {
-                // Ruft window.db auf
                 const templateContent = await window.db.getTemplateContent(selectedOption);
                 if (templateContent.error) {
                     window.showInfoModal('Fehler', `Inhalt der Vorlage konnte nicht geladen werden: ${templateContent.error}`);
@@ -137,8 +168,8 @@ export async function createNewProject(showTemplateSelection = false) {
                 projectNamePrompt = `Name für das Projekt (Vorlage: ${templateContent.name || selectedOption}):`;
             }
 
-            // Ruft showPromptModal auf
-            window.showPromptModal('Projektname', projectNamePrompt, '', async (projectName) => {
+            // Direkter Aufruf der importierten Funktion
+            showPromptModal('Projektname', projectNamePrompt, '', async (projectName) => {
                 if (!projectName || projectName.trim() === '') {
                     if (projectName !== null) {
                         window.showInfoModal('Info', 'Projektname darf nicht leer sein.');
@@ -152,7 +183,6 @@ export async function createNewProject(showTemplateSelection = false) {
                     phases: newProjectData.phases
                 };
 
-                // Ruft window.db auf
                 const response = await window.db.createProject(finalProject);
                 if (response.ok) {
                     const createdProject = await response.json();
@@ -163,9 +193,9 @@ export async function createNewProject(showTemplateSelection = false) {
             });
         });
 
-    } else { // Sofort ein leeres Projekt erstellen
-        // Ruft showPromptModal auf
-        window.showPromptModal('Neues leeres Projekt erstellen', 'Wie soll Ihr neues leeres Projekt heißen?', '', async (projectName) => {
+    } else { // Create a blank project immediately
+        // Direkter Aufruf der importierten Funktion
+        showPromptModal('Neues leeres Projekt erstellen', 'Wie soll Ihr neues leeres Projekt heißen?', '', async (projectName) => {
             if (!projectName || projectName.trim() === '') {
                 if (projectName !== null) {
                     window.showInfoModal('Info', 'Projektname darf nicht leer sein.');
@@ -179,7 +209,6 @@ export async function createNewProject(showTemplateSelection = false) {
                 phases: []
             };
 
-            // Ruft window.db auf
             const response = await window.db.createProject(newProject);
             if (response.ok) {
                 const createdProject = await response.json();

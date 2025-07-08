@@ -1,94 +1,131 @@
 "use strict";
 
-// Importiere globale Zustandsvariablen
-import {
-    currentProjectData,
-    currentProjectId,
-    currentlySelectedItem,
-    currentlySelectedType,
-    db,
-    currentUser,
-    globalSettings,
-    hasInitialProjectBeenLoaded
-} from './core/globals.js';
-
-// Importiere Datenbank-Abstraktionen
-import { apiDb } from './core/api_db.js';
-import { guestDb } from './core/guest_db.js';
-
-// Importiere UI-Komponenten und Helfer
-import * as Modals from './ui/modals.js';
-import * as GlobalUI from './ui/global_ui.js';
-import * as ProjectTreeRenderer from './ui/project_tree_renderer.js';
-import * as CommentsManager from './ui/comments_manager.js';
-import * as ProjectOverviewRenderer from './ui/project_overview_renderer.js';
-
-// Importiere Seitenlogik
-import * as DashboardLogic from './dashboard/dashboard_logic.js';
-import * as ProjectManagerLogic from './project/project_manager_logic.js';
-import * as SettingsLogic from './settings/settings_logic.js';
-import * as InfoLogic from './info/info_logic.js';
-import * as AdminMain from './admin/admin_main.js';
-import * as UserManagement from './admin/user_management.js';
-import * as GlobalSettings from './admin/global_settings.js';
-import * as StructureCheck from './admin/structure_check.js';
-
-
 // =================================================================
-// GLOBAL STATE & INITIALIZATION (Expose to window for broader access)
+// GLOBAL STATE & INITIALIZATION
 // =================================================================
-// Diese Variablen werden global am window-Objekt verfügbar gemacht,
-// damit sie von anderen Skripten und HTML-Event-Handlern direkt
-// aufgerufen oder gelesen werden können, ohne explizite Importe in jedem File.
-// Dies ist eine gängige Praxis in kleineren Projekten ohne Build-Tools.
+let currentProjectData = null;
+let currentProjectId = null;
+let currentlySelectedItem = null;
+let currentlySelectedType = null;
+let db; // This will be our database interface (either API or LocalStorage)
+let currentUser = null; // Holds session info like { username, is_guest, isAdmin }
+let globalSettings = {}; // Guest limits etc.
+let hasInitialProjectBeenLoaded = false; // Flag to track initial project load
+
+// Expose these globally for ui.js to access
 window.currentProjectData = currentProjectData;
-window.currentProjectId = currentProjectId;
 window.currentlySelectedItem = currentlySelectedItem;
 window.currentlySelectedType = currentlySelectedType;
-window.db = db; // Wird nach Session-Check zugewiesen
-window.currentUser = currentUser; // Wird nach Session-Check zugewiesen
-window.globalSettings = globalSettings; // Wird nach Global-Settings-Check zugewiesen
-window.hasInitialProjectBeenLoaded = hasInitialProjectBeenLoaded; // Flag für Initialprojekt
+window.db = db;
+window.currentUser = currentUser;
+window.hasInitialProjectBeenLoaded = hasInitialProjectBeenLoaded; // Expose this flag
 
-// Exponiere Modal-Funktionen global
-window.showInfoModal = Modals.showInfoModal;
-window.showConfirmationModal = Modals.showConfirmationModal;
-window.showUserEditModal = Modals.showUserEditModal;
-window.showPromptModal = Modals.showPromptModal;
-window.showTemplateSelectionModal = Modals.showTemplateSelectionModal;
+// =================================================================
+// DATABASE ABSTRACTION
+// =================================================================
+const apiDb = {
+    async getProjects() { return (await fetch('/api/projects')).json(); },
+    async getProject(id) { return (await fetch(`/api/project/${id}`)).json(); },
+    async saveProject(id, data) { return fetch(`/api/project/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); },
+    async createProject(data) { return fetch('/api/project', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); },
+    async deleteProject(id) { return fetch(`/api/project/${id}`, { method: 'DELETE' }); },
+    async getSettings() { return (await fetch('/api/settings')).json(); },
+    async saveSettings(data) { return fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); },
+    async resetAllData() { return fetch('/api/reset-all-data', { method: 'POST' }); },
+    async getTemplates() { return (await fetch('/api/templates')).json(); }, // New API call
+    async getTemplateContent(templateId) { return (await fetch(`/api/template/${templateId}`)).json(); }, // New API call
+    async getInitialProjectContent() { return (await fetch('/api/initial-project')).json(); } // New API call
+};
 
-// Exponiere UI-Renderer und Manager global
-window.renderProjectTree = ProjectTreeRenderer.renderProjectTree;
-window.showDetailsInEditor = ProjectTreeRenderer.showDetailsInEditor;
-window.renderCommentsSection = CommentsManager.renderCommentsSection;
-window.showCommentsDetailModal = CommentsManager.showCommentsDetailModal;
-window.renderProjectOverviewTextView = ProjectOverviewRenderer.renderProjectOverviewTextView;
-
-// Exponiere Logik-Funktionen global, die von UI-Elementen aufgerufen werden
-window.addNewItem = ProjectManagerLogic.addNewItem;
-window.saveItemDetails = ProjectManagerLogic.saveItemDetails;
-window.addCommentToItem = CommentsManager.addCommentToItem;
-window.deleteComment = CommentsManager.deleteComment;
-window.editComment = CommentsManager.editComment;
-
+const guestDb = {
+    _getProjects() { try { return JSON.parse(localStorage.getItem('guestProjects') || '{}'); } catch (e) { return {}; } },
+    _saveProjects(p) { localStorage.setItem('guestProjects', JSON.stringify(p)); },
+    async getProjects() {
+        const projects = this._getProjects();
+        return Object.values(projects).map(p => ({ ...p, id: p.projectId, name: p.projectName, progress: this._calculateProgress(p) }));
+    },
+    async getProject(id) { return this._getProjects()[id] || null; },
+    async saveProject(id, data) {
+        const projects = this._getProjects();
+        projects[id] = data;
+        this._saveProjects(projects);
+        return { ok: true };
+    },
+    async createProject(data) {
+        const projects = this._getProjects();
+        if (Object.keys(projects).length >= (globalSettings?.guest_limits?.projects || 1)) {
+            window.showInfoModal('Limit erreicht', `Als Gast können Sie maximal ${globalSettings.guest_limits.projects} Projekte erstellen.`);
+            return { ok: false };
+        }
+        projects[data.projectId] = data;
+        this._saveProjects(projects);
+        return { ok: true, json: async () => data };
+    },
+    async deleteProject(id) {
+        const projects = this._getProjects();
+        delete projects[id];
+        this._saveProjects(projects);
+        return { ok: true };
+    },
+    _calculateProgress(project) {
+        let total = 0, completed = 0;
+        (project.phases || []).forEach(phase => {
+            (phase.tasks || []).forEach(task => {
+                const items = task.subtasks && task.subtasks.length > 0 ? task.subtasks : [task];
+                total += items.length;
+                completed += items.filter(i => i.done).length;
+            });
+        });
+        return total > 0 ? Math.round((completed / total) * 100) : 0;
+    },
+    async getSettings() { return { theme: localStorage.getItem('theme') || 'light' }; },
+    async saveSettings(s) {
+        localStorage.setItem('theme', s.theme);
+        return { ok: true };
+    },
+    async resetAllData() {
+        localStorage.removeItem('guestProjects');
+        return { ok: true };
+    },
+    async getTemplates() { return []; }, // Guests don't get server templates
+    async getTemplateContent(templateId) { return { error: "Guests cannot access templates." }; },
+    async getInitialProjectContent() {
+        // For guest, provide a very simple example or empty. Let's provide a basic one.
+        return {
+            projectId: "bsp_guest",
+            projectName: "Beispielprojekt (Gast)",
+            phases: [
+                {
+                    phaseId: "phase01",
+                    phaseName: "Erste Schritte",
+                    isExpanded: true,
+                    tasks: [
+                        { taskId: "task01", taskName: "App erkunden", subtasks: [] }
+                    ]
+                }
+            ]
+        };
+    }
+};
 
 // =================================================================
 // INITIALIZATION
 // =================================================================
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Lade Session- und globale Einstellungen
         const [session, settings] = await Promise.all([
             fetch('/api/session').then(res => res.json()),
             fetch('/api/global-settings').then(res => res.json())
         ]);
 
-        // Weise globale Variablen zu (direkt auf window, da importierte Variablen Konstanten sind)
-        window.currentUser = session;
-        window.globalSettings = settings;
-        window.db = session.is_guest ? guestDb : apiDb;
+        currentUser = session;
+        globalSettings = settings;
+        db = session.is_guest ? guestDb : apiDb;
 
-        // Überprüfe Anmelde-Status für öffentliche Seiten
+        // Update global window objects
+        window.db = db;
+        window.currentUser = currentUser;
+
         const publicPages = ['/', '/login', '/register', '/info', '/agb'];
         const path = window.location.pathname;
         if (!session.logged_in && !session.is_guest && !publicPages.some(p => path.startsWith(p))) {
@@ -96,33 +133,63 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Theme anwenden und seiten-spezifisches Setup ausführen
-        await GlobalUI.applyTheme();
+        await applyTheme();
         runPageSpecificSetup();
 
     } catch (error) {
-        console.error("Initialisierung fehlgeschlagen:", error);
+        console.error("Initialization failed:", error);
     }
 });
 
-/**
- * Führt das Setup für die aktuelle Seite basierend auf dem Pfad aus.
- */
+async function applyTheme() {
+    const settings = await db.getSettings();
+    const isDark = settings.theme === 'dark';
+    document.body.classList.toggle('dark-mode', isDark);
+
+    const themeSwitcher = document.getElementById('themeSwitcher');
+    if (themeSwitcher) {
+        themeSwitcher.checked = isDark;
+    }
+}
+
+
+// NEU: Direkter Import von setupGlobalUI
+import { setupGlobalUI, updateHeaderTitles } from './ui/global_ui.js';
+// Importiere spezifische Setup-Funktionen direkt
+import { setupDashboardPage } from './dashboard/dashboard_logic.js';
+import { setupProjectManagerPage, setupProjectChecklistPage } from './project/project_manager_logic.js';
+import { setupSettingsPage } from './settings/settings_logic.js';
+import { setupInfoPage } from './info/info_logic.js';
+import { setupAdminPages } from './admin/admin_main.js';
+import { setupProjectOverviewPage } from './ui/project_overview_renderer.js';
+
+
 function runPageSpecificSetup() {
-    GlobalUI.setupGlobalUI(window.currentUser); // Globale UI einrichten
+    // Direkter Aufruf der importierten Funktion
+    setupGlobalUI(currentUser);
     const path = window.location.pathname;
 
     const projectPageMatch = path.match(/^\/project(?:-overview|-checklist)?\/([a-zA-Z0-9_]+)/);
 
+    let projectTitle = '';
+    let pageTitle = '';
+
     if (projectPageMatch) {
         window.currentProjectId = projectPageMatch[1]; // Setze die globale Projekt-ID
+        projectTitle = 'Projekt: ...'; // Platzhalter, wird später durch tatsächlichen Namen ersetzt
+        
         // Setup für alle projektbezogenen Seiten
         if (path.startsWith('/project/')) {
-            ProjectManagerLogic.setupProjectManagerPage();
+            setupProjectManagerPage(); // Direkter Aufruf
+            pageTitle = 'Editor';
         } else if (path.startsWith('/project-overview/')) {
-            ProjectOverviewRenderer.setupProjectOverviewPage();
+            setupProjectOverviewPage(); // Direkter Aufruf
+            pageTitle = 'Übersicht';
+        } else if (path.startsWith('/project-checklist/')) {
+            setupProjectChecklistPage(); // Direkter Aufruf
+            pageTitle = 'Checkliste';
         }
-        // Menü für aktuelles Projekt einblenden
+        // Menü für aktuelles Projekt einblenden und Buttons setzen
         const projectMenu = document.getElementById('current-project-menu');
         if (projectMenu) {
             projectMenu.classList.remove('hidden');
@@ -133,13 +200,57 @@ function runPageSpecificSetup() {
             projectMenu.querySelector('.submenu').classList.add('open');
         }
 
+        // Setze Navigationsbuttons für Projektansichten
+        const goToOverviewBtn = document.getElementById('go-to-overview-btn');
+        const goToEditorBtn = document.getElementById('go-to-editor-btn');
+        const goToChecklistBtn = document.getElementById('go-to-checklist-btn');
+
+        if (goToOverviewBtn) {
+            goToOverviewBtn.href = `/project-overview/${window.currentProjectId}`;
+        }
+        if (goToEditorBtn) {
+            goToEditorBtn.href = `/project/${window.currentProjectId}`;
+        }
+        if (goToChecklistBtn) {
+            goToChecklistBtn.href = `/project-checklist/${window.currentProjectId}`;
+        }
+
     } else if (path.startsWith('/dashboard')) {
-        DashboardLogic.setupDashboardPage();
+        setupDashboardPage(); // Direkter Aufruf
+        pageTitle = 'Dashboard';
     } else if (path.startsWith('/settings')) {
-        SettingsLogic.setupSettingsPage();
-    } else if (path.startsWith('/info') || path.startsWith('/agb')) {
-        InfoLogic.setupInfoPage();
+        setupSettingsPage(); // Direkter Aufruf
+        pageTitle = 'Einstellungen';
+    } else if (path.startsWith('/info')) { // Changed to startsWith to catch #anchors
+        setupInfoPage(); // Direkter Aufruf
+        pageTitle = 'Info & Hilfe';
+    } else if (path.startsWith('/agb')) {
+        setupInfoPage(); // AGB uses info_logic for accordion, etc.
+        pageTitle = 'AGB';
     } else if (path.startsWith('/admin')) {
-        AdminMain.setupAdminPages();
+        setupAdminPages(); // Direkter Aufruf
+        // Admin-Seiten haben oft eigene Titel in den Templates,
+        // hier könnte man spezifische Titel setzen, falls gewünscht.
+        // Für den Moment bleibt der pageTitle leer oder wird vom Template bestimmt.
+        const adminPageTitles = {
+            '/admin': 'Admin Dashboard',
+            '/admin/users': 'Benutzerverwaltung',
+            '/admin/settings': 'Globale Einstellungen',
+            '/admin/structure-check': 'Struktur-Check'
+        };
+        pageTitle = adminPageTitles[path] || 'Admin Bereich';
+
+    } else { // Default for index page
+        pageTitle = 'Willkommen';
     }
+
+    // Aktualisiere den Header-Titel, nachdem die seiten-spezifische Logik gelaufen ist
+    // und window.currentProjectData (falls vorhanden) gesetzt wurde.
+    if (window.currentProjectData && window.currentProjectData.projectName) {
+        projectTitle = window.currentProjectData.projectName;
+    } else if (path === '/dashboard' || path === '/') {
+        projectTitle = ''; // Auf Dashboard oder Index kein Projekttitel im Header
+    }
+    // Direkter Aufruf der importierten Funktion
+    updateHeaderTitles(projectTitle, pageTitle);
 }

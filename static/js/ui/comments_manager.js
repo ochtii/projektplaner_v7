@@ -5,6 +5,9 @@
 // =================================================================
 // Dieses Modul verwaltet das Rendern, Hinzufügen, Bearbeiten und Löschen von Kommentaren.
 
+// Importiere Modal-Funktionen direkt
+import { showInfoModal, showConfirmationModal, showPromptModal } from '../ui/modals.js';
+
 /**
  * Rendert die Kommentare für ein gegebenes Element im Editor-Bereich.
  * @param {object} item Das Datenobjekt (Phase, Aufgabe oder Subaufgabe).
@@ -39,18 +42,20 @@ export function renderCommentsSection(item) {
     });
     commentsSectionDiv.scrollTop = commentsSectionDiv.scrollHeight; // Zum Ende scrollen
 
-    // Event Listener für neue Icons hinzufügen
+    // Add event listeners for new icons
     commentsSectionDiv.querySelectorAll('.edit-comment-icon').forEach(icon => {
         icon.addEventListener('click', (e) => {
             const timestamp = e.target.dataset.timestamp;
             const commentToEdit = item.comments.find(c => c.timestamp === timestamp);
             if (commentToEdit) {
-                window.showPromptModal('Kommentar bearbeiten', 'Neuer Kommentartext:', commentToEdit.text, async (newText) => {
+                // Direkter Aufruf der importierten Funktion
+                showPromptModal('Kommentar bearbeiten', 'Neuer Kommentartext:', commentToEdit.text, async (newText) => {
                     if (newText !== null && newText.trim() !== commentToEdit.text.trim()) {
                         await editComment(item, timestamp, newText.trim());
                     } else if (newText === '') {
                         // Option zum Löschen, wenn Text gelöscht wird
-                        window.showConfirmationModal('Kommentar löschen?', 'Möchten Sie diesen Kommentar wirklich löschen, da er leer ist?', async () => {
+                        // Direkter Aufruf der importierten Funktion
+                        showConfirmationModal('Kommentar löschen?', 'Möchten Sie diesen Kommentar wirklich löschen, da er leer ist?', async () => {
                             await deleteComment(item, timestamp);
                         });
                     }
@@ -62,7 +67,8 @@ export function renderCommentsSection(item) {
     commentsSectionDiv.querySelectorAll('.delete-comment-icon').forEach(icon => {
         icon.addEventListener('click', (e) => {
             const timestamp = e.target.dataset.timestamp;
-            window.showConfirmationModal('Kommentar löschen?', 'Möchten Sie diesen Kommentar wirklich löschen?', async () => {
+            // Direkter Aufruf der importierten Funktion
+            showConfirmationModal('Kommentar löschen?', 'Möchten Sie diesen Kommentar wirklich löschen?', async () => {
                 await deleteComment(item, timestamp);
             });
         });
@@ -88,9 +94,11 @@ export async function addCommentToItem(item, commentText) {
     if (response.ok) {
         document.getElementById('new-comment-input').value = ''; // Eingabefeld leeren
         renderCommentsSection(item); // Kommentare neu rendern
-        window.showInfoModal('Erfolg', 'Kommentar hinzugefügt.');
+        // Direkter Aufruf der importierten Funktion
+        showInfoModal('Erfolg', 'Kommentar hinzugefügt.');
     } else {
-        window.showInfoModal('Fehler', 'Kommentar konnte nicht hinzugefügt werden.');
+        // Direkter Aufruf der importierten Funktion
+        showInfoModal('Fehler', 'Kommentar konnte nicht hinzugefügt werden.');
     }
 }
 
@@ -108,9 +116,11 @@ export async function deleteComment(item, commentTimestamp) {
         const response = await window.db.saveProject(window.currentProjectId, window.currentProjectData);
         if (response.ok) {
             renderCommentsSection(item); // Kommentare neu rendern
-            window.showInfoModal('Erfolg', 'Kommentar gelöscht.');
+            // Direkter Aufruf der importierten Funktion
+            showInfoModal('Erfolg', 'Kommentar gelöscht.');
         } else {
-            window.showInfoModal('Fehler', 'Kommentar konnte nicht gelöscht werden.');
+            // Direkter Aufruf der importierten Funktion
+            showInfoModal('Fehler', 'Kommentar konnte nicht gelöscht werden.');
         }
     }
 }
@@ -129,9 +139,11 @@ export async function editComment(item, commentTimestamp, newText) {
         const response = await window.db.saveProject(window.currentProjectId, window.currentProjectData);
         if (response.ok) {
             renderCommentsSection(item); // Kommentare neu rendern
-            window.showInfoModal('Erfolg', 'Kommentar bearbeitet.');
+            // Direkter Aufruf der importierten Funktion
+            showInfoModal('Erfolg', 'Kommentar bearbeitet.');
         } else {
-            window.showInfoModal('Fehler', 'Kommentar konnte nicht bearbeitet werden.');
+            // Direkter Aufruf der importierten Funktion
+            showInfoModal('Fehler', 'Kommentar konnte nicht bearbeitet werden.');
         }
     }
 }

@@ -5,6 +5,9 @@
 // =================================================================
 // Dieses Modul enthält die Logik für die Benutzerverwaltung im Admin-Bereich.
 
+// Importiere Modal-Funktionen direkt
+import { showUserEditModal, showInfoModal, showConfirmationModal } from '../ui/modals.js';
+
 /**
  * Richtet die Benutzerverwaltungsseite ein.
  * Lädt Benutzerdaten und initialisiert Event-Listener für Aktionen.
@@ -78,19 +81,19 @@ async function handleEditUser(event) {
     const email = row.dataset.email;
     const isAdmin = row.dataset.isAdmin === 'true';
 
-    // Ruft showUserEditModal auf
-    window.showUserEditModal(username, email, isAdmin, async (newUsername, newEmail, newIsAdmin) => {
+    // Ruft showUserEditModal auf (direkt importiert)
+    showUserEditModal(username, email, isAdmin, async (newUsername, newEmail, newIsAdmin) => {
         const response = await fetch(`/api/admin/user/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: newUsername, email: newEmail, isAdmin: newIsAdmin })
         });
         if (response.ok) {
-            window.showInfoModal('Erfolg', `Benutzer ${newUsername} wurde aktualisiert.`);
+            showInfoModal('Erfolg', `Benutzer ${newUsername} wurde aktualisiert.`);
             setupUserManagementPage(); // Tabelle neu laden
         } else {
             const error = await response.json();
-            window.showInfoModal('Fehler', `Konnte Benutzer nicht aktualisieren: ${error.error}`);
+            showInfoModal('Fehler', `Konnte Benutzer nicht aktualisieren: ${error.error}`);
         }
     });
 }
@@ -105,14 +108,14 @@ async function handleDeleteUser(event) {
     const userId = row.dataset.userId;
     const username = row.dataset.username;
 
-    // Ruft showConfirmationModal auf
-    window.showConfirmationModal('Benutzer löschen', `Möchten Sie den Benutzer "${username}" wirklich endgültig löschen? Alle seine Daten gehen verloren.`, async () => {
+    // Ruft showConfirmationModal auf (direkt importiert)
+    showConfirmationModal('Benutzer löschen', `Möchten Sie den Benutzer "${username}" wirklich endgültig löschen? Alle seine Daten gehen verloren.`, async () => {
         const response = await fetch(`/api/admin/user/${userId}`, { method: 'DELETE' });
         if (response.ok) {
-            window.showInfoModal('Erfolg', `Benutzer ${username} wurde gelöscht.`);
+            showInfoModal('Erfolg', `Benutzer ${username} wurde gelöscht.`);
             setupUserManagementPage(); // Tabelle neu laden
         } else {
-            window.showInfoModal('Fehler', 'Konnte Benutzer nicht löschen.');
+            showInfoModal('Fehler', 'Konnte Benutzer nicht löschen.');
         }
     });
 }
@@ -127,8 +130,8 @@ async function handleResetPassword(event) {
     const userId = row.dataset.userId;
     const username = row.dataset.username;
 
-    // Ruft showConfirmationModal auf
-    window.showConfirmationModal('Passwort zurücksetzen', `Möchten Sie das Passwort für "${username}" wirklich zurücksetzen? Ein neues, zufälliges Passwort wird generiert.`, async () => {
+    // Ruft showConfirmationModal auf (direkt importiert)
+    showConfirmationModal('Passwort zurücksetzen', `Möchten Sie das Passwort für "${username}" wirklich zurücksetzen? Ein neues, zufälliges Passwort wird generiert.`, async () => {
         const response = await fetch(`/api/admin/user/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -136,9 +139,9 @@ async function handleResetPassword(event) {
         });
         if (response.ok) {
             const result = await response.json();
-            window.showInfoModal('Passwort zurückgesetzt', `Das neue Passwort für ${username} lautet: <strong>${result.new_password}</strong><br>Bitte speichern Sie es an einem sicheren Ort, es kann nicht erneut angezeigt werden.`);
+            showInfoModal('Passwort zurückgesetzt', `Das neue Passwort für ${username} lautet: <strong>${result.new_password}</strong><br>Bitte speichern Sie es an einem sicheren Ort, es kann nicht erneut angezeigt werden.`);
         } else {
-            window.showInfoModal('Fehler', 'Passwort konnte nicht zurückgesetzt werden.');
+            showInfoModal('Fehler', 'Passwort konnte nicht zurückgesetzt werden.');
         }
     });
 }

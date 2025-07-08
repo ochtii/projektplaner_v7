@@ -9,6 +9,10 @@
     --font-family: 'Inter', sans-serif;
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     --border-radius: 8px;
+    /* Farben für Farbmodus */
+    --phase-bg-color: rgba(74, 144, 226, 0.08); /* Leichter Blauton */
+    --task-bg-color: rgba(80, 227, 194, 0.08);  /* Leichter Grünton */
+    --subtask-bg-color: rgba(255, 165, 0, 0.08); /* Leichter Orangeton */
 }
 
 /* Dark Mode Variablen */
@@ -17,6 +21,10 @@ body.dark-mode {
     --surface-color: #2c2c2c;
     --text-color: #f0f0f0;
     --border-color: #444444;
+    /* Farben für Farbmodus im Dark Mode */
+    --phase-bg-color: rgba(74, 144, 226, 0.15);
+    --task-bg-color: rgba(80, 227, 194, 0.15);
+    --subtask-bg-color: rgba(255, 165, 0, 0.15);
 }
 
 /* Globale Resets und Body-Styling */
@@ -62,11 +70,42 @@ body {
     background-color: var(--surface-color); 
     height: 60px;
 }
+/* Header Left: Project Title & Page Title */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1; /* Allows it to take available space */
+    flex-direction: row-reverse; /* NEU: Tauscht die Reihenfolge der Elemente */
+    justify-content: flex-end; /* NEU: Schiebt die Elemente nach rechts */
+}
+
+.header-left h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-color);
+}
+
+.header-left .separator {
+    color: var(--border-color);
+    font-size: 1.25rem;
+    margin: 0 0.5rem;
+}
+
+.header-left .page-title {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Header Right: Actions (Login/User Info) */
 .header-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex-shrink: 0; /* Prevents shrinking */
 }
+
 .header-actions .btn {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
@@ -92,10 +131,42 @@ main { padding: 2rem; flex-grow: 1; }
 
 /* Dashboard */
 .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-.project-card { background-color: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+.project-card { 
+    background-color: var(--surface-color); 
+    padding: 1.5rem; 
+    border-radius: var(--border-radius); 
+    box-shadow: var(--shadow); 
+    transition: transform 0.2s, box-shadow 0.2s; 
+    display: flex; 
+    flex-direction: column; 
+}
 .project-card:hover { transform: translateY(-5px); box-shadow: 0 8px 12px rgba(0,0,0,0.1); }
 .project-card h3 { margin-bottom: auto; }
-.project-card-actions { margin-top: 1rem; }
+.project-card-actions { 
+    margin-top: 1rem; 
+    display: flex; /* Use flex for buttons */
+    gap: 0.5rem; /* Space between buttons */
+    flex-wrap: wrap; /* Allow buttons to wrap */
+}
+/* Dashboard Progress Bar */
+.project-card-progress {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+.project-card-progress .progress-bar-container {
+    height: 20px; /* Smaller height for dashboard cards */
+}
+.project-card-progress .progress-bar-container div {
+    line-height: 20px;
+    font-size: 0.8em;
+}
+
+/* Make dashboard card buttons smaller */
+.project-card-actions .btn.btn-sm {
+    padding: 0.3rem 0.6rem; /* Smaller padding */
+    font-size: 0.75rem; /* Smaller font size */
+}
+
 
 /* Modernisierte Einstellungsseite */
 .settings-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
@@ -249,8 +320,8 @@ main { padding: 2rem; flex-grow: 1; }
 }
 
 .project-tree-container {
-    flex: 0 0 385px; /* Fixed width for the tree container, make it narrower */
-    max-width: 385px;
+    flex: 0 0 424px; /* Breite um 10% erhöht (385 * 1.1 = 423.5) */
+    max-width: 424px; /* Breite um 10% erhöht */
     background-color: var(--surface-color);
     padding: 1.5rem;
     border-radius: var(--border-radius);
@@ -258,6 +329,32 @@ main { padding: 2rem; flex-grow: 1; }
     display: flex;
     flex-direction: column; /* Ensure header and list stack vertically */
 }
+
+/* Dragging styles */
+.project-tree li[draggable="true"] {
+    cursor: grab;
+}
+
+.project-tree li.dragging {
+    opacity: 0.5;
+    border: 1px dashed var(--primary-color);
+}
+
+.project-tree li.drag-over-top {
+    border-top: 2px solid var(--primary-color);
+}
+
+.project-tree li.drag-over-bottom {
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Optional: Visual feedback for dropping into a container (e.g., a task list) */
+.project-tree ul.checklist-tasks.drag-over-center,
+.project-tree ul.checklist-subtasks.drag-over-center {
+    outline: 2px dashed var(--secondary-color);
+    background-color: rgba(80, 227, 194, 0.1);
+}
+
 
 .project-editor-container {
     flex-grow: 1; /* Editor takes up remaining space */
@@ -316,6 +413,7 @@ main { padding: 2rem; flex-grow: 1; }
 
 .project-overview-list li ul li::before {
     left: 1.5rem;
+
 }
 
 .project-overview-list li ul ul li::before {
@@ -466,4 +564,402 @@ main { padding: 2rem; flex-grow: 1; }
 .modal-footer .btn {
     min-width: 100px; /* Give buttons a minimum width */
     justify-content: center; /* Center text in buttons */
+}
+
+/* Template Selection Modal Specifics */
+.template-selection-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.template-option {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.template-option:hover {
+    background-color: var(--background-color);
+    border-color: var(--primary-color);
+}
+
+.template-option input[type="radio"] {
+    margin-right: 0.75rem;
+    margin-top: 0.25rem; /* Align radio button with text */
+    flex-shrink: 0; /* Prevent radio from shrinking */
+}
+
+.template-option h4 {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    color: var(--primary-color);
+}
+
+.template-option p {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* Checklist specific styles */
+.checklist-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.checklist-list ul {
+    list-style: none;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.checklist-item {
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.checklist-item .item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0;
+}
+
+.checklist-item .item-header label {
+    flex-grow: 1;
+    cursor: pointer;
+}
+
+.checklist-checkbox {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-right: 5px;
+    cursor: pointer;
+    accent-color: var(--primary-color); /* Colors the checkbox itself */
+}
+
+.checklist-checkbox:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Strikethrough for completed items */
+.checklist-checkbox:checked + label {
+    text-decoration: line-through;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Style for graphical view placeholder */
+.overview-container-graphical {
+    background-color: var(--background-color);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.7;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* New styles for the progress bar container */
+.checklist-progress-container {
+    width: 100%;
+    background-color: var(--border-color); /* Use border-color for the empty part */
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    padding: 3px; /* Add a small padding to give a visual border effect to the inner bar */
+}
+
+#checklist-progress-bar {
+    height: 25px;
+    background-color: var(--primary-color);
+    border-radius: calc(var(--border-radius) - 2px); /* Slightly smaller radius for inner bar */
+    text-align: center;
+    line-height: 25px;
+    color: white;
+    transition: width 0.5s ease-in-out, background-color 0.3s ease; /* Add background-color transition */
+    display: flex; /* Use flex to center text vertically if needed */
+    align-items: center;
+    justify-content: center;
+}
+
+#checklist-progress-percentage {
+    font-weight: 600;
+    text-shadow: 0 0 3px rgba(0,0,0,0.3); /* Add subtle shadow for better readability */
+}
+
+/* Styles for the progress bar label and info icon */
+.progress-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    gap: 0.5rem;
+}
+
+.progress-info-icon {
+    cursor: pointer;
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+
+.progress-info-icon:hover {
+    color: var(--secondary-color);
+}
+
+/* New styles for the overall progress section container */
+.progress-section {
+    margin-top: 2rem; /* Adjust margin-top to create space below view-switcher */
+    margin-bottom: 2rem; /* Space below the progress section */
+    background-color: var(--surface-color); /* Add a background to group it visually */
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+/* Styles for comments within the checklist items */
+.checklist-comment-preview {
+    margin-top: 0.2rem; /* Small space below item title */
+    margin-left: 1.5rem; /* Indent comments slightly */
+    font-size: 0.8em; /* Smaller font size */
+    color: var(--text-color);
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checklist-comment-preview strong {
+    font-weight: 500; /* Less bold for "Kommentar:" */
+}
+
+.checklist-comment-preview .comment-icon {
+    font-size: 0.9em; /* Smaller icon for preview */
+    margin-left: 0; /* Remove extra margin */
+}
+
+/* Styles for the comment toggle switch */
+.comment-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto; /* Push to the right */
+    padding-left: 1rem; /* Space from other buttons */
+    margin-top: 1rem; /* Added margin-top */
+    margin-bottom: 1rem; /* Added margin-bottom */
+}
+
+/* Base styles for the toggle switch (copied from settings) */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    width: 48px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.slider {
+    background-color: var(--border-color);
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+}
+
+.slider:before {
+    background-color: var(--surface-color);
+    bottom: 4px;
+    content: "";
+    height: 16px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 16px;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Info page accordion styles */
+.info-card .accordion-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem; /* Mehr Padding für Klickbereich */
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem; /* Abstand zwischen den Karten */
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.info-card .accordion-toggle:hover {
+    background-color: var(--background-color);
+    border-color: var(--primary-color); /* Randfarbe bei Hover */
+}
+
+.info-card .accordion-toggle h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-color);
+    flex-grow: 1;
+}
+
+.info-card .accordion-toggle .arrow {
+    transition: transform 0.3s ease;
+}
+
+.info-card .accordion-toggle.open .arrow {
+    transform: rotate(180deg);
+}
+
+.info-card-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; /* Übergang für max-height und padding */
+    padding: 0 1.5rem; /* Horizontales Padding immer, vertikales nur wenn offen */
+    background-color: var(--background-color); /* Hintergrund für den Inhalt */
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    margin-bottom: 0.5rem; /* Abstand zur nächsten Karte */
+}
+
+.info-card-content.open {
+    max-height: 2000px; /* Ausreichend großer Wert, um Inhalt anzuzeigen */
+    padding-top: 1rem; /* Padding, wenn geöffnet */
+    padding-bottom: 1.5rem; /* Mehr Padding unten, wenn offen */
+}
+
+/* Support Formular Styling */
+.support-form {
+    background-color: var(--background-color); /* Leichter Hintergrund für das Formular */
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Dezenter innerer Schatten */
+    margin-top: 1.5rem;
+}
+
+.support-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.support-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.support-form .form-control {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.support-form .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* Leichter Fokus-Schatten */
+    outline: none;
+}
+
+.support-form textarea.form-control {
+    resize: vertical; /* Nur vertikales Resizing erlauben */
+    min-height: 80px;
+}
+
+.support-form .btn-primary {
+    width: auto; /* Button nicht über die volle Breite ziehen */
+    margin-top: 1rem;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+}
+/* Anleitung und FAQ Überschriften */
+.info-card-content h4.section-heading {
+    font-size: 1.3rem; /* Etwas größer als normal h4 */
+    color: var(--primary-color); /* Akzentfarbe */
+    margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border-color); /* Trennlinie */
+}
+
+/* FAQ Fragen und Antworten */
+.faq-list dt {
+    font-weight: 600; /* Fragen fetter */
+    color: var(--text-color);
+    margin-top: 1rem; /* Abstand zwischen Fragen */
+    margin-bottom: 0.3rem;
+}
+
+.faq-list dd {
+    margin-left: 1.5rem; /* Antworten leicht einrücken */
+    margin-bottom: 0.8rem; /* Abstand nach der Antwort */
+    color: var(--text-color);
+    opacity: 0.9;
+}
+
+/* Farbmodus für Checkliste */
+.checklist-container-text.color-mode-active .phase-item > .item-header {
+    background-color: var(--phase-bg-color);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+}
+
+.checklist-container-text.color-mode-active .task-item > .item-header {
+    background-color: var(--task-bg-color);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+}
+
+.checklist-container-text.color-mode-active .subtask-item > .item-header {
+    background-color: var(--subtask-bg-color);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
 }

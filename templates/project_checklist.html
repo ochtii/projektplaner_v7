@@ -1,10 +1,62 @@
+<!-- templates/project_checklist.html -->
 {% extends "base.html" %}
 {% block title %}Projekt Checkliste{% endblock %}
 {% block content %}
 <div class="page-header">
     <h2 id="page-main-title">Projekt Checkliste</h2>
+    <div class="project-actions">
+        <!-- Buttons zum schnellen Wechsel zwischen den Ansichten -->
+        <a href="#" id="go-to-editor-btn" class="btn btn-secondary">&#9998; Zum Editor</a>
+        <a href="#" id="go-to-overview-btn" class="btn btn-secondary">&#8617; Zur Übersicht</a>
+    </div>
 </div>
-<div id="checklist-container">
+
+<div class="view-switcher">
+    <button class="btn btn-primary" id="checklist-text-view-btn">Textansicht</button>
+    <button class="btn btn-secondary" id="checklist-graphical-view-btn">Grafische Ansicht</button>
+    
+    <!-- NEU: Button für Anzeige-Einstellungen -->
+    <button class="btn btn-secondary" id="toggle-checklist-settings-btn" style="margin-left: 1rem;">Anzeige-Einstellungen</button>
+</div>
+
+<!-- NEU: Einstellungsbereich für die Checkliste -->
+<div id="checklist-settings-panel" class="settings-panel hidden">
+    <div class="setting-item">
+        <div class="setting-item-label">
+            <h4>Kommentare anzeigen</h4>
+            <p>Schalten Sie die Anzeige von Kommentarvorschauen in der Checkliste ein oder aus.</p>
+        </div>
+        <div class="setting-item-control">
+            <label class="theme-switch" for="toggle-comments">
+                <input type="checkbox" id="toggle-comments" />
+                <div class="slider round"></div>
+            </label>
+        </div>
+    </div>
+    <div class="setting-item">
+        <div class="setting-item-label">
+            <h4>Farbmodus aktivieren</h4>
+            <p>Färbt Hierarchieebenen unterschiedlich ein, um die Struktur besser zu erkennen.</p>
+        </div>
+        <div class="setting-item-control">
+            <label class="theme-switch" for="toggle-color-mode">
+                <input type="checkbox" id="toggle-color-mode" />
+                <div class="slider round"></div>
+            </label>
+        </div>
+    </div>
+</div>
+
+<!-- Container für Projektfortschritt und Details -->
+<div id="checklist-progress-section">
+    <!-- Inhalt wird von JS gerendert -->
+</div>
+
+
+<div id="checklist-text-view-content" class="checklist-container-text">
     <p>Lade Checkliste...</p>
+</div>
+<div id="checklist-graphical-view-content" class="overview-container-graphical hidden">
+    <p>Grafische Checklistenansicht wird hier geladen...</p>
 </div>
 {% endblock %}

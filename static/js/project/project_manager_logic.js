@@ -6,6 +6,12 @@
 // Dieses Modul enthält die Kernlogik für die Verwaltung von Projekten,
 // Phasen, Aufgaben und Unteraufgaben.
 
+// Importiere den ChecklistRenderer direkt
+import { renderChecklistTextView } from '../ui/checklist_renderer.js';
+import * as GlobalUI from '../ui/global_ui.js'; // Importiere GlobalUI für Header-Updates
+import { renderProjectTree } from '../ui/project_tree_renderer.js'; // NEU: Direkter Import von renderProjectTree
+
+
 /**
  * Richtet die Projektmanager-Seite ein.
  * Lädt Projektdaten und initialisiert Event-Listener.
@@ -15,9 +21,12 @@ export async function setupProjectManagerPage() {
     const projectData = await window.db.getProject(window.currentProjectId);
     if (projectData) {
         window.currentProjectData = projectData; // Globale Referenz aktualisieren
+        // Aktualisiere den Projektnamen im Haupttitel und im globalen Header
         document.getElementById('page-main-title').textContent = `Projekt: ${projectData.projectName}`;
-        // Ruft window.renderProjectTree auf
-        window.renderProjectTree(window.currentProjectData, document.getElementById('projectTree'));
+        GlobalUI.updateHeaderTitles(projectData.projectName, 'Editor');
+
+        // Ruft renderProjectTree direkt auf
+        renderProjectTree(window.currentProjectData, document.getElementById('projectTree'));
     }
 
     // Event-Listener für Buttons
@@ -41,6 +50,57 @@ export async function setupProjectManagerPage() {
 }
 
 /**
+ * Richtet die Projekt-Checklisten-Seite ein.
+ * Lädt Projektdaten und rendert die Checkliste.
+ */
+export async function setupProjectChecklistPage() {
+    const projectData = await window.db.getProject(window.currentProjectId);
+    const checklistTextViewContainer = document.getElementById('checklist-text-view-content');
+    const checklistGraphicalViewContainer = document.getElementById('checklist-graphical-view-content');
+
+    if (projectData) {
+        window.currentProjectData = projectData;
+        // Aktualisiere den Projektnamen im Haupttitel und im globalen Header
+        document.getElementById('page-main-title').textContent = `Checkliste für: ${projectData.projectName}`;
+        GlobalUI.updateHeaderTitles(projectData.projectName, 'Checkliste');
+        
+        if (checklistTextViewContainer) { // Überprüfen, ob das Element existiert
+            // Ruft renderChecklistTextView direkt über den Import auf
+            renderChecklistTextView(window.currentProjectData, checklistTextViewContainer);
+        } else {
+            console.error("Fehler: Das Element 'checklist-text-view-content' wurde nicht gefunden.");
+            // Fallback-Anzeige, falls der Container nicht gefunden wird
+            const mainChecklistContainer = document.getElementById('checklist-container'); // Dies war die alte ID, falls sie noch irgendwo existiert
+            if (mainChecklistContainer) {
+                mainChecklistContainer.innerHTML = '<p>Fehler: Die Textansicht der Checkliste konnte nicht geladen werden (Container nicht gefunden).</p>';
+            }
+        }
+
+        // Ansichts-Umschalter einrichten
+        document.getElementById('checklist-text-view-btn')?.addEventListener('click', () => {
+            if (checklistTextViewContainer) checklistTextViewContainer.classList.remove('hidden');
+            if (checklistGraphicalViewContainer) checklistGraphicalViewContainer.classList.add('hidden');
+        });
+        document.getElementById('checklist-graphical-view-btn')?.addEventListener('click', () => {
+            if (checklistTextViewContainer) checklistTextViewContainer.classList.add('hidden');
+            if (checklistGraphicalViewContainer) {
+                checklistGraphicalViewContainer.classList.remove('hidden');
+                // TODO: Grafische Checklistenansicht hier implementieren
+                checklistGraphicalViewContainer.innerHTML = '<p>Grafische Checklistenansicht wird hier geladen...</p>';
+            }
+        });
+
+    } else {
+        // Korrigierte ID für die Fehlermeldung
+        if (checklistTextViewContainer) {
+            checklistTextViewContainer.innerHTML = '<p>Projekt konnte nicht geladen werden.</p>';
+        } else {
+            console.error("Fehler: Das Element 'checklist-text-view-content' wurde nicht gefunden, um den Ladefehler anzuzeigen.");
+        }
+    }
+}
+
+/**
  * Bearbeitet den Namen des aktuellen Projekts.
  */
 export async function editProjectName() {
@@ -60,6 +120,7 @@ export async function editProjectName() {
         const response = await window.db.saveProject(window.currentProjectId, window.currentProjectData);
         if (response.ok) {
             document.getElementById('page-main-title').textContent = `Projekt: ${window.currentProjectData.projectName}`;
+            GlobalUI.updateHeaderTitles(window.currentProjectData.projectName, 'Editor'); // Aktualisiere Header
             window.showInfoModal('Erfolg', 'Projektname erfolgreich aktualisiert.');
         } else {
             window.showInfoModal('Fehler', 'Projektname konnte nicht aktualisiert werden.');
@@ -71,7 +132,7 @@ export async function editProjectName() {
  * Löscht das aktuell geladene Projekt.
  */
 export async function deleteCurrentProject() {
-    if (!window.currentProjectId) return;
+    if (!window.currentProjectData) return;
 
     // Ruft showConfirmationModal auf
     window.showConfirmationModal('Projekt löschen', `Möchten Sie das Projekt "${window.currentProjectData.projectName}" wirklich endgültig löschen?`, async () => {
