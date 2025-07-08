@@ -15,7 +15,8 @@ app.secret_key = 'your_very_secret_key_12345'
 DATA_ROOT = os.path.join('static', 'data')
 USER_DATA_DIR = os.path.join(DATA_ROOT, 'user_data')
 USERS_FILE = os.path.join(DATA_ROOT, 'users.json')
-SETTINGS_FILE = os.path.join(DATA_ROOT, 'global_settings.json')
+SETTINGS_FILE = os.path.join('api', 'global_settings.json')
+STRUCTURE_FILE = 'structure.json' # Hinzugefügt für den neuen Endpunkt
 os.makedirs(USER_DATA_DIR, exist_ok=True)
 
 # --- Helper-Funktionen ---
@@ -30,6 +31,7 @@ def _load_json(filepath, default_data={}):
         return default_data
 
 def _save_json(filepath, data):
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
@@ -62,8 +64,7 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# --- Routen für Seiten ---
-
+# --- Routen für Seiten (unverändert) ---
 @app.route('/')
 def index():
     if 'user_id' in session: return redirect(url_for('dashboard'))
@@ -161,7 +162,7 @@ def info():
 def agb():
     return render_template('agb.html')
 
-# --- Admin-Routen ---
+# --- Admin-Routen (unverändert) ---
 @app.route('/admin')
 @login_required
 @admin_required
@@ -186,9 +187,7 @@ def admin_global_settings():
 def admin_structure_check():
     return render_template('admin_run_check.html')
 
-
-# --- API-Endpunkte ---
-
+# --- API-Endpunkte (unverändert bis auf Admin-Teil) ---
 @app.route('/api/session', methods=['GET'])
 def get_session():
     if session.get('is_guest'):
@@ -258,8 +257,61 @@ def handle_project(project_id):
 @admin_required
 def get_all_users_api():
     users = _load_json(USERS_FILE)
-    users_safe = {uname: {k: v for k, v in uinfo.items() if k != 'password'} for uname, uinfo in users.items()}
-    return jsonify(users_safe)
+    users_with_username = []
+    for username, data in users.items():
+        user_info = {k: v for k, v in data.items() if k != 'password'}
+        user_info['username'] = username
+        users_with_username.append(user_info)
+    return jsonify(users_with_username)
+
+
+@app.route('/api/admin/user/<user_id>', methods=['PUT', 'DELETE'])
+@login_required
+@admin_required
+def handle_user_api(user_id):
+    users = _load_json(USERS_FILE)
+    username_to_modify = None
+    for uname, uinfo in users.items():
+        if uinfo.get('id') == user_id:
+            username_to_modify = uname
+            break
+            
+    if not username_to_modify:
+        return jsonify({"error": "User not found"}), 404
+
+    if request.method == 'DELETE':
+        del users[username_to_modify]
+        user_data_dir = os.path.join(USER_DATA_DIR, user_id)
+        if os.path.exists(user_data_dir):
+            import shutil
+            shutil.rmtree(user_data_dir)
+        _save_json(USERS_FILE, users)
+        return jsonify({"success": True})
+
+    if request.method == 'PUT':
+        data = request.get_json()
+        user_info = users[username_to_modify]
+        
+        if 'reset_password' in data:
+            new_password = str(uuid.uuid4()).split('-')[0]
+            user_info['password'] = new_password
+            _save_json(USERS_FILE, users)
+            return jsonify({"success": True, "new_password": new_password})
+            
+        user_info['email'] = data.get('email', user_info['email'])
+        user_info['isAdmin'] = data.get('isAdmin', user_info['isAdmin'])
+        
+        new_username = data.get('username', username_to_modify)
+        if new_username != username_to_modify:
+            if new_username in users:
+                return jsonify({"error": "New username already exists"}), 409
+            users[new_username] = users.pop(username_to_modify)
+
+        _save_json(USERS_FILE, users)
+        return jsonify({"success": True})
+        
+    return jsonify({"error": "Method not allowed"}), 405
+
 
 @app.route('/api/admin/global-settings', methods=['GET', 'POST'])
 @login_required
@@ -271,6 +323,14 @@ def handle_global_settings_api():
         _save_json(SETTINGS_FILE, request.get_json())
         return jsonify({"success": True})
 
+# NEUER Endpunkt zum Abrufen der Struktur
+@app.route('/api/admin/get-structure', methods=['GET'])
+@login_required
+@admin_required
+def get_structure_api():
+    structure_data = _load_json(STRUCTURE_FILE, {"error": "structure.json nicht gefunden oder leer."})
+    return jsonify(structure_data)
+
 @app.route('/api/admin/run-check', methods=['POST'])
 @login_required
 @admin_required
@@ -281,10 +341,11 @@ def run_structure_check_api():
 
     try:
         result = subprocess.run(
-            [sys.executable, 'structure_tool.py', command_flag],
+            [sys.executable, 'check_structure.py', command_flag],
             capture_output=True,
             text=True,
-            encoding='utf-8'
+            encoding='utf-8',
+            cwd=os.path.dirname(os.path.abspath(__file__))
         )
         log_output = result.stdout + result.stderr
         return jsonify({"log": log_output})

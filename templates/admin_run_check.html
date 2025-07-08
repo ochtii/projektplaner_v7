@@ -2,16 +2,32 @@
 {% block title %}Struktur-Check{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>Struktur-Check ausführen</h2>
+    <h2>Struktur-Check</h2>
 </div>
+
 <div class="info-card">
     <div class="info-card-content open" style="max-height: none; padding-top: 1rem;">
-        <p>Führen Sie das serverseitige Skript aus, um die Ordner- und Dateistruktur zu validieren oder zu generieren.</p>
-        <div class="structure-check-controls">
+        <p>Führen Sie das serverseitige Skript <strong>check_structure.py</strong> aus, um die Ordner- und Dateistruktur des Projekts zu validieren oder zu generieren.</p>
+        
+        <div class="structure-check-controls" style="display: flex; gap: 1rem; margin: 1.5rem 0;">
             <button id="run-check-btn" class="btn btn-primary">Struktur prüfen (--check)</button>
             <button id="run-generate-btn" class="btn btn-secondary">Struktur generieren (--generate)</button>
         </div>
         <pre id="check-log-output" class="log-output"></pre>
+    </div>
+</div>
+
+<div class="structure-display-container">
+    <div class="structure-display-header">
+        <h3>Aktuelle Struktur aus <code>structure.json</code></h3>
+        <div class="structure-export-controls" style="display: flex; gap: 1rem;">
+            <button id="view-structure-btn" class="btn btn-primary">Anzeigen</button>
+            <button id="export-structure-txt-btn" class="btn btn-secondary hidden">Als Text exportieren</button>
+            <button id="export-structure-json-btn" class="btn btn-secondary hidden">Als JSON exportieren</button>
+        </div>
+    </div>
+    <div id="structure-output" class="hidden">
+        <p>Klicken Sie auf "Anzeigen", um die Struktur zu laden.</p>
     </div>
 </div>
 {% endblock %}

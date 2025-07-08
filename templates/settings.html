@@ -1,31 +1,54 @@
-<!-- templates/settings.html -->
 {% extends "base.html" %}
 {% block title %}Einstellungen{% endblock %}
 {% block content %}
-<div class="page-header"><h2>Einstellungen</h2></div>
-<div class="info-page-container">
-    <div class="info-card">
+<div class="page-header">
+    <h2>Einstellungen</h2>
+</div>
+
+<div class="settings-container">
+    
+    <div class="settings-card">
         <h3>Allgemein</h3>
-        <div class="settings-list">
-            <div class="setting-item">
-                <div class="setting-item-label"><h4>Darstellung</h4><p>Wählen Sie zwischen dem hellen und dunklen Design.</p></div>
-                <div class="setting-item-control">
-                    <div class="theme-switch-wrapper">
-                        <label class="theme-switch" for="themeSwitcher"><input type="checkbox" id="themeSwitcher" /><div class="slider round"></div></label>
-                        <span id="theme-label">Light Mode</span>
-                    </div>
+        <div class="setting-item">
+            <div class="setting-item-label">
+                <h4>Darstellung</h4>
+                <p>Wählen Sie das helle oder dunkle Design.</p>
+            </div>
+            <div class="setting-item-control">
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="themeSwitcher">
+                        <input type="checkbox" id="themeSwitcher" />
+                        <div class="slider round"></div>
+                    </label>
                 </div>
             </div>
-            <div class="setting-item">
-                <div class="setting-item-label"><h4>Sprache</h4><p>Wählen Sie die Anzeigesprache der App.</p></div>
-                <div class="setting-item-control"><select id="language-select" class="form-control" style="max-width: 200px;"><option value="de">Deutsch</option><option value="en" disabled>English (in Kürze)</option></select></div>
+        </div>
+        <div class="setting-item">
+            <div class="setting-item-label">
+                <h4>Sprache</h4>
+                <p>Wählen Sie die Anzeigesprache.</p>
+            </div>
+            <div class="setting-item-control">
+                <select id="language-select" class="form-control" style="max-width: 200px;">
+                    <option value="de">Deutsch</option>
+                    <option value="en" disabled>English (bald)</option>
+                </select>
             </div>
         </div>
     </div>
-    <div class="info-card danger-zone">
+
+    <div class="settings-card danger-zone">
         <h3>Gefahrenbereich</h3>
-        <p>Diese Aktion kann nicht rückgängig gemacht werden. Hiermit werden <strong>alle Projekte auf dem Server</strong> auf den Auslieferungszustand zurückgesetzt und alle lokalen Einstellungen aus Ihrem Browser entfernt.</p>
-        <button id="delete-app-data-btn" class="btn btn-danger">Alle App-Daten zurücksetzen</button>
+        <div class="setting-item">
+            <div class="setting-item-label">
+                <h4>Alle Anwendungsdaten löschen</h4>
+                <p>Setzt alle Ihre Projekte und Einstellungen unwiderruflich zurück.</p>
+            </div>
+            <div class="setting-item-control">
+                <button id="delete-app-data-btn" class="btn btn-danger">Daten zurücksetzen</button>
+            </div>
+        </div>
     </div>
+
 </div>
 {% endblock %}

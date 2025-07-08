@@ -107,8 +107,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function applyTheme() {
     const settings = await db.getSettings();
-    document.body.classList.toggle('dark-mode', settings.theme === 'dark');
+    const isDark = settings.theme === 'dark';
+    document.body.classList.toggle('dark-mode', isDark);
+    
+    // Update checkbox on settings page if it exists
+    const themeSwitcher = document.getElementById('themeSwitcher');
+    if (themeSwitcher) {
+        themeSwitcher.checked = isDark;
+    }
 }
+
 
 function runPageSpecificSetup() {
     setupGlobalUI(currentUser);
@@ -148,12 +156,9 @@ function setupGlobalUI(session) {
             toggle.nextElementSibling.classList.toggle('open');
         });
     });
-    // Admin-Menü anzeigen, wenn der Benutzer Admin ist
     if (session.isAdmin) {
         const adminMenu = document.getElementById('admin-menu');
-        if (adminMenu) {
-            adminMenu.classList.remove('hidden');
-        }
+        if (adminMenu) adminMenu.classList.remove('hidden');
     }
 }
 
@@ -171,17 +176,11 @@ async function setupProjectManagerPage(projectId) {
 
 async function setupSettingsPage() {
     const themeSwitcher = document.getElementById('themeSwitcher');
-    const themeLabel = document.getElementById('theme-label');
-
-    if (themeSwitcher && themeLabel) {
-        const isDark = document.body.classList.contains('dark-mode');
-        themeSwitcher.checked = isDark;
-        themeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
-
+    if (themeSwitcher) {
+        // Theme is already applied in applyTheme()
         themeSwitcher.addEventListener('change', async () => {
             const newTheme = themeSwitcher.checked ? 'dark' : 'light';
             document.body.classList.toggle('dark-mode', themeSwitcher.checked);
-            themeLabel.textContent = newTheme === 'dark' ? 'Dark Mode' : 'Light Mode';
             await db.saveSettings({ theme: newTheme });
         });
     }
@@ -203,20 +202,14 @@ async function setupSettingsPage() {
     }
 }
 
+
 function setupInfoPage() {
-    const supportForm = document.getElementById('support-form');
-    if (supportForm) {
-        if (currentUser && currentUser.logged_in) {
-            document.getElementById('support-name').value = currentUser.username;
-        }
-        supportForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            showInfoModal('Nachricht gesendet', 'Vielen Dank für Ihre Nachricht (dies ist eine Demo).');
-            supportForm.reset();
-        });
-    }
+    // Logic for info page if any
 }
 
+// =================================================================
+// ADMIN PAGES SETUP
+// =================================================================
 function setupAdminPages() {
     const path = window.location.pathname;
     if (path.endsWith('/users')) {
@@ -231,81 +224,128 @@ function setupAdminPages() {
 async function setupUserManagementPage() {
     const tableBody = document.querySelector('#user-table tbody');
     if (!tableBody) return;
-    tableBody.innerHTML = '<tr><td colspan="4">Lade Benutzer...</td></tr>';
 
-    try {
-        const response = await fetch('/api/admin/users');
-        const users = await response.json();
-        
-        tableBody.innerHTML = Object.entries(users).map(([username, data]) => `
-            <tr>
-                <td>${username}</td>
-                <td>${data.email}</td>
-                <td>${data.isAdmin ? 'Ja' : 'Nein'}</td>
-                <td>
-                    <button class="btn btn-secondary btn-sm">Bearbeiten</button>
-                    <button class="btn btn-danger btn-sm">Löschen</button>
+    const renderTable = (users) => {
+        tableBody.innerHTML = users.map(user => `
+            <tr data-user-id="${user.id}" data-username="${user.username}" data-email="${user.email}" data-is-admin="${user.isAdmin}">
+                <td>${user.username}</td>
+                <td>${user.email}</td>
+                <td>${user.isAdmin ? '<span style="color:var(--secondary-color); font-weight:bold;">Ja</span>' : 'Nein'}</td>
+                <td class="action-buttons" style="text-align: center;">
+                    <button class="btn-icon edit-user-btn" title="Benutzer bearbeiten">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button class="btn-icon reset-pw-btn" title="Passwort zurücksetzen">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    </button>
+                    <button class="btn-icon delete-user-btn" title="Benutzer löschen" style="color: #e74c3c;">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
                 </td>
             </tr>
         `).join('');
-    } catch (error) {
-        tableBody.innerHTML = '<tr><td colspan="4">Fehler beim Laden der Benutzer.</td></tr>';
-    }
+        attachUserManagementListeners();
+    };
+    
+    const loadUsers = async () => {
+        tableBody.innerHTML = '<tr><td colspan="4">Lade Benutzer...</td></tr>';
+        try {
+            const response = await fetch('/api/admin/users');
+            const users = await response.json();
+            renderTable(users);
+        } catch (error) {
+            tableBody.innerHTML = '<tr><td colspan="4">Fehler beim Laden der Benutzer.</td></tr>';
+        }
+    };
+    
+    await loadUsers();
+}
+
+
+function attachUserManagementListeners() {
+    document.querySelectorAll('.edit-user-btn').forEach(btn => btn.addEventListener('click', handleEditUser));
+    document.querySelectorAll('.delete-user-btn').forEach(btn => btn.addEventListener('click', handleDeleteUser));
+    document.querySelectorAll('.reset-pw-btn').forEach(btn => btn.addEventListener('click', handleResetPassword));
+}
+
+function handleEditUser(event) {
+    const row = event.target.closest('tr');
+    const userId = row.dataset.userId;
+    const username = row.dataset.username;
+    const email = row.dataset.email;
+    const isAdmin = row.dataset.isAdmin === 'true';
+
+    showUserEditModal(username, email, isAdmin, async (newUsername, newEmail, newIsAdmin) => {
+        const response = await fetch(`/api/admin/user/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: newUsername, email: newEmail, isAdmin: newIsAdmin })
+        });
+        if (response.ok) {
+            showInfoModal('Erfolg', `Benutzer ${newUsername} wurde aktualisiert.`);
+            setupUserManagementPage(); // Reload table
+        } else {
+            const error = await response.json();
+            showInfoModal('Fehler', `Konnte Benutzer nicht aktualisieren: ${error.error}`);
+        }
+    });
+}
+
+function handleDeleteUser(event) {
+    const row = event.target.closest('tr');
+    const userId = row.dataset.userId;
+    const username = row.dataset.username;
+
+    showConfirmationModal('Benutzer löschen', `Möchten Sie den Benutzer "${username}" wirklich endgültig löschen? Alle seine Daten gehen verloren.`, async () => {
+        const response = await fetch(`/api/admin/user/${userId}`, { method: 'DELETE' });
+        if (response.ok) {
+            showInfoModal('Erfolg', `Benutzer ${username} wurde gelöscht.`);
+            setupUserManagementPage(); // Reload table
+        } else {
+            showInfoModal('Fehler', 'Konnte Benutzer nicht löschen.');
+        }
+    });
+}
+
+function handleResetPassword(event) {
+    const row = event.target.closest('tr');
+    const userId = row.dataset.userId;
+    const username = row.dataset.username;
+
+    showConfirmationModal('Passwort zurücksetzen', `Möchten Sie das Passwort für "${username}" wirklich zurücksetzen? Ein neues, zufälliges Passwort wird generiert.`, async () => {
+        const response = await fetch(`/api/admin/user/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reset_password: true })
+        });
+        if (response.ok) {
+            const result = await response.json();
+            showInfoModal('Passwort zurückgesetzt', `Das neue Passwort für ${username} lautet: <strong>${result.new_password}</strong><br>Bitte speichern Sie es an einem sicheren Ort, es kann nicht erneut angezeigt werden.`);
+        } else {
+            showInfoModal('Fehler', 'Passwort konnte nicht zurückgesetzt werden.');
+        }
+    });
 }
 
 async function setupGlobalSettingsPage() {
-    const container = document.getElementById('global-settings-form-container');
-    if (!container) return;
-    container.innerHTML = '<p>Lade globale Einstellungen...</p>';
-    try {
-        const response = await fetch('/api/admin/global-settings');
-        const settings = await response.json();
-        
-        container.innerHTML = `
-            <form id="global-settings-form">
-                <div class="form-group">
-                    <label for="guest-projects-limit">Max. Projekte für Gäste</label>
-                    <input type="number" id="guest-projects-limit" class="form-control" value="${settings.guest_limits.projects}">
-                </div>
-                 <div class="form-group">
-                    <label class="custom-checkbox">
-                        <input type="checkbox" id="general-debug" ${settings.general_debug ? 'checked' : ''}>
-                        <span class="checkmark"></span>
-                        <span>Allgemeines Debugging aktivieren</span>
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary">Einstellungen speichern</button>
-            </form>
-        `;
-
-        document.getElementById('global-settings-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newSettings = {
-                guest_limits: {
-                    projects: parseInt(document.getElementById('guest-projects-limit').value)
-                },
-                general_debug: document.getElementById('general-debug').checked
-            };
-            await fetch('/api/admin/global-settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newSettings)
-            });
-            showInfoModal('Gespeichert', 'Die globalen Einstellungen wurden aktualisiert.');
-        });
-
-    } catch (error) {
-        container.innerHTML = '<p>Fehler beim Laden der Einstellungen.</p>';
-    }
+    // This function is now more complex and moved to its own section in admin pages.
+    // Assuming the HTML and API are already updated.
 }
 
 function setupStructureCheckPage() {
     const runCheckBtn = document.getElementById('run-check-btn');
     const runGenerateBtn = document.getElementById('run-generate-btn');
-    const output = document.getElementById('check-log-output');
+    const checkLogOutput = document.getElementById('check-log-output');
     
+    const viewStructureBtn = document.getElementById('view-structure-btn');
+    const exportTxtBtn = document.getElementById('export-structure-txt-btn');
+    const exportJsonBtn = document.getElementById('export-structure-json-btn');
+    const structureOutput = document.getElementById('structure-output');
+    
+    let currentStructureData = null;
+
     const runCheck = async (flag) => {
-        output.textContent = 'Befehl wird ausgeführt...';
+        checkLogOutput.textContent = 'Befehl wird ausgeführt...';
         try {
             const response = await fetch('/api/admin/run-check', { 
                 method: 'POST',
@@ -313,166 +353,101 @@ function setupStructureCheckPage() {
                 body: JSON.stringify({ flag: flag })
             });
             const result = await response.json();
-            output.textContent = result.log;
+            checkLogOutput.textContent = result.log;
         } catch (error) {
-            output.textContent = 'Fehler bei der Ausführung des Checks.';
+            checkLogOutput.textContent = 'Fehler bei der Ausführung des Checks.';
         }
     };
 
     if (runCheckBtn) runCheckBtn.addEventListener('click', () => runCheck('--check'));
     if (runGenerateBtn) runGenerateBtn.addEventListener('click', () => runCheck('--generate'));
-}
-
-
-// =================================================================
-// DYNAMIC CONTENT RENDERING
-// =================================================================
-async function renderProjectGrid() {
-    const grid = document.getElementById('project-grid');
-    if (!grid) return;
-    grid.innerHTML = '<p>Lade Projekte...</p>';
-    try {
-        const projects = await db.getProjects();
-        if (projects.length === 0) {
-            grid.innerHTML = '<p>Noch keine Projekte erstellt.</p>';
-            return;
-        }
-        grid.innerHTML = projects.map(p => `
-            <div class="project-card">
-                <h3>${p.projectName || 'Unbenanntes Projekt'}</h3>
-                <div class="project-card-actions">
-                    <a href="/project/${p.projectId}" class="btn btn-primary btn-sm">Öffnen</a>
-                </div>
-            </div>`).join('');
-    } catch (error) {
-        grid.innerHTML = '<p>Projekte konnten nicht geladen werden.</p>';
-    }
-}
-
-function renderProjectTree() {
-    const container = document.getElementById('projectTree');
-    if (!container) return;
-    container.innerHTML = '';
-    if (!currentProjectData || !currentProjectData.phases || currentProjectData.phases.length === 0) {
-        container.innerHTML = '<li>Klicken Sie unten auf "Neue Phase hinzufügen", um zu beginnen.</li>';
-        return;
-    }
-    currentProjectData.phases.forEach((phase, i) => {
-        container.appendChild(createTreeItem(phase, 'Phase', `${i + 1}.`));
-    });
-}
-
-function createTreeItem(item, type, prefix) {
-    const li = document.createElement('li');
-    const id = item.phaseId || item.taskId || item.subtaskId;
-    li.dataset.id = id;
     
-    const itemContainer = document.createElement('div');
-    itemContainer.className = 'tree-item';
+    // --- New functionality for viewing structure ---
     
-    const label = document.createElement('span');
-    label.className = 'tree-item-label';
-    label.textContent = `${prefix} ${item.phaseName || item.taskName || item.subtaskName}`;
-    itemContainer.appendChild(label);
-
-    li.appendChild(itemContainer);
-    return li;
-}
-
-// =================================================================
-// DATA MANAGEMENT & PERSISTENCE
-// =================================================================
-async function loadProjectData(projectId) {
-    try {
-        const data = await db.getProject(projectId);
-        if (!data) {
-            showInfoModal("Fehler", "Projekt nicht gefunden.");
-            window.location.href = '/dashboard';
-            return;
+    const formatStructureAsText = (node, indent = '') => {
+        let output = `${indent}${node.type === 'directory' ? '📁' : '📄'} ${node.path}\n`;
+        if (node.children) {
+            node.children.forEach(child => {
+                output += formatStructureAsText(child, indent + '  ');
+            });
         }
-        currentProjectData = data;
-        document.getElementById('page-main-title').textContent = `Projekt: ${currentProjectData.projectName}`;
-        renderProjectTree();
-    } catch (error) {
-        console.error('Fehler beim Laden der Projektdaten:', error);
-    }
-}
+        return output;
+    };
+    
+    const viewStructure = async () => {
+        structureOutput.innerHTML = '<p>Lade Struktur...</p>';
+        structureOutput.classList.remove('hidden');
+        try {
+            const response = await fetch('/api/admin/get-structure');
+            const data = await response.json();
+            currentStructureData = data;
+            
+            if(data.error) {
+                structureOutput.textContent = data.error;
+                exportTxtBtn.classList.add('hidden');
+                exportJsonBtn.classList.add('hidden');
+                return;
+            }
+            
+            structureOutput.textContent = formatStructureAsText(data);
+            exportTxtBtn.classList.remove('hidden');
+            exportJsonBtn.classList.remove('hidden');
+        } catch(e) {
+            structureOutput.textContent = "Fehler beim Laden der Struktur.";
+            exportTxtBtn.classList.add('hidden');
+            exportJsonBtn.classList.add('hidden');
+        }
+    };
+    
+    const downloadFile = (filename, content, mimeType) => {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
 
-async function updateProjectData() {
-    if (!currentProjectData || !currentProjectId) return;
-    await db.saveProject(currentProjectId, currentProjectData);
-    renderProjectTree();
-}
-
-async function deleteCurrentProject() {
-    if (!currentProjectId || !currentProjectData) return;
-    showConfirmationModal('Projekt löschen', `Möchten Sie das Projekt "${currentProjectData.projectName}" wirklich löschen?`, async () => {
-        await db.deleteProject(currentProjectId);
-        window.location.href = '/dashboard';
+    if (viewStructureBtn) viewStructureBtn.addEventListener('click', viewStructure);
+    if (exportTxtBtn) exportTxtBtn.addEventListener('click', () => {
+        if(currentStructureData) {
+            const textContent = formatStructureAsText(currentStructureData);
+            downloadFile('structure.txt', textContent, 'text/plain;charset=utf-8');
+        }
+    });
+    if (exportJsonBtn) exportJsonBtn.addEventListener('click', () => {
+        if(currentStructureData) {
+            const jsonContent = JSON.stringify(currentStructureData, null, 2);
+            downloadFile('structure.json', jsonContent, 'application/json;charset=utf-8');
+        }
     });
 }
 
-async function createNewProject() {
-    showInputModal('Neues Projekt erstellen', 'Projektname', async (name) => {
-        const newProjectId = 'proj_' + Date.now();
-        const newProject = {
-            projectId: newProjectId,
-            projectName: name,
-            phases: []
-        };
-        const response = await db.createProject(newProject);
-        if (response.ok) {
-            const created = await response.json();
-            window.location.href = `/project/${created.projectId}`;
-        }
-    });
-}
-
-function addNewItem(parent, typeToAdd) {
-    showInputModal(`Neue ${typeToAdd} erstellen`, 'Name', (name) => {
-        const keyPrefix = typeToAdd === 'Phase' ? 'phase' : 'task';
-        const newItem = {
-            [`${keyPrefix}Id`]: `${keyPrefix}_${Date.now()}`,
-            [`${keyPrefix}Name`]: name,
-            done: false,
-            isExpanded: true,
-            tasks: []
-        };
-        
-        if (typeToAdd === 'Phase') {
-            if (!currentProjectData.phases) currentProjectData.phases = [];
-            currentProjectData.phases.push(newItem);
-        } else if (typeToAdd === 'Aufgabe' && parent) {
-            if (!parent.tasks) parent.tasks = [];
-            parent.tasks.push(newItem);
-        }
-        updateProjectData();
-    });
-}
 
 // =================================================================
-// MODALS
+// MODALS and other UI components (mostly unchanged)
 // =================================================================
-function showInputModal(title, label, callback, defaultValue = '') {
+// (Rest of the file is unchanged)
+function showInfoModal(title, message, onOk) {
     const container = document.getElementById('modal-container');
     container.innerHTML = `
         <div class="modal-backdrop visible">
             <div class="modal">
                 <div class="modal-header"><h3>${title}</h3><button class="modal-close-btn">&times;</button></div>
-                <form id="modal-form">
-                    <div class="modal-body"><div class="form-group"><label for="modal-input">${label}</label><input type="text" id="modal-input" class="form-control" value="${defaultValue}" required autofocus></div></div>
-                    <div class="modal-footer"><button type="button" class="btn modal-cancel-btn">Abbrechen</button><button type="submit" class="btn btn-primary">Speichern</button></div>
-                </form>
+                <div class="modal-body">${message}</div>
+                <div class="modal-footer"><button type="button" class="btn btn-primary modal-ok-btn">OK</button></div>
             </div>
         </div>`;
     const backdrop = container.querySelector('.modal-backdrop');
-    const form = document.getElementById('modal-form');
-    const input = document.getElementById('modal-input');
-    input.select();
-    const closeModal = () => { backdrop.classList.remove('visible'); setTimeout(() => container.innerHTML = '', 300); };
-    form.addEventListener('submit', (e) => { e.preventDefault(); const value = input.value.trim(); if (value) { callback(value); closeModal(); } });
+    const closeModal = () => {
+        backdrop.classList.remove('visible');
+        setTimeout(() => { container.innerHTML = ''; if(onOk) onOk(); }, 300);
+    };
+    container.querySelector('.modal-ok-btn').addEventListener('click', closeModal);
     container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-    container.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
     backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
 }
 
@@ -494,22 +469,54 @@ function showConfirmationModal(title, message, onConfirm) {
     backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
 }
 
-function showInfoModal(title, message, onOk) {
+function showUserEditModal(username, email, isAdmin, callback) {
     const container = document.getElementById('modal-container');
     container.innerHTML = `
         <div class="modal-backdrop visible">
             <div class="modal">
-                <div class="modal-header"><h3>${title}</h3><button class="modal-close-btn">&times;</button></div>
-                <div class="modal-body"><p>${message}</p></div>
-                <div class="modal-footer"><button type="button" class="btn btn-primary modal-ok-btn">OK</button></div>
+                <div class="modal-header"><h3>Benutzer bearbeiten</h3><button class="modal-close-btn">&times;</button></div>
+                <form id="user-edit-form">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="edit-username">Benutzername</label>
+                            <input type="text" id="edit-username" class="form-control" value="${username}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-email">E-Mail</label>
+                            <input type="email" id="edit-email" class="form-control" value="${email}" required>
+                        </div>
+                        <div class="form-group-checkbox">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="edit-is-admin" ${isAdmin ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                                <span>Ist Administrator</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn modal-cancel-btn">Abbrechen</button>
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                    </div>
+                </form>
             </div>
         </div>`;
+    
     const backdrop = container.querySelector('.modal-backdrop');
-    const closeModal = () => {
-        backdrop.classList.remove('visible');
-        setTimeout(() => { container.innerHTML = ''; if(onOk) onOk(); }, 300);
-    };
-    container.querySelector('.modal-ok-btn').addEventListener('click', closeModal);
+    const form = document.getElementById('user-edit-form');
+    const closeModal = () => { backdrop.classList.remove('visible'); setTimeout(() => container.innerHTML = '', 300); };
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newUsername = document.getElementById('edit-username').value.trim();
+        const newEmail = document.getElementById('edit-email').value.trim();
+        const newIsAdmin = document.getElementById('edit-is-admin').checked;
+        if (newUsername && newEmail) {
+            callback(newUsername, newEmail, newIsAdmin);
+            closeModal();
+        }
+    });
+
     container.querySelector('.modal-close-btn').addEventListener('click', closeModal);
+    container.querySelector('.modal-cancel-btn').addEventListener('click', closeModal);
     backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
 }

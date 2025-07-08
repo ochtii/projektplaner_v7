@@ -7,6 +7,16 @@
       "type": "file"
     },
     {
+      "path": "api",
+      "type": "directory",
+      "children": [
+        {
+          "path": "api/global_settings.json",
+          "type": "file"
+        }
+      ]
+    },
+    {
       "path": "app.py",
       "type": "file"
     },
@@ -103,6 +113,24 @@
                   ]
                 },
                 {
+                  "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b",
+                  "type": "directory",
+                  "children": [
+                    {
+                      "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/logs.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/projects.json",
+                      "type": "file"
+                    },
+                    {
+                      "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/settings.json",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
                   "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef",
                   "type": "directory",
                   "children": [
@@ -184,6 +212,22 @@
       "path": "templates",
       "type": "directory",
       "children": [
+        {
+          "path": "templates/admin_dashboard.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/admin_global_settings.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/admin_run_check.html",
+          "type": "file"
+        },
+        {
+          "path": "templates/admin_user_management.html",
+          "type": "file"
+        },
         {
           "path": "templates/agb.html",
           "type": "file"
