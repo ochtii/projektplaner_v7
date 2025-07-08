@@ -1,34 +1,41 @@
 {
   "p1": {
-    "projectId": "p1",
-    "projectName": "Beispielprojekt",
     "phases": [
       {
+        "isExpanded": true,
         "phaseId": "phase01",
         "phaseName": "Planungsphase",
-        "isExpanded": true,
         "tasks": [
           {
-            "taskId": "task01",
-            "taskName": "Analyse",
-            "isExpanded": true,
             "completed": false,
+            "isExpanded": true,
             "subtasks": [
               {
+                "completed": true,
                 "subtaskId": "sub01",
-                "subtaskName": "Anforderungen definieren",
-                "completed": true
+                "subtaskName": "Anforderungen definieren"
               },
               {
+                "completed": false,
                 "subtaskId": "sub02",
-                "subtaskName": "Stakeholder befragen",
-                "completed": false
+                "subtaskName": "Stakeholder befragen"
+              }
+            ],
+            "taskId": "task01",
+            "taskName": "Analyse",
+            "comments": [
+              {
+                "author": "Benutzer",
+                "text": "dfgdfg",
+                "timestamp": "1751938479955"
               }
             ]
           }
         ]
       }
-    ]
+    ],
+    "projectId": "p1",
+    "projectName": "Beispielprojekt"
   },
   "proj_1751925060418": {
     "phases": [
