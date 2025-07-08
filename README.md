@@ -14,9 +14,11 @@ Stellen Sie sicher, dass die folgende Software auf Ihrem System installiert ist:
 
 ## 2. Installation
 
-Sie haben zwei Möglichkeiten, das Projekt zu installieren. Die Installation via Git wird empfohlen.
+Sie haben zwei Möglichkeiten, das Projekt zu installieren. **Möglichkeit 1 wird empfohlen.**
 
 ### Möglichkeit 1: Von GitHub klonen (Empfohlen)
+
+Diese Methode ist am einfachsten und schnellsten, da alle Dateien bereits vorhanden sind.
 
 #### Schritt 1: Repository klonen
 
@@ -42,7 +44,7 @@ pip install Flask
 
 ### Möglichkeit 2: Manuelle Installation
 
-Folgen Sie diesen Schritten, um das Projekt manuell einzurichten.
+Folgen Sie diesen Schritten, wenn Sie das Projekt nicht von GitHub klonen können oder möchten.
 
 #### Schritt 1: Ordnerstruktur
 
@@ -76,50 +78,60 @@ Die Anwendung verwendet die folgende Ordnerstruktur:
 
 #### Schritt 2: Ordner- und Dateistruktur erstellen
 
-Öffnen Sie ein Terminal und verwenden Sie die für Ihr Betriebssystem passenden Befehle, um die gesamte Ordner- und Dateistruktur auf einmal zu erstellen.
+Wählen Sie die passende Anleitung für Ihr Betriebssystem.
 
-**Für Linux (Ubuntu, Debian, etc.) oder macOS:**
+---
+##### **Für Linux (Ubuntu, Debian, etc.) oder macOS**
 
-Erstellen Sie zuerst die Ordner:
-```bash
-mkdir -p projektplaner_v7/templates projektplaner_v7/static/css projektplaner_v7/static/js projektplaner_v7/static/data/templates
-```
-Erstellen Sie dann die leeren Dateien:
-```bash
-touch projektplaner_v7/app.py \
-      projektplaner_v7/README.md \
-      projektplaner_v7/templates/base.html \
-      projektplaner_v7/templates/dashboard.html \
-      projektplaner_v7/templates/index.html \
-      projektplaner_v7/templates/info.html \
-      projektplaner_v7/templates/login.html \
-      projektplaner_v7/templates/project_manager.html \
-      projektplaner_v7/templates/project_overview.html \
-      projektplaner_v7/templates/project_checklist.html \
-      projektplaner_v7/templates/settings.html \
-      projektplaner_v7/static/css/style.css \
-      projektplaner_v7/static/js/main.js \
-      projektplaner_v7/static/js/ui.js \
-      projektplaner_v7/static/data/bsp.json \
-      projektplaner_v7/static/data/templates/software.json \
-      projektplaner_v7/static/data/templates/marketing.json \
-      projektplaner_v7/static/data/templates/event_planning.json \
-      projektplaner_v7/static/data/templates/book_writing.json
-```
+Führen Sie die folgenden beiden Befehle nacheinander in Ihrem Terminal aus.
 
-**Für Windows (PowerShell):**
+1.  **Ordner erstellen:**
+    ```bash
+    mkdir -p projektplaner_v7/templates projektplaner_v7/static/css projektplaner_v7/static/js projektplaner_v7/static/data/templates
+    ```
+2.  **Leere Dateien erstellen:**
+    ```bash
+    touch projektplaner_v7/app.py \
+          projektplaner_v7/README.md \
+          projektplaner_v7/templates/base.html \
+          projektplaner_v7/templates/dashboard.html \
+          projektplaner_v7/templates/index.html \
+          projektplaner_v7/templates/info.html \
+          projektplaner_v7/templates/login.html \
+          projektplaner_v7/templates/project_manager.html \
+          projektplaner_v7/templates/project_overview.html \
+          projektplaner_v7/templates/project_checklist.html \
+          projektplaner_v7/templates/settings.html \
+          projektplaner_v7/static/css/style.css \
+          projektplaner_v7/static/js/main.js \
+          projektplaner_v7/static/js/ui.js \
+          projektplaner_v7/static/data/bsp.json \
+          projektplaner_v7/static/data/templates/software.json \
+          projektplaner_v7/static/data/templates/marketing.json \
+          projektplaner_v7/static/data/templates/event_planning.json \
+          projektplaner_v7/static/data/templates/book_writing.json
+    ```
 
-Erstellen Sie zuerst die Ordner:
-```powershell
-mkdir projektplaner_v7\templates, projektplaner_v7\static\css, projektplaner_v7\static\js, projektplaner_v7\static\data\templates
-```
-Erstellen Sie dann die leeren Dateien:
-```powershell
-$files = "app.py", "README.md", "templates\base.html", "templates\dashboard.html", "templates\index.html", "templates\info.html", "templates\login.html", "templates\project_manager.html", "templates\project_overview.html", "templates\project_checklist.html", "templates\settings.html", "static\css\style.css", "static\js\main.js", "static\js\ui.js", "static\data\bsp.json", "static\data\templates\software.json", "static\data\templates\marketing.json", "static\data\templates\event_planning.json", "static\data\templates\book_writing.json"
-foreach ($file in $files) { New-Item -ItemType File -Path "projektplaner_v7\$file" }
-```
+---
+##### **Für Windows**
 
-**Für Windows (Batch-Datei):**
+Wählen Sie **eine** der folgenden Methoden (PowerShell oder Batch-Datei).
+
+**Methode A: PowerShell**
+
+Führen Sie die folgenden beiden Befehle nacheinander in PowerShell aus.
+
+1.  **Ordner erstellen:**
+    ```powershell
+    mkdir projektplaner_v7\templates, projektplaner_v7\static\css, projektplaner_v7\static\js, projektplaner_v7\static\data\templates
+    ```
+2.  **Leere Dateien erstellen:**
+    ```powershell
+    $files = "app.py", "README.md", "templates\base.html", "templates\dashboard.html", "templates\index.html", "templates\info.html", "templates\login.html", "templates\project_manager.html", "templates\project_overview.html", "templates\project_checklist.html", "templates\settings.html", "static\css\style.css", "static\js\main.js", "static\js\ui.js", "static\data\bsp.json", "static\data\templates\software.json", "static\data\templates\marketing.json", "static\data\templates\event_planning.json", "static\data\templates\book_writing.json"
+    foreach ($file in $files) { New-Item -ItemType File -Path "projektplaner_v7\$file" }
+    ```
+
+**Methode B: Batch-Datei (.bat)**
 
 Erstellen Sie eine Datei mit dem Namen `projektplaner_v7_install.bat` und fügen Sie den folgenden Code ein. Führen Sie die Datei anschließend per Doppelklick aus.
 
@@ -174,13 +186,14 @@ pip install Flask
 
 ## 3. Anwendung starten
 
-Unabhängig von der Installationsmethode, führen Sie die Hauptanwendungsdatei aus dem `projektplaner_v7`-Verzeichnis aus, um den lokalen Entwicklungsserver zu starten:
+Unabhängig von der Installationsmethode, führen Sie die Hauptanwendungsdatei aus dem `projektplaner_v7`-Verzeichnis aus. Der Befehl startet einen lokalen Webserver, der für die Entwicklung gedacht ist.
 
 ```bash
 python app.py
 ```
 
-Sie sollten eine Ausgabe sehen, die in etwa so aussieht:
+Sie sollten eine Ausgabe sehen, die in etwa so aussieht. Die URL ist die Adresse, unter der Sie die Anwendung in Ihrem Browser aufrufen können.
+
 ```
  * Running on [http://127.0.0.1:5000/](http://127.0.0.1:5000/) (Press CTRL+C to quit)
  * Restarting with stat
