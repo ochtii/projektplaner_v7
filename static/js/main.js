@@ -122,7 +122,7 @@ function runPageSpecificSetup() {
     setupGlobalUI(currentUser);
     const path = window.location.pathname;
     
-    // Prüfen, ob wir uns auf einer Projektseite befinden
+    // Check if we are on a project page
     const projectPageMatch = path.match(/^\/project(?:-overview|-checklist)?\/([a-zA-Z0-9_]+)/);
 
     if (projectPageMatch) {
@@ -161,7 +161,6 @@ function setupGlobalUI(session) {
                 submenu.classList.remove('open');
                 toggle.classList.remove('open');
             } else {
-                // Optional: Andere offene Menüs schließen
                 document.querySelectorAll('.main-nav .submenu.open').forEach(openSubmenu => {
                     openSubmenu.classList.remove('open');
                     openSubmenu.previousElementSibling.classList.remove('open');
@@ -177,28 +176,24 @@ function setupGlobalUI(session) {
     }
 }
 
-// NEU: Bündelt das Setup für alle Projektseiten
+// Setup for all project-related pages
 async function setupProjectPages(projectId, currentPath) {
     currentProjectId = projectId;
     const projectMenu = document.getElementById('current-project-menu');
 
-    // Menü anzeigen und Links setzen
     if (projectMenu) {
         projectMenu.classList.remove('hidden');
         document.getElementById('current-project-overview-link').href = `/project-overview/${projectId}`;
         document.getElementById('current-project-editor-link').href = `/project/${projectId}`;
         document.getElementById('current-project-checklist-link').href = `/project-checklist/${projectId}`;
         
-        // Menü standardmäßig öffnen
         projectMenu.querySelector('.submenu-toggle').classList.add('open');
         projectMenu.querySelector('.submenu').classList.add('open');
     }
 
-    // Seitenspezifische Logik ausführen
     if (currentPath.startsWith('/project/')) {
         await setupProjectManagerPage();
     }
-    // Hier könnten später die Setups für overview und checklist hin
 }
 
 async function setupDashboardPage() {
@@ -302,7 +297,6 @@ async function deleteCurrentProject() {
     });
 }
 
-// +++ KORRIGIERTE/NEUE FUNKTION +++
 async function addNewItem(type, parentId = null) {
     const name = prompt(`Name für neue(s/n) ${type}:`);
     if (!name || !name.trim()) return;
@@ -316,9 +310,12 @@ async function addNewItem(type, parentId = null) {
             isExpanded: true,
             tasks: []
         };
+        if (!currentProjectData.phases) {
+            currentProjectData.phases = [];
+        }
         currentProjectData.phases.push(newItem);
     } 
-    // Hier können später 'task' und 'subtask' ergänzt werden
+    // 'task' and 'subtask' can be added here later
 
     await db.saveProject(currentProjectId, currentProjectData);
     renderProjectTree(currentProjectData, document.getElementById('projectTree'));
@@ -445,8 +442,7 @@ function handleResetPassword(event) {
 }
 
 async function setupGlobalSettingsPage() {
-    // This function is now more complex and moved to its own section in admin pages.
-    // Assuming the HTML and API are already updated.
+    // Logic for global settings page
 }
 
 function setupStructureCheckPage() {
@@ -478,9 +474,7 @@ function setupStructureCheckPage() {
 
     if (runCheckBtn) runCheckBtn.addEventListener('click', () => runCheck('--check'));
     if (runGenerateBtn) runGenerateBtn.addEventListener('click', () => runCheck('--generate'));
-
-    // --- New functionality for viewing structure ---
-
+    
     const formatStructureAsText = (node, indent = '') => {
         let output = `${indent}${node.type === 'directory' ? '📁' : '📄'} ${node.path}\n`;
         if (node.children) {
