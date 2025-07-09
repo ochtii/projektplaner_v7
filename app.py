@@ -252,8 +252,8 @@ def register_route():
             _save_json(user_profile_path, default_profile_data) # Initialisiert profile.json
 
             _save_json(get_user_data_path(new_user_id, 'projects'), {})
-            # ÄNDERUNG: Standard-Theme für neue Benutzer von 'light' zu 'dark'
-            _save_json(get_user_data_path(new_user_id, 'settings'), {"theme": "dark"})
+            # ÄNDERUNG: Standard-Theme für neue Benutzer von 'light'/'dark' zu 'default'
+            _save_json(get_user_data_path(new_user_id, 'settings'), {"design": "default"})
             _save_json(get_user_data_path(new_user_id, 'logs'), [])
             
             flash('Registrierung erfolgreich! Sie können sich jetzt anmelden.', 'success')
@@ -489,11 +489,11 @@ def handle_settings():
     if request.method == 'GET':
         # Wenn der Benutzer nicht angemeldet ist, geben Sie Standardeinstellungen zurück
         if 'user_id' not in session and not session.get('is_guest'):
-            return jsonify({"theme": "dark"}) # Standard-Theme für nicht eingeloggte Benutzer
+            return jsonify({"design": "default"}) # Standard Design für nicht eingeloggte Benutzer
         
         user_settings_path = get_user_data_path(session['user_id'], 'settings')
-        # ÄNDERUNG: Standard-Theme für GET-Anfragen von 'light' zu 'dark'
-        return jsonify(_load_json(user_settings_path, {"theme": "dark"}))
+        # ÄNDERUNG: Standard-Theme für GET-Anfragen von 'light'/'dark' zu 'default'
+        return jsonify(_load_json(user_settings_path, {"design": "default"}))
     
     if request.method == 'POST':
         # Für POST-Anfragen (Speichern) ist ein Login erforderlich

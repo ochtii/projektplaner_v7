@@ -7,22 +7,8 @@
 // Dieses Modul enthält Funktionen, die allgemeine UI-Elemente
 // und das globale Erscheinungsbild der Anwendung steuern.
 
-/**
- * Wendet das gespeicherte Theme auf den Body an.
- * @returns {Promise<void>}
- */
-export async function applyTheme() {
-    // Greift auf window.db zu, da db eine globale Variable ist, die in main.js zugewiesen wird
-    const settings = await window.db.getSettings();
-    const isDark = settings.theme === 'dark';
-    document.body.classList.toggle('dark-mode', isDark);
+const USER_MENU_EXPANDED_KEY = 'userMenuExpanded'; // NEU: Schlüssel für LocalStorage
 
-    const themeSwitcher = document.getElementById('themeSwitcher');
-    if (themeSwitcher) {
-        themeSwitcher.checked = isDark;
-    }
-    window.debugLog(`GlobalUI: Theme angewendet: ${isDark ? 'dark' : 'light'}.`, 'INFO', 'GlobalUI');
-}
 
 /**
  * Richtet globale UI-Elemente ein, wie Header-Aktionen und Submenüs.
@@ -125,6 +111,50 @@ export function setupGlobalUI(session) {
             localStorage.setItem('language', selectedLanguage);
             window.debugLog(`GlobalUI: Sprache geändert zu: ${selectedLanguage}. Seite wird neu geladen.`, 'INFO', 'GlobalUI');
             location.reload(); // Seite neu laden, um Sprachänderung anzuwenden
+        });
+    }
+
+    // NEU: User-Menü Umschalt-Logik
+    const toggleUserMenuBtn = document.getElementById('toggle-user-menu-btn');
+    const userNavContent = document.getElementById('user-nav-content');
+    const userProfileUsername = document.getElementById('user-profile-username');
+    const userProfilePic = document.getElementById('user-profile-pic');
+
+
+    if (userProfileUsername) {
+        userProfileUsername.textContent = session.username;
+    }
+    // Setze das Profilbild des Benutzers (Placeholder für zukünftige Funktion)
+    if (userProfilePic) {
+        // Hier könnte Logik stehen, um ein benutzerspezifisches Bild zu laden,
+        // falls verfügbar. Für jetzt bleibt es der Standard.
+        userProfilePic.src = "/static/img/standard_profile_picture.png"; 
+    }
+
+
+    if (toggleUserMenuBtn && userNavContent) {
+        // Initialen Zustand aus LocalStorage laden
+        const isUserMenuExpanded = localStorage.getItem(USER_MENU_EXPANDED_KEY) === 'true';
+        if (isUserMenuExpanded) {
+            userNavContent.classList.add('expanded');
+            toggleUserMenuBtn.querySelector('.arrow-down')?.classList.add('hidden');
+            toggleUserMenuBtn.querySelector('.arrow-up')?.classList.remove('hidden');
+        } else {
+            userNavContent.classList.remove('expanded');
+            toggleUserMenuBtn.querySelector('.arrow-down')?.classList.remove('hidden');
+            toggleUserMenuBtn.querySelector('.arrow-up')?.classList.add('hidden');
+        }
+
+        toggleUserMenuBtn.addEventListener('click', () => {
+            const isCurrentlyExpanded = userNavContent.classList.contains('expanded');
+            userNavContent.classList.toggle('expanded');
+            localStorage.setItem(USER_MENU_EXPANDED_KEY, (!isCurrentlyExpanded).toString());
+
+            // Pfeil-Icons umschalten
+            toggleUserMenuBtn.querySelector('.arrow-down')?.classList.toggle('hidden', !isCurrentlyExpanded);
+            toggleUserMenuBtn.querySelector('.arrow-up')?.classList.toggle('hidden', isCurrentlyExpanded);
+            
+            window.debugLog(`GlobalUI: User-Menü ${isCurrentlyExpanded ? 'eingeklappt' : 'ausgeklappt'}.`, 'INFO', 'GlobalUI');
         });
     }
     window.debugLog("GlobalUI: Setup der globalen UI abgeschlossen.", 'INFO', 'GlobalUI');

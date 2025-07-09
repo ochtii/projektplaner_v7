@@ -8,8 +8,6 @@
 // einschließlich Theme-Umschaltung und Datenrücksetzung.
 
 import { showInfoModal, showConfirmationModal } from '../ui/modals.js';
-// NEU: Theme-Switcher-Logik aus theme.js importieren
-import { initializeThemeSwitcher } from '../ui/theme.js';
 
 /**
  * Richtet die Einstellungsseite ein.
@@ -18,10 +16,6 @@ import { initializeThemeSwitcher } from '../ui/theme.js';
 export async function setupSettingsPage() {
     window.debugLog("Settings: Setup der Einstellungsseite gestartet.");
 
-    // NEU: Theme-Switcher-Logik wird nun von theme.js verwaltet
-    // Lade die aktuellen Benutzereinstellungen, um den Theme-Switcher korrekt zu initialisieren
-    const userSettings = await window.db.getSettings();
-    initializeThemeSwitcher(userSettings); // Übergibt die initialen Einstellungen an den Theme-Switcher
 
     const deleteAppDataBtn = document.getElementById('delete-app-data-btn');
     if (deleteAppDataBtn) {

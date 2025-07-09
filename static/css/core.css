@@ -9,15 +9,13 @@ html, body {
     overflow-x: hidden; /* Verhindert ungewolltes horizontales Scrollen */
 }
 
-body { 
-    font-family: var(--font-family); 
-    background-color: var(--background-color); 
-    color: var(--text-color); 
-    line-height: 1.6; 
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
 }
-/* transition auf body entfernen, da Theme-Wechsel jetzt sofort erfolgt */
-body { transition: color 0.3s; } /* Nur Textfarbe animieren, Hintergrund sofort */
-body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light Mode wieder alles animieren */
+
 
 
 .hidden { display: none !important; }
@@ -41,8 +39,8 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
 .user-sidebar {
     width: 240px;
     flex-shrink: 0;
-    background-color: var(--surface-color);
-    border-left: 1px solid var(--border-color);
+    background-color: transparent; /* Behält transparent bei */
+    border-left: none; /* Behält entfernten Trennstrich bei */
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
@@ -90,7 +88,7 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
 }
 
 .user-nav a:hover {
-    background-color: var(--background-color);
+    background-color: transparent; /* Hintergrund der Links beim Hovern wird transparent */
 }
 
 /* NEU: Styles für User-Menü Toggle */
@@ -99,8 +97,8 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
     bottom: -15px; /* Halb außerhalb des unteren Rands der Zusammenfassung */
     left: 50%;
     transform: translateX(-50%);
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
+    background-color: transparent; /* Hintergrund des Buttons wird transparent */
+    border: none; /* Rahmen des Buttons wird entfernt */
     border-radius: 50%;
     width: 30px;
     height: 30px;
@@ -108,14 +106,14 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: var(--shadow);
+    box-shadow: none; /* Schatten des Buttons wird entfernt */
     transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
     z-index: 10;
 }
 
 .user-menu-toggle-btn:hover {
-    background-color: var(--background-color);
-    border-color: var(--primary-color);
+    background-color: transparent; /* Hintergrund des Buttons beim Hovern wird transparent */
+    border-color: transparent; /* Rahmen des Buttons beim Hovern wird transparent */
     transform: translateX(-50%) scale(1.1);
 }
 
@@ -153,13 +151,13 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
 
 
 /* Moderner Header */
-.main-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 0.75rem 1.5rem; 
-    border-bottom: 1px solid var(--border-color); 
-    background-color: var(--surface-color); 
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--surface-color);
     height: 60px;
 }
 /* Header Left: Project Title & Page Title */
@@ -204,17 +202,7 @@ body.light-mode { transition: background-color 0.3s, color 0.3s; } /* Für Light
     100% { transform: scale(1); opacity: 0.8; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
 }
 
-/* Optional: Anpassung für Light Mode, falls gewünscht */
-body.light-mode .debug-indicator {
-    color: #e74c3c; /* Rot im Light Mode */
-    text-shadow: none;
-    animation: pulse 1.5s infinite; /* Zurück zur roten Puls-Animation */
-}
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.8; }
-}
+
 
 
 /* Header Right: Actions (Login/User Info) */
@@ -230,9 +218,9 @@ body.light-mode .debug-indicator {
 }
 
 /* Revert padding-right, as user-sidebar now fills the space */
-main { 
+main {
     padding: 2rem; /* Padding ist jetzt gleichmäßig auf allen Seiten */
-    flex-grow: 1; 
+    flex-grow: 1;
 }
 
 /* Allgemeine Komponenten */
@@ -276,10 +264,6 @@ main {
     background-color: var(--surface-color);
     border-bottom: 1px solid var(--border-color);
     padding: 0.5rem 1.5rem;
-    display: flex;
-    flex-direction: column; /* Inhalt und Toggle-Button vertikal anordnen */
-    justify-content: space-between;
-    align-items: center;
     font-size: 0.9em;
     color: var(--text-color);
     box-shadow: var(--shadow);
@@ -359,8 +343,8 @@ main {
     border-color: var(--primary-color); /* Rahmenfarbe bei Hover */
     box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.3); /* Leichter Schatten bei Hover */
     /* Hintergrund und Textfarbe bleiben gleich, wenn nicht aktiv */
-    background-color: var(--background-color); 
-    color: var(--text-color); 
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
 
@@ -390,7 +374,7 @@ main {
 }
 
 .debug-menu-toggle-btn .arrow-icon {
-    width: 20px; /* Größe des Pfeils */
+    width: 20px;
     height: 20px;
     color: var(--text-color);
     transition: transform 0.2s;

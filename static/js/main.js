@@ -426,7 +426,7 @@ function toggleGangsterDevMode() {
     }
     // Stellen Sie sicher, dass applyTheme das Standard-Theme korrekt setzt oder aktualisiert
     // Dies ist wichtig, da hacker-mode andere Farbvariablen überschreibt
-    applyTheme(); 
+    // applyTheme(); // DIESER AUFRUF WIRD SPÄTER VON NEUEM DESIGN-MANAGER ÜBERNOMMEN
 }
 
 /**
@@ -569,14 +569,15 @@ const guestDb = {
         window.debugLog(`GuestDB: Fortschritt für Projekt '${project.projectName}' berechnet: ${progress}%`, 'INFO', 'GuestDB');
         return progress;
     },
-    async getSettings() { 
-        const themeSetting = localStorage.getItem('theme') || 'dark'; 
-        window.debugLog(`GuestDB: Theme-Einstellung abgerufen: '${themeSetting}'`, 'INFO', 'GuestDB');
-        return { theme: themeSetting }; 
+    async getSettings() {
+        // NEU: Alte Theme-Logik entfernt. Später durch Design-Logik ersetzt.
+        window.debugLog(`GuestDB: Theme-Einstellung abgerufen (alte Logik entfernt).`, 'INFO', 'GuestDB');
+        return {}; // Leeres Objekt zurückgeben, da Theme-Einstellung entfernt wird.
     },
     async saveSettings(s) {
-        localStorage.setItem('theme', s.theme);
-        window.debugLog(`GuestDB: Theme-Einstellung gespeichert: '${s.theme}'`, 'INFO', 'GuestDB');
+        // NEU: Alte Theme-Logik entfernt. Später durch Design-Logik ersetzt.
+        // localStorage.setItem('theme', s.theme); // ENTFERNT
+        window.debugLog(`GuestDB: Theme-Einstellung gespeichert (alte Logik entfernt).`, 'INFO', 'GuestDB');
         return { ok: true };
     },
     async resetAllData() {
@@ -764,6 +765,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             toggleGangsterDevModeSwitch.addEventListener('change', toggleGangsterDevMode);
         }
 
+        // Lokaler Cleanup alter Theme-Einstellungen
+        localStorage.removeItem('theme'); // Sicherstellen, dass alte Theme-Einstellung gelöscht wird
 
         const publicPages = ['/', '/login', '/register', '/info', '/agb'];
         const path = window.location.pathname;
@@ -773,9 +776,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // NEU: applyTheme direkt nach dem Laden der Einstellungen aufrufen
-        applyTheme();
-        window.debugLog("main.js: Theme nach Initialisierung angewendet.", 'INFO', 'main.js');
+        // NEU: applyTheme Aufruf entfernt - wird später durch Design-Manager ersetzt
+        // applyTheme(); // ENTFERNT
+        // window.debugLog("main.js: Theme nach Initialisierung angewendet.", 'INFO', 'main.js'); // ENTFERNT
 
         runPageSpecificSetup();
         window.debugLog("main.js: Seiten-spezifisches Setup ausgeführt.", 'INFO', 'main.js');
@@ -787,8 +790,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-// NEU: applyTheme Funktion aus theme.js importieren
-import { applyTheme } from './ui/theme.js';
+// NEU: applyTheme Funktion aus theme.js importieren (Wird später durch Design Manager ersetzt)
+import { applyTheme } from './ui/theme.js'; // Wird noch benötigt, bis die neue Design-Logik integriert ist
 // NEU: Direkter Import von setupGlobalUI
 import { setupGlobalUI, updateHeaderTitles } from './ui/global_ui.js';
 // Importiere spezifische Setup-Funktionen direkt
@@ -800,8 +803,8 @@ import { setupAdminPages } from './admin/admin_main.js';
 import { setupProjectOverviewPage } from './ui/project_overview_renderer.js';
 // NEU: showConfirmationModal aus modals.js importieren für clearDebugLogs
 import { showConfirmationModal, showInfoModal } from './ui/modals.js';
-// NEU: initializeThemeSwitcher aus theme.js importieren
-import { initializeThemeSwitcher } from './ui/theme.js';
+// NEU: initializeThemeSwitcher aus theme.js importieren (Wird noch benötigt, bis die neue Design-Logik integriert ist)
+import { initializeThemeSwitcher } from './ui/theme.js'; // Wird noch benötigt, bis die neue Design-Logik integriert ist
 
 
 function runPageSpecificSetup() {
@@ -866,24 +869,11 @@ function runPageSpecificSetup() {
     } else if (path.startsWith('/settings')) {
         pageTitle = 'Einstellungen';
         window.debugLog("main.js: Setup für Einstellungsseite.", 'INFO', 'main.js');
-        // Rufen Sie setupSettingsPage auf, das seine eigene Logik hat,
-        // und initialisieren Sie dann den Theme-Switcher, nachdem die Einstellungen geladen wurden.
-        // setupSettingsPage ist asynchron, daher .then() verwenden.
+        // Rufen Sie setupSettingsPage auf, das seine eigene Logik hat.
+        // Theme-Switcher Initialisierungsblock ENTFERNT
         setupSettingsPage().then(async () => {
-            // Sicherstellen, dass db und currentUser gesetzt sind, bevor getSettings aufgerufen wird
-            if (window.db && window.currentUser) {
-                try {
-                    const userSettings = await window.db.getSettings();
-                    initializeThemeSwitcher(userSettings);
-                    window.debugLog("main.js: Theme-Switcher initialisiert mit Benutzereinstellungen.", 'INFO', 'main.js', userSettings);
-                }
-                catch (error) {
-                    console.error("Fehler beim Laden der Benutzereinstellungen für Theme-Switcher:", error);
-                    window.debugLog("main.js: Fehler beim Laden der Benutzereinstellungen für Theme-Switcher.", 'ERROR', 'main.js', error);
-                }
-            } else {
-                window.debugLog("main.js: db oder currentUser nicht verfügbar für Theme-Switcher Initialisierung.", 'WARN', 'main.js');
-            }
+            // ALT: if (window.db && window.currentUser) { ... initializeThemeSwitcher(userSettings); ... }
+            window.debugLog("main.js: Alte Theme-Switcher-Initialisierung entfernt.", 'INFO', 'main.js'); // Log, dass der Block entfernt wurde
         });
     } else if (path.startsWith('/info')) { // Changed to startsWith to catch #anchors
         setupInfoPage(); // Direkter Aufruf

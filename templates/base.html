@@ -36,8 +36,8 @@
                         <a href="{{ url_for('info') }}#about">Über die App</a>
                         <a href="{{ url_for('info') }}#anleitung">Anleitung</a>
                         <a href="{{ url_for('info') }}#faq">FAQ</a> {# NEU: FAQ als separater Link #}
-                        <a href="{{ url_for('info') }}#support">Support</a>
                         <a href="{{ url_for('agb') }}">AGB</a> {# AGB neu positioniert #}
+                        <a href="{{ url_for('info') }}#support">Support</a>
                     </div>
                 </div>
                 <a href="{{ url_for('settings') }}">Einstellungen</a>
@@ -54,7 +54,7 @@
             <div class="sidebar-footer"><p>&copy; 2025 Projektplaner</p></div>
         </aside>
         <div class="main-content">
-            <header class="main-header">
+            <header class="main-header"> {# Der Header wurde hierher zurückverschoben #}
                 <div class="header-left">
                     <span id="current-page-header-title" class="page-title"></span> {# Seitentitel zuerst #}
                     <span id="header-title-separator" class="separator hidden">|</span> {# Trenner #}

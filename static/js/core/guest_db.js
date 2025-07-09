@@ -127,23 +127,21 @@ export const guestDb = {
     },
 
     /**
-     * Ruft Benutzereinstellungen des Gastbenutzers ab (nur Theme).
-     * @returns {Promise<object>} Die Benutzereinstellungen.
+     * Ruft Benutzereinstellungen des Gastbenutzers ab.
+     * @returns {Promise<object>} Die Benutzereinstellungen (nun keine Theme-spezifischen Daten).
      */
     async getSettings() {
-        const themeSetting = localStorage.getItem('theme') || 'dark'; // Standard ist 'dark'
-        window.debugLog(`GuestDB: Theme-Einstellung abgerufen: '${themeSetting}'`);
-        return { theme: themeSetting };
+        window.debugLog(`GuestDB: Theme-Einstellung abgerufen (alte Logik entfernt).`);
+        return {}; // Leeres Objekt zurückgeben, da Theme-Einstellung entfernt wird.
     },
 
     /**
-     * Speichert Benutzereinstellungen des Gastbenutzers (nur Theme).
+     * Speichert Benutzereinstellungen des Gastbenutzers.
      * @param {object} s Die zu speichernden Einstellungen.
      * @returns {Promise<object>} Ein Erfolgsobjekt.
      */
     async saveSettings(s) {
-        localStorage.setItem('theme', s.theme);
-        window.debugLog(`GuestDB: Theme-Einstellung gespeichert: '${s.theme}'`);
+        window.debugLog(`GuestDB: Theme-Einstellung gespeichert (alte Logik entfernt).`);
         return { ok: true };
     },
 

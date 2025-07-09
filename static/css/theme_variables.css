@@ -17,19 +17,6 @@
     --subtask-bg-color: rgba(255, 165, 0, 0.15);
 }
 
-/* Light Mode Variablen (Überschreiben Dark Mode Defaults) */
-body.light-mode {
-    --background-color: #f4f7f9;
-    --surface-color: #ffffff;
-    --text-color: #333333;
-    --border-color: #e0e0e0;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hellerer Schatten für Light Mode */
-    /* Farben für Farbmodus im Light Mode */
-    --phase-bg-color: rgba(74, 144, 226, 0.08);
-    --task-bg-color: rgba(80, 227, 194, 0.08);
-    --subtask-bg-color: rgba(255, 165, 0, 0.08);
-}
-
 /* Gangster Dev Mode Variablen (Überschreiben andere Themes) */
 body.hacker-mode {
     --primary-color: #00ff00; /* Neon Grün */
