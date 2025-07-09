@@ -7,36 +7,82 @@
 // Dieses Modul enthält die Logik für die Info-Seite.
 // Es verwaltet die Akkordeon-Funktionalität für die Info-Karten.
 
-import { showInfoModal } from '../ui/modals.js'; // showInfoModal hinzugefügt
+import { showInfoModal } from '../ui/modals.js';
+
+/**
+ * Öffnet ein spezifisches Akkordeon-Element und schließt alle anderen.
+ * @param {HTMLElement} elementToOpen Das zu öffnende .info-card Element.
+ */
+function toggleAccordion(elementToOpen) {
+    // Schließe zuerst alle anderen offenen Akkordeons
+    document.querySelectorAll('.info-card-content.open').forEach(openContent => {
+        // Schließe nicht, wenn es das Ziel-Element ist
+        if (openContent.parentElement !== elementToOpen) {
+            openContent.classList.remove('open');
+            openContent.style.maxHeight = null;
+            openContent.previousElementSibling.classList.remove('open');
+        }
+    });
+
+    const content = elementToOpen.querySelector('.info-card-content');
+    const toggle = elementToOpen.querySelector('.accordion-toggle');
+    
+    // Öffne das Ziel-Element, falls es noch nicht offen ist
+    if (content && !content.classList.contains('open')) {
+        content.classList.add('open');
+        content.style.maxHeight = content.scrollHeight + "px"; // Höhe basierend auf Inhalt setzen
+        if (toggle) toggle.classList.add('open');
+    }
+}
 
 /**
  * Richtet die Info-Seite ein.
- * Fügt Event-Listener für Akkordeon-Elemente hinzu.
+ * Fügt Event-Listener für Akkordeon-Elemente und die Submenü-Navigation hinzu.
  */
 export function setupInfoPage() {
-    // Akkordeon-Funktionalität für Info-Karten
+    // Akkordeon-Funktionalität für Klicks auf die Header
     document.querySelectorAll('.info-card .accordion-toggle').forEach(toggle => {
         toggle.addEventListener('click', function() {
-            const content = this.nextElementSibling; // Der Inhalt, der geklappt werden soll
+            const infoCard = this.parentElement;
+            const content = this.nextElementSibling;
             const isCurrentlyOpen = content.classList.contains('open');
 
-            // Schließe zuerst alle anderen offenen Akkordeons
+            // Schließe alle anderen
             document.querySelectorAll('.info-card-content.open').forEach(openContent => {
                 openContent.classList.remove('open');
-                openContent.style.maxHeight = null; // Max-Height zurücksetzen
-                openContent.previousElementSibling.classList.remove('open'); // Toggle-Header-Klasse entfernen
+                openContent.style.maxHeight = null;
+                openContent.previousElementSibling.classList.remove('open');
             });
 
-            // Wenn das geklickte Akkordeon nicht bereits offen war, öffne es
+            // Öffne das geklickte Element, wenn es nicht bereits offen war
             if (!isCurrentlyOpen) {
                 content.classList.add('open');
-                // Setze max-height auf einen großen Wert, um die Animation zu ermöglichen
-                // und sicherzustellen, dass der Inhalt nicht abgeschnitten wird.
-                content.style.maxHeight = "2000px"; // Ein großer, fester Wert
-                this.classList.add('open'); // Füge Klasse zum Toggle-Header hinzu
+                content.style.maxHeight = content.scrollHeight + "px";
+                this.classList.add('open');
             }
-            // Wenn es bereits offen war und wir es gerade geschlossen haben (durch den ersten Block),
-            // dann wird hier nichts mehr gemacht, es bleibt geschlossen.
+        });
+    });
+
+    // NEU: Logik für die Submenü-Links in der Sidebar
+    const infoMenuLinks = document.querySelectorAll('.info-menu .submenu a');
+    infoMenuLinks.forEach(link => {
+        // Verhindere, dass der AGB-Link diese Logik ausführt
+        if (link.getAttribute('href').includes('agb')) {
+            return;
+        }
+
+        link.addEventListener('click', function(e) {
+            e.preventDefault(); // Standard-Anker-Verhalten verhindern
+            const targetId = this.getAttribute('href').split('#')[1];
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+                // Öffne das entsprechende Akkordeon
+                toggleAccordion(targetElement);
+
+                // Scrolle sanft zum Element
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
     });
 
@@ -45,25 +91,22 @@ export function setupInfoPage() {
     if (supportForm) {
         supportForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            // Hier würde die Logik zum Senden des Formulars an ein Backend stehen
-            // Für dieses Beispiel zeigen wir nur ein Info-Modal
-            showInfoModal('Support-Anfrage gesendet', 'Vielen Dank für Ihre Nachricht! Wir werden uns in Kürze bei Ihnen melden.'); // window. entfernt
+            showInfoModal('Support-Anfrage gesendet', 'Vielen Dank für Ihre Nachricht! Wir werden uns in Kürze bei Ihnen melden.');
             supportForm.reset();
         });
     }
 
-    // Optional: Wenn die Seite mit einem Hash-Anker geladen wird (z.B. #faq),
-    // das entsprechende Akkordeon öffnen.
+    // Optional: Wenn die Seite mit einem Hash-Anker geladen wird,
+    // das entsprechende Akkordeon öffnen und hinscrollen.
     const hash = window.location.hash;
     if (hash) {
         const targetElement = document.querySelector(hash);
         if (targetElement && targetElement.classList.contains('info-card')) {
-            const toggle = targetElement.querySelector('.accordion-toggle');
-            const content = targetElement.querySelector('.info-card-content');
-            if (toggle && content && !content.classList.contains('open')) {
-                // Simuliere einen Klick, um die Akkordeon-Logik auszulösen
-                toggle.click();
-            }
+            // Kurze Verzögerung, um sicherzustellen, dass alles geladen ist
+            setTimeout(() => {
+                toggleAccordion(targetElement);
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
     }
 }

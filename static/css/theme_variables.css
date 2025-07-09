@@ -2,40 +2,48 @@
 
 /* Grundlegende Stile und Variablen (Standard: Dark Mode) */
 :root {
+    /* Core Color Palette */
     --primary-color: #4a90e2;
     --secondary-color: #50e3c2;
-    --background-color: #1a1a1a; /* Standardmäßig Dark Mode Hintergrund */
-    --surface-color: #2c2c2c;    /* Standardmäßig Dark Mode Oberfläche */
-    --text-color: #f0f0f0;       /* Standardmäßig Dark Mode Text */
-    --border-color: #444444;     /* Standardmäßig Dark Mode Rahmen */
+    --background-color: #1a1a1a;
+    --surface-color: #2c2c2c;
+    --text-color: #f0f0f0;
+    --border-color: #444444;
+
+    /* Typography */
     --font-family: 'Inter', sans-serif;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Dunklerer Schatten für Dark Mode */
+
+    /* UI Elements (Shadows, Borders, etc.) */
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     --border-radius: 8px;
-    /* Farben für Farbmodus im Dark Mode */
+
+    /* Component-Specific Colors */
     --phase-bg-color: rgba(74, 144, 226, 0.15);
     --task-bg-color: rgba(80, 227, 194, 0.15);
     --subtask-bg-color: rgba(255, 165, 0, 0.15);
 }
 
-/* Gangster Dev Mode Variablen (Überschreiben andere Themes) */
+/* Hacker Mode Theme (Überschreibt :root Variablen) */
 body.hacker-mode {
+    /* Core Color Palette */
     --primary-color: #00ff00; /* Neon Grün */
     --secondary-color: #00cc00; /* Dunkleres Grün */
     --background-color: #000000; /* Schwarz */
     --surface-color: #0a0a0a;    /* Sehr dunkles Grau */
     --text-color: #00ff00;       /* Neon Grün Text */
     --border-color: #008800;     /* Dunklerer grüner Rahmen */
-    --shadow: 0 0 15px rgba(0, 255, 0, 0.4); /* Grüner Glüh-Schatten */
 
-    /* Hintergrundbild und Eigenschaften */
+    /* UI Elements & Typography */
+    --shadow: 0 0 15px rgba(0, 255, 0, 0.4); /* Grüner Glüh-Schatten */
+    font-family: 'Press Start 2P', monospace; /* Hacker Schriftart */
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.6); /* Leichter Grüner Text-Schatten */
+    
+    /* Background Image */
     background-image: url('../img/matrix_background.gif');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    
-    font-family: 'Press Start 2P', monospace; /* Hacker Schriftart */
-    text-shadow: 0 0 5px rgba(0, 255, 0, 0.6); /* Leichter Grüner Text-Schatten */
 }
 
 /* Optional: Semi-transparenter Overlay für bessere Lesbarkeit über dem GIF */

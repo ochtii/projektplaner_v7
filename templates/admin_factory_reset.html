@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Werkseinstellungen{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin.css') }}">
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>Werkseinstellungen wiederherstellen</h2>
+</div>
+
+<div class="danger-zone-card">
+    <h3><span style="color: #e74c3c; margin-right: 0.5rem;">&#9888;</span>Gefahrenbereich</h3>
+    <p>
+        Diese Aktion ist **unwiderruflich**. Das Ausführen des Resets wird alle Benutzerdaten, Projekte,
+        Einstellungen und Profile löschen. Die Anwendung wird auf ihren initialen Zustand mit zwei
+        Test-Benutzern ('admin' und 'testuser') zurückgesetzt. Projektvorlagen bleiben erhalten.
+    </p>
+    <div class="reset-controls">
+        <button id="run-factory-reset-btn" class="btn btn-danger">App auf Werkseinstellungen zurücksetzen</button>
+    </div>
+    <div class="log-container">
+        <h4>Ausgabe-Log:</h4>
+        <pre id="reset-log-output">Warte auf Aktion...</pre>
+    </div>
+</div>
+{% endblock %}

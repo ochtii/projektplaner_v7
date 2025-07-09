@@ -424,9 +424,6 @@ function toggleGangsterDevMode() {
         }
         window.debugLog("Gangster Dev Mode aktiviert! Willkommen im Matrix.", 'INFO', 'HackerMode');
     }
-    // Stellen Sie sicher, dass applyTheme das Standard-Theme korrekt setzt oder aktualisiert
-    // Dies ist wichtig, da hacker-mode andere Farbvariablen überschreibt
-    // applyTheme(); // DIESER AUFRUF WIRD SPÄTER VON NEUEM DESIGN-MANAGER ÜBERNOMMEN
 }
 
 /**
@@ -570,13 +567,10 @@ const guestDb = {
         return progress;
     },
     async getSettings() {
-        // NEU: Alte Theme-Logik entfernt. Später durch Design-Logik ersetzt.
         window.debugLog(`GuestDB: Theme-Einstellung abgerufen (alte Logik entfernt).`, 'INFO', 'GuestDB');
-        return {}; // Leeres Objekt zurückgeben, da Theme-Einstellung entfernt wird.
+        return {};
     },
     async saveSettings(s) {
-        // NEU: Alte Theme-Logik entfernt. Später durch Design-Logik ersetzt.
-        // localStorage.setItem('theme', s.theme); // ENTFERNT
         window.debugLog(`GuestDB: Theme-Einstellung gespeichert (alte Logik entfernt).`, 'INFO', 'GuestDB');
         return { ok: true };
     },
@@ -612,114 +606,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         ]);
 
         currentUser = session;
-        globalSettings = globalSettingsData; // Weise die geladenen globalen Einstellungen zu
+        globalSettings = globalSettingsData;
         db = session.is_guest ? guestDb : apiDb;
 
         // Update global window objects
         window.db = db;
         window.currentUser = currentUser;
-        window.globalSettings = globalSettings; // Sicherstellen, dass die globale Variable aktualisiert wird
-
-        // Debug-Log, um zu sehen, ob globalSettings korrekt geladen wurde
+        window.globalSettings = globalSettings;
         window.debugLog("main.js: Globale Einstellungen geladen.", 'INFO', 'main.js', window.globalSettings);
         window.debugLog("main.js: Aktueller Benutzer geladen.", 'INFO', 'main.js', window.currentUser);
 
-        // NEU: Initialisiere Debug-Konsole und lade Logs
         const debugConsole = document.getElementById('debug-console');
         const clearLogsBtn = document.getElementById('clear-debug-logs-btn');
         const debugIndicator = document.getElementById('debug-indicator');
-        const toggleFixBtn = document.getElementById('toggle-fix-debug-logs-btn');
-        const exportLogsBtn = document.getElementById('export-debug-logs-btn');
-        const toggleReverseLogsBtn = document.getElementById('toggle-reverse-logs-btn');
-        const toggleAutoScrollBtn = document.getElementById('toggle-auto-scroll-btn');
-        
-        // Schiebeschalter Elemente
         const toggleDebugConsoleVisibilitySwitch = document.getElementById('toggle-debug-console-visibility-switch');
         const toggleGangsterDevModeSwitch = document.getElementById('toggle-gangster-dev-mode-switch');
-
-        const toggleDebugMenuBtn = document.getElementById('toggle-debug-menu-btn');
         const debugMenu = document.getElementById('debug-menu');
-        const logFilterButtons = document.querySelectorAll('.debug-log-filter .filter-btn'); // WIEDERHERGESTELLT
+        const logFilterButtons = document.querySelectorAll('.debug-log-filter .filter-btn');
         
 
         if (window.globalSettings?.general_debug_mode && window.currentUser?.isAdmin) {
-            // Debug-Menü und Konsole initialisieren und Sichtbarkeit steuern
             if (debugMenu) {
-                // Initialen Zustand des Debug-Menüs aus LocalStorage laden
-                const isMenuCollapsed = localStorage.getItem(DEBUG_MENU_HIDDEN_KEY) === 'true'; // Verwende 'collapsed' statt 'hidden'
+                const isMenuCollapsed = localStorage.getItem(DEBUG_MENU_HIDDEN_KEY) === 'true';
                 if (isMenuCollapsed) {
                     debugMenu.classList.add('collapsed');
                 } else {
                     debugMenu.classList.remove('collapsed');
                 }
-                debugMenu.classList.remove('hidden'); // Menü immer sichtbar machen, wenn Debug aktiv
-                // Initialisiere Pfeilrichtung des Toggle-Buttons
-                if (toggleDebugMenuBtn) {
-                    const arrowDown = toggleDebugMenuBtn.querySelector('.arrow-down');
-                    const arrowUp = toggleDebugMenuBtn.querySelector('.arrow-up');
-                    if (arrowDown && arrowUp) {
-                        arrowDown.classList.toggle('hidden', isMenuCollapsed);
-                        arrowUp.classList.toggle('hidden', !isMenuCollapsed);
+                debugMenu.classList.remove('hidden');
+
+                debugMenu.addEventListener('click', (e) => {
+                    if (e.target.closest('.debug-control-item')) {
+                        return;
                     }
-                }
+                    
+                    debugMenu.classList.toggle('collapsed');
+                    const isCollapsed = debugMenu.classList.contains('collapsed');
+                    localStorage.setItem(DEBUG_MENU_HIDDEN_KEY, isCollapsed);
+                    window.debugLog(`DebugMenu: Menü ${isCollapsed ? 'eingeklappt' : 'ausgeklappt'}.`, 'INFO', 'DebugMenu');
+                });
             }
-            if (debugIndicator) debugIndicator.classList.remove('hidden'); // Bug-Symbol im Menü
+            if (debugIndicator) debugIndicator.classList.remove('hidden');
             
-            // Konsole initial versteckt/sichtbar basierend auf gespeichertem Zustand
             if (debugConsole && toggleDebugConsoleVisibilitySwitch) {
-                // Wenn debugConsoleHidden nicht gesetzt ist, standardmäßig anzeigen
+                // NEU: Standardmäßig auf "versteckt" setzen, wenn der Wert nicht existiert
                 let isConsoleHidden = localStorage.getItem('debugConsoleHidden');
                 if (isConsoleHidden === null) {
-                    isConsoleHidden = false; // Standardmäßig sichtbar
-                    localStorage.setItem('debugConsoleHidden', 'false');
-                } else {
-                    isConsoleHidden = (isConsoleHidden === 'true');
+                    isConsoleHidden = 'true'; // Standardmäßig versteckt
+                    localStorage.setItem('debugConsoleHidden', 'true');
                 }
                 
-                if (isConsoleHidden) { // Wenn es true ist (versteckt)
+                if (isConsoleHidden === 'true') {
                     debugConsole.classList.add('hidden');
-                    toggleDebugConsoleVisibilitySwitch.checked = false; // Schalter auf OFF
-                } else { // Wenn es false ist (sichtbar)
+                    toggleDebugConsoleVisibilitySwitch.checked = false;
+                } else {
                     debugConsole.classList.remove('hidden');
-                    toggleDebugConsoleVisibilitySwitch.checked = true; // Schalter auf ON
+                    toggleDebugConsoleVisibilitySwitch.checked = true;
                 }
                 
-                // Event-Listener für den Konsole-Schalter
                 toggleDebugConsoleVisibilitySwitch.addEventListener('change', toggleDebugConsoleVisibility);
             }
 
-            loadDebugLogsFromLocalStorage(); // Logs laden, wenn Debug-Modus aktiv
-            
-            // Event Listener für Debug-Konsole Buttons (die keine Schalter sind)
+            loadDebugLogsFromLocalStorage();
             if (clearLogsBtn) {
                 clearLogsBtn.addEventListener('click', clearDebugLogs);
             }
-            if (exportLogsBtn) {
-                exportLogsBtn.addEventListener('click', exportDebugLogs);
-            }
+            initializeDebugConsoleResizing();
 
-            initializeDebugConsoleResizing(); // NEU: Initialisiere Größenänderungslogik
-
-            // NEU: Toggle Debug-Menü Button (der runde Pfeil)
-            if (toggleDebugMenuBtn) {
-                toggleDebugMenuBtn.addEventListener('click', () => {
-                    if (debugMenu) {
-                        debugMenu.classList.toggle('collapsed');
-                        const isCollapsed = debugMenu.classList.contains('collapsed');
-                        localStorage.setItem(DEBUG_MENU_HIDDEN_KEY, isCollapsed); // Zustand speichern
-                        
-                        const arrowDown = toggleDebugMenuBtn.querySelector('.arrow-down');
-                        const arrowUp = toggleDebugMenuBtn.querySelector('.arrow-up');
-                        if (arrowDown && arrowUp) {
-                            arrowDown.classList.toggle('hidden', isCollapsed);
-                            arrowUp.classList.toggle('hidden', !isCollapsed);
-                        }
-                        window.debugLog(`DebugMenu: Menü ${isCollapsed ? 'eingeklappt' : 'ausgeklappt'}.`, 'INFO', 'DebugMenu');
-                    }
-                });
-            }
-
-            // NEU: Log-Filter Buttons initialisieren (WIEDERHERGESTELLT)
             const savedFilters = JSON.parse(localStorage.getItem(DEBUG_LOG_FILTER_KEY) || '["INFO", "WARN", "ERROR"]');
             logFilterButtons.forEach(button => {
                 if (savedFilters.includes(button.dataset.logLevel)) {
@@ -728,45 +681,40 @@ document.addEventListener('DOMContentLoaded', async () => {
                     button.classList.remove('active');
                 }
                 button.addEventListener('click', () => {
-                    button.classList.toggle('active'); // This toggles 'active' class
+                    button.classList.toggle('active');
                     let currentFilters = Array.from(document.querySelectorAll('.debug-log-filter .filter-btn.active')).map(btn => btn.dataset.logLevel);
                     localStorage.setItem(DEBUG_LOG_FILTER_KEY, JSON.stringify(currentFilters));
-                    loadDebugLogsFromLocalStorage(); // Logs mit neuem Filter neu laden
+                    loadDebugLogsFromLocalStorage();
                     window.debugLog(`DebugConsole: Log-Filter geändert. Aktive Filter: ${currentFilters.join(', ')}.`, 'INFO', 'DebugConsole');
                 });
             });
 
-
             window.debugLog("main.js: Debug-Modus und Konsole aktiviert.", 'INFO', 'main.js');
         } else {
-            // NEU: Debug-Menü und Konsole verstecken
             const debugMenu = document.getElementById('debug-menu');
             if (debugMenu) debugMenu.classList.add('hidden');
             if (debugConsole) debugConsole.classList.add('hidden');
             if (debugIndicator) debugIndicator.classList.add('hidden');
-            localStorage.removeItem(DEBUG_LOG_STORAGE_KEY); // Logs löschen, wenn Debug-Modus nicht aktiv
-            localStorage.removeItem(DEBUG_MENU_HIDDEN_KEY); // Menü-Status löschen
-            localStorage.removeItem('debugConsoleHidden'); // Konsolen-Status löschen
+            localStorage.removeItem(DEBUG_LOG_STORAGE_KEY);
+            localStorage.removeItem(DEBUG_MENU_HIDDEN_KEY);
+            localStorage.removeItem('debugConsoleHidden');
             window.debugLog("main.js: Debug-Modus ist deaktiviert oder Benutzer ist kein Admin.", 'INFO', 'main.js');
         }
 
-        // NEU: Initialisiere Gangster Dev Mode Schalter
         if (toggleGangsterDevModeSwitch) {
             const isHackerModeEnabledOnLoad = localStorage.getItem(HACKER_MODE_KEY) === 'true';
-            if (isHackerModeEnabledOnLoad) { // Hacker-Modus ist AN beim Laden
+            if (isHackerModeEnabledOnLoad) {
                 document.body.classList.add('hacker-mode');
-                toggleGangsterDevModeSwitch.checked = true; // Schalter auf ON
+                toggleGangsterDevModeSwitch.checked = true;
                 window.debugLog("main.js: Gangster Dev Mode beim Start aktiviert.", 'INFO', 'main.js');
-            } else { // Hacker-Modus ist AUS beim Laden
-                document.body.classList.remove('hacker-mode'); // Sicherstellen, dass Klasse entfernt ist
-                toggleGangsterDevModeSwitch.checked = false; // Schalter auf OFF
+            } else {
+                document.body.classList.remove('hacker-mode');
+                toggleGangsterDevModeSwitch.checked = false;
             }
-            // Event-Listener für den Gangster-Modus-Schalter
             toggleGangsterDevModeSwitch.addEventListener('change', toggleGangsterDevMode);
         }
 
-        // Lokaler Cleanup alter Theme-Einstellungen
-        localStorage.removeItem('theme'); // Sicherstellen, dass alte Theme-Einstellung gelöscht wird
+        localStorage.removeItem('theme');
 
         const publicPages = ['/', '/login', '/register', '/info', '/agb'];
         const path = window.location.pathname;
@@ -775,10 +723,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = '/login';
             return;
         }
-
-        // NEU: applyTheme Aufruf entfernt - wird später durch Design-Manager ersetzt
-        // applyTheme(); // ENTFERNT
-        // window.debugLog("main.js: Theme nach Initialisierung angewendet.", 'INFO', 'main.js'); // ENTFERNT
 
         runPageSpecificSetup();
         window.debugLog("main.js: Seiten-spezifisches Setup ausgeführt.", 'INFO', 'main.js');
@@ -790,26 +734,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-// NEU: applyTheme Funktion aus theme.js importieren (Wird später durch Design Manager ersetzt)
-import { applyTheme } from './ui/theme.js'; // Wird noch benötigt, bis die neue Design-Logik integriert ist
-// NEU: Direkter Import von setupGlobalUI
+import { applyTheme } from './ui/theme.js';
 import { setupGlobalUI, updateHeaderTitles } from './ui/global_ui.js';
-// Importiere spezifische Setup-Funktionen direkt
 import { setupDashboardPage } from './dashboard/dashboard_logic.js';
 import { setupProjectManagerPage, setupProjectChecklistPage } from './project/project_manager_logic.js';
-import { setupSettingsPage } from './settings/settings_logic.js'; // Korrigierter Import
+import { setupSettingsPage } from './settings/settings_logic.js';
 import { setupInfoPage } from './info/info_logic.js';
 import { setupAdminPages } from './admin/admin_main.js';
 import { setupProjectOverviewPage } from './ui/project_overview_renderer.js';
-// NEU: showConfirmationModal aus modals.js importieren für clearDebugLogs
 import { showConfirmationModal, showInfoModal } from './ui/modals.js';
-// NEU: initializeThemeSwitcher aus theme.js importieren (Wird noch benötigt, bis die neue Design-Logik integriert ist)
-import { initializeThemeSwitcher } from './ui/theme.js'; // Wird noch benötigt, bis die neue Design-Logik integriert ist
+import { initializeThemeSwitcher } from './ui/theme.js';
 
 
 function runPageSpecificSetup() {
-    // Direkter Aufruf der importierten Funktion
-    setupGlobalUI(currentUser); // NEU: setupGlobalUI hier aufrufen, damit es die globalSettings nutzen kann
+    setupGlobalUI(currentUser);
     const path = window.location.pathname;
 
     const projectPageMatch = path.match(/^\/project(?:-overview|-checklist)?\/([a-zA-Z0-9_]+)/);
@@ -818,24 +756,22 @@ function runPageSpecificSetup() {
     let pageTitle = '';
 
     if (projectPageMatch) {
-        window.currentProjectId = projectPageMatch[1]; // Setze die globale Projekt-ID
-        projectTitle = 'Projekt: ...'; // Platzhalter, wird später durch tatsächlichen Namen ersetzt
+        window.currentProjectId = projectPageMatch[1];
+        projectTitle = 'Projekt: ...';
         
-        // Setup für alle projektbezogenen Seiten
         if (path.startsWith('/project/')) {
-            setupProjectManagerPage(); // Direkter Aufruf
+            setupProjectManagerPage();
             pageTitle = 'Editor';
             window.debugLog("main.js: Setup für Projekt-Editor-Seite.", 'INFO', 'main.js');
         } else if (path.startsWith('/project-overview/')) {
-            setupProjectOverviewPage(); // Direkter Aufruf
+            setupProjectOverviewPage();
             pageTitle = 'Übersicht';
             window.debugLog("main.js: Setup für Projekt-Übersichtsseite.", 'INFO', 'main.js');
         } else if (path.startsWith('/project-checklist/')) {
-            setupProjectChecklistPage(); // Direkter Aufruf
+            setupProjectChecklistPage();
             pageTitle = 'Checkliste';
             window.debugLog("main.js: Setup für Projekt-Checklisten-Seite.", 'INFO', 'main.js');
         }
-        // Menü für aktuelles Projekt einblenden und Buttons setzen
         const projectMenu = document.getElementById('current-project-menu');
         if (projectMenu) {
             projectMenu.classList.remove('hidden');
@@ -847,7 +783,6 @@ function runPageSpecificSetup() {
             window.debugLog("main.js: Projektmenü aktiviert.", 'INFO', 'main.js');
         }
 
-        // Setze Navigationsbuttons für Projektansichten
         const goToOverviewBtn = document.getElementById('go-to-overview-btn');
         const goToEditorBtn = document.getElementById('go-to-editor-btn');
         const goToChecklistBtn = document.getElementById('go-to-checklist-btn');
@@ -863,31 +798,25 @@ function runPageSpecificSetup() {
         }
 
     } else if (path.startsWith('/dashboard')) {
-        setupDashboardPage(); // Direkter Aufruf
+        setupDashboardPage();
         pageTitle = 'Dashboard';
         window.debugLog("main.js: Setup für Dashboard-Seite.", 'INFO', 'main.js');
     } else if (path.startsWith('/settings')) {
         pageTitle = 'Einstellungen';
         window.debugLog("main.js: Setup für Einstellungsseite.", 'INFO', 'main.js');
-        // Rufen Sie setupSettingsPage auf, das seine eigene Logik hat.
-        // Theme-Switcher Initialisierungsblock ENTFERNT
         setupSettingsPage().then(async () => {
-            // ALT: if (window.db && window.currentUser) { ... initializeThemeSwitcher(userSettings); ... }
-            window.debugLog("main.js: Alte Theme-Switcher-Initialisierung entfernt.", 'INFO', 'main.js'); // Log, dass der Block entfernt wurde
+            window.debugLog("main.js: Alte Theme-Switcher-Initialisierung entfernt.", 'INFO', 'main.js');
         });
-    } else if (path.startsWith('/info')) { // Changed to startsWith to catch #anchors
-        setupInfoPage(); // Direkter Aufruf
+    } else if (path.startsWith('/info')) {
+        setupInfoPage();
         pageTitle = 'Info & Hilfe';
         window.debugLog("main.js: Setup für Info-Seite.", 'INFO', 'main.js');
     } else if (path.startsWith('/agb')) {
-        setupInfoPage(); // AGB uses info_logic for accordion, etc.
+        setupInfoPage();
         pageTitle = 'AGB';
         window.debugLog("main.js: Setup für AGB-Seite.", 'INFO', 'main.js');
     } else if (path.startsWith('/admin')) {
-        setupAdminPages(); // Direkter Aufruf
-        // Admin-Seiten haben oft eigene Titel in den Templates,
-        // hier könnte man spezifische Titel setzen, falls gewünscht.
-        // Für den Moment bleibt der pageTitle leer oder wird vom Template bestimmt.
+        setupAdminPages();
         const adminPageTitles = {
             '/admin': 'Admin Dashboard',
             '/admin/users': 'Benutzerverwaltung',
@@ -897,19 +826,16 @@ function runPageSpecificSetup() {
         pageTitle = adminPageTitles[path] || 'Admin Bereich';
         window.debugLog(`main.js: Admin-Seite erkannt: ${path}`, 'INFO', 'main.js');
 
-    } else { // Default for index page
+    } else {
         pageTitle = 'Willkommen';
         window.debugLog("main.js: Setup für Index-Seite.", 'INFO', 'main.js');
     }
 
-    // Aktualisiere den Header-Titel, nachdem die seiten-spezifische Logik gelaufen ist
-    // und window.currentProjectData (falls vorhanden) gesetzt wurde.
     if (window.currentProjectData && window.currentProjectData.projectName) {
         projectTitle = window.currentProjectData.projectName;
     } else if (path === '/dashboard' || path === '/') {
-        projectTitle = ''; // Auf Dashboard oder Index kein Projekttitel im Header
+        projectTitle = '';
     }
-    // Direkter Aufruf der importierten Funktion
     updateHeaderTitles(projectTitle, pageTitle);
     window.debugLog(`main.js: Header-Titel aktualisiert: Seite='${pageTitle}', Projekt='${projectTitle}'`, 'INFO', 'main.js');
 }

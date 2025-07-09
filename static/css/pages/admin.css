@@ -29,3 +29,49 @@
     white-space: pre-wrap;
     font-family: monospace;
 }
+
+/* NEUE STILE FÜR FACTORY RESET SEITE */
+.danger-zone-card {
+    background-color: var(--surface-color);
+    border: 1px solid #e74c3c; /* Roter Rahmen */
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+}
+
+.danger-zone-card h3 {
+    color: #e74c3c;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.danger-zone-card p {
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.reset-controls {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.log-container {
+    margin-top: 1.5rem;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 1.5rem;
+}
+
+#reset-log-output {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    min-height: 100px;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 0.9em;
+}

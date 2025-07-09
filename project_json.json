@@ -1,0 +1,131 @@
+{
+  "analysis_date": "2025-07-09T14:31:13.217800",
+  "total_json_files": 25,
+  "files": [
+    {
+      "path": "api/global_settings.json",
+      "keys": 8,
+      "max_depth": 3
+    },
+    {
+      "path": "static/data/temp_data.json",
+      "keys": 149,
+      "max_depth": 9
+    },
+    {
+      "path": "static/data/templates/book_writing.json",
+      "keys": 50,
+      "max_depth": 7
+    },
+    {
+      "path": "static/data/templates/bsp.json",
+      "keys": 16,
+      "max_depth": 9
+    },
+    {
+      "path": "static/data/templates/event_planning.json",
+      "keys": 53,
+      "max_depth": 7
+    },
+    {
+      "path": "static/data/templates/marketing.json",
+      "keys": 20,
+      "max_depth": 5
+    },
+    {
+      "path": "static/data/templates/software.json",
+      "keys": 54,
+      "max_depth": 9
+    },
+    {
+      "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/logs.json",
+      "keys": 0,
+      "max_depth": 1
+    },
+    {
+      "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/profile.json",
+      "keys": 6,
+      "max_depth": 2
+    },
+    {
+      "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/projects.json",
+      "keys": 4,
+      "max_depth": 3
+    },
+    {
+      "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/settings.json",
+      "keys": 1,
+      "max_depth": 2
+    },
+    {
+      "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/logs.json",
+      "keys": 0,
+      "max_depth": 1
+    },
+    {
+      "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/profile.json",
+      "keys": 6,
+      "max_depth": 2
+    },
+    {
+      "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/projects.json",
+      "keys": 14,
+      "max_depth": 5
+    },
+    {
+      "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/settings.json",
+      "keys": 1,
+      "max_depth": 2
+    },
+    {
+      "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/logs.json",
+      "keys": 2,
+      "max_depth": 3
+    },
+    {
+      "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/profile.json",
+      "keys": 6,
+      "max_depth": 2
+    },
+    {
+      "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/projects.json",
+      "keys": 311,
+      "max_depth": 11
+    },
+    {
+      "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/settings.json",
+      "keys": 1,
+      "max_depth": 2
+    },
+    {
+      "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/logs.json",
+      "keys": 22,
+      "max_depth": 3
+    },
+    {
+      "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/profile.json",
+      "keys": 6,
+      "max_depth": 2
+    },
+    {
+      "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/projects.json",
+      "keys": 14,
+      "max_depth": 5
+    },
+    {
+      "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/settings.json",
+      "keys": 1,
+      "max_depth": 2
+    },
+    {
+      "path": "static/data/users.json",
+      "keys": 20,
+      "max_depth": 3
+    },
+    {
+      "path": "structure.json",
+      "keys": 196,
+      "max_depth": 12
+    }
+  ]
+}

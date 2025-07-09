@@ -1,0 +1,180 @@
+==================================================
+Projektstruktur-Analyse - 2025-07-09 11:24:53
+==================================================
+
+ZUSAMMENFASSUNG
+  - Verzeichnisse: 25
+  - Dateien: 80
+
+DATEITYPEN
+  - .<keine>: 1
+  - .css: 10
+  - .gif: 2
+  - .html: 15
+  - .ico: 1
+  - .js: 20
+  - .json: 25
+  - .md: 2
+  - .png: 1
+  - .py: 3
+
+JSON-ANALYSE
+  - Pfad: structure.json
+    Schlüssel: 196, Max. Tiefe: 12
+  - Pfad: api\global_settings.json
+    Schlüssel: 8, Max. Tiefe: 3
+  - Pfad: static\data\temp_data.json
+    Schlüssel: 149, Max. Tiefe: 9
+  - Pfad: static\data\users.json
+    Schlüssel: 20, Max. Tiefe: 3
+  - Pfad: static\data\templates\book_writing.json
+    Schlüssel: 50, Max. Tiefe: 7
+  - Pfad: static\data\templates\bsp.json
+    Schlüssel: 16, Max. Tiefe: 9
+  - Pfad: static\data\templates\event_planning.json
+    Schlüssel: 53, Max. Tiefe: 7
+  - Pfad: static\data\templates\marketing.json
+    Schlüssel: 20, Max. Tiefe: 5
+  - Pfad: static\data\templates\software.json
+    Schlüssel: 54, Max. Tiefe: 9
+  - Pfad: static\data\user_data\8e81a80c-7182-4ef1-95fa-b0af14e06063\logs.json
+    Schlüssel: 0, Max. Tiefe: 1
+  - Pfad: static\data\user_data\8e81a80c-7182-4ef1-95fa-b0af14e06063\profile.json
+    Schlüssel: 6, Max. Tiefe: 2
+  - Pfad: static\data\user_data\8e81a80c-7182-4ef1-95fa-b0af14e06063\projects.json
+    Schlüssel: 4, Max. Tiefe: 3
+  - Pfad: static\data\user_data\8e81a80c-7182-4ef1-95fa-b0af14e06063\settings.json
+    Schlüssel: 1, Max. Tiefe: 2
+  - Pfad: static\data\user_data\92c79a67-085e-4ec4-98ed-250f484dcd0b\logs.json
+    Schlüssel: 0, Max. Tiefe: 1
+  - Pfad: static\data\user_data\92c79a67-085e-4ec4-98ed-250f484dcd0b\profile.json
+    Schlüssel: 6, Max. Tiefe: 2
+  - Pfad: static\data\user_data\92c79a67-085e-4ec4-98ed-250f484dcd0b\projects.json
+    Schlüssel: 14, Max. Tiefe: 5
+  - Pfad: static\data\user_data\92c79a67-085e-4ec4-98ed-250f484dcd0b\settings.json
+    Schlüssel: 1, Max. Tiefe: 2
+  - Pfad: static\data\user_data\a1b2c3d4-e5f6-7890-1234-567890abcdef\logs.json
+    Schlüssel: 2, Max. Tiefe: 3
+  - Pfad: static\data\user_data\a1b2c3d4-e5f6-7890-1234-567890abcdef\profile.json
+    Schlüssel: 6, Max. Tiefe: 2
+  - Pfad: static\data\user_data\a1b2c3d4-e5f6-7890-1234-567890abcdef\projects.json
+    Schlüssel: 311, Max. Tiefe: 11
+  - Pfad: static\data\user_data\a1b2c3d4-e5f6-7890-1234-567890abcdef\settings.json
+    Schlüssel: 1, Max. Tiefe: 2
+  - Pfad: static\data\user_data\fedcba98-7654-3210-fedc-ba9876543210\logs.json
+    Schlüssel: 22, Max. Tiefe: 3
+  - Pfad: static\data\user_data\fedcba98-7654-3210-fedc-ba9876543210\profile.json
+    Schlüssel: 6, Max. Tiefe: 2
+  - Pfad: static\data\user_data\fedcba98-7654-3210-fedc-ba9876543210\projects.json
+    Schlüssel: 14, Max. Tiefe: 5
+  - Pfad: static\data\user_data\fedcba98-7654-3210-fedc-ba9876543210\settings.json
+    Schlüssel: 1, Max. Tiefe: 2
+
+VERZEICHNISSTRUKTUR
+📁 projektplaner_v7/
+  📄 .gitignore
+  📄 README.md
+  📄 README_ordnerstruktur.md
+  📁 api/
+    📄 global_settings.json
+  📄 app.py
+  📄 check_structure.py
+  📁 static/
+    📁 css/
+      📄 components.css
+      📄 core.css
+      📁 pages/
+        📄 admin.css
+        📄 checklist.css
+        📄 dashboard.css
+        📄 info.css
+        📄 project_manager.css
+        📄 project_overview.css
+        📄 settings.css
+      📄 theme_variables.css
+    📁 data/
+      📄 temp_data.json
+      📁 templates/
+        📄 book_writing.json
+        📄 bsp.json
+        📄 event_planning.json
+        📄 marketing.json
+        📄 software.json
+      📁 user_data/
+        📁 8e81a80c-7182-4ef1-95fa-b0af14e06063/
+          📁 img/
+          📄 logs.json
+          📄 profile.json
+          📄 projects.json
+          📄 settings.json
+        📁 92c79a67-085e-4ec4-98ed-250f484dcd0b/
+          📁 img/
+          📄 logs.json
+          📄 profile.json
+          📄 projects.json
+          📄 settings.json
+        📁 a1b2c3d4-e5f6-7890-1234-567890abcdef/
+          📁 img/
+          📄 logs.json
+          📄 profile.json
+          📄 projects.json
+          📄 settings.json
+        📁 fedcba98-7654-3210-fedc-ba9876543210/
+          📁 img/
+          📄 logs.json
+          📄 profile.json
+          📄 projects.json
+          📄 settings.json
+      📄 users.json
+    📄 favicon.ico
+    📁 img/
+      📄 kitty.gif
+      📄 matrix_background.gif
+      📄 standard_profile_picture.png
+    📁 js/
+      📁 admin/
+        📄 admin_main.js
+        📄 global_settings.js
+        📄 structure_check.js
+        📄 user_management.js
+      📁 core/
+        📄 api_db.js
+        📄 globals.js
+        📄 guest_db.js
+      📁 dashboard/
+        📄 dashboard_logic.js
+      📁 info/
+        📄 info_logic.js
+      📄 main.js
+      📁 project/
+        📄 project_manager_logic.js
+      📁 settings/
+        📄 settings_logic.js
+      📁 ui/
+        📄 checklist_renderer.js
+        📄 comments_manager.js
+        📄 global_ui.js
+        📄 modals.js
+        📄 project_overview_renderer.js
+        📄 project_tree_renderer.js
+        📄 theme.js
+      📄 ui.js
+  📄 structure.json
+  📄 structure_report.py
+  📄 structure_report.txt
+  📁 templates/
+    📄 admin_dashboard.html
+    📄 admin_global_settings.html
+    📄 admin_run_check.html
+    📄 admin_user_management.html
+    📄 agb.html
+    📄 base.html
+    📄 dashboard.html
+    📄 index.html
+    📄 info.html
+    📄 login.html
+    📄 project_checklist.html
+    📄 project_manager.html
+    📄 project_overview.html
+    📄 register.html
+    📄 settings.html

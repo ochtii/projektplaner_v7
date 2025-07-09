@@ -1,0 +1,484 @@
+{
+  "project_name": "projektplaner_v7",
+  "analysis_date": "2025-07-09T14:31:13.209259",
+  "structure": {
+    "path": ".",
+    "type": "directory",
+    "children": [
+      {
+        "path": ".gitignore",
+        "type": "file"
+      },
+      {
+        "path": "README.md",
+        "type": "file"
+      },
+      {
+        "path": "README_ordnerstruktur.md",
+        "type": "file"
+      },
+      {
+        "path": "api",
+        "type": "directory",
+        "children": [
+          {
+            "path": "api/global_settings.json",
+            "type": "file"
+          }
+        ]
+      },
+      {
+        "path": "app.py",
+        "type": "file"
+      },
+      {
+        "path": "check_structure.py",
+        "type": "file"
+      },
+      {
+        "path": "reset.py",
+        "type": "file"
+      },
+      {
+        "path": "static",
+        "type": "directory",
+        "children": [
+          {
+            "path": "static/css",
+            "type": "directory",
+            "children": [
+              {
+                "path": "static/css/components.css",
+                "type": "file"
+              },
+              {
+                "path": "static/css/core.css",
+                "type": "file"
+              },
+              {
+                "path": "static/css/pages",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/css/pages/admin.css",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/css/pages/checklist.css",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/css/pages/dashboard.css",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/css/pages/info.css",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/css/pages/project_manager.css",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/css/pages/project_overview.css",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/css/pages/settings.css",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/css/theme_variables.css",
+                "type": "file"
+              }
+            ]
+          },
+          {
+            "path": "static/data",
+            "type": "directory",
+            "children": [
+              {
+                "path": "static/data/temp_data.json",
+                "type": "file"
+              },
+              {
+                "path": "static/data/templates",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/data/templates/book_writing.json",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/data/templates/bsp.json",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/data/templates/event_planning.json",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/data/templates/marketing.json",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/data/templates/software.json",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/data/user_data",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063",
+                    "type": "directory",
+                    "children": [
+                      {
+                        "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/img",
+                        "type": "directory",
+                        "children": []
+                      },
+                      {
+                        "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/logs.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/profile.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/projects.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/8e81a80c-7182-4ef1-95fa-b0af14e06063/settings.json",
+                        "type": "file"
+                      }
+                    ]
+                  },
+                  {
+                    "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b",
+                    "type": "directory",
+                    "children": [
+                      {
+                        "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/img",
+                        "type": "directory",
+                        "children": []
+                      },
+                      {
+                        "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/logs.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/profile.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/projects.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/92c79a67-085e-4ec4-98ed-250f484dcd0b/settings.json",
+                        "type": "file"
+                      }
+                    ]
+                  },
+                  {
+                    "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                    "type": "directory",
+                    "children": [
+                      {
+                        "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/img",
+                        "type": "directory",
+                        "children": []
+                      },
+                      {
+                        "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/logs.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/profile.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/projects.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/a1b2c3d4-e5f6-7890-1234-567890abcdef/settings.json",
+                        "type": "file"
+                      }
+                    ]
+                  },
+                  {
+                    "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210",
+                    "type": "directory",
+                    "children": [
+                      {
+                        "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/img",
+                        "type": "directory",
+                        "children": []
+                      },
+                      {
+                        "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/logs.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/profile.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/projects.json",
+                        "type": "file"
+                      },
+                      {
+                        "path": "static/data/user_data/fedcba98-7654-3210-fedc-ba9876543210/settings.json",
+                        "type": "file"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "path": "static/data/users.json",
+                "type": "file"
+              }
+            ]
+          },
+          {
+            "path": "static/favicon.ico",
+            "type": "file"
+          },
+          {
+            "path": "static/img",
+            "type": "directory",
+            "children": [
+              {
+                "path": "static/img/kitty.gif",
+                "type": "file"
+              },
+              {
+                "path": "static/img/matrix_background.gif",
+                "type": "file"
+              },
+              {
+                "path": "static/img/standard_profile_picture.png",
+                "type": "file"
+              }
+            ]
+          },
+          {
+            "path": "static/js",
+            "type": "directory",
+            "children": [
+              {
+                "path": "static/js/admin",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/js/admin/admin_main.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/admin/global_settings.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/admin/structure_check.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/admin/user_management.js",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/js/core",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/js/core/api_db.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/core/globals.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/core/guest_db.js",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/js/dashboard",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/js/dashboard/dashboard_logic.js",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/js/info",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/js/info/info_logic.js",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/js/main.js",
+                "type": "file"
+              },
+              {
+                "path": "static/js/project",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/js/project/project_manager_logic.js",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/js/settings",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/js/settings/settings_logic.js",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/js/ui",
+                "type": "directory",
+                "children": [
+                  {
+                    "path": "static/js/ui/checklist_renderer.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/ui/comments_manager.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/ui/global_ui.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/ui/modals.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/ui/project_overview_renderer.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/ui/project_tree_renderer.js",
+                    "type": "file"
+                  },
+                  {
+                    "path": "static/js/ui/theme.js",
+                    "type": "file"
+                  }
+                ]
+              },
+              {
+                "path": "static/js/ui.js",
+                "type": "file"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "structure.json",
+        "type": "file"
+      },
+      {
+        "path": "structure_report.py",
+        "type": "file"
+      },
+      {
+        "path": "structure_report.txt",
+        "type": "file"
+      },
+      {
+        "path": "templates",
+        "type": "directory",
+        "children": [
+          {
+            "path": "templates/admin_dashboard.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/admin_global_settings.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/admin_run_check.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/admin_user_management.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/agb.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/base.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/dashboard.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/index.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/info.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/login.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/project_checklist.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/project_manager.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/project_overview.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/register.html",
+            "type": "file"
+          },
+          {
+            "path": "templates/settings.html",
+            "type": "file"
+          }
+        ]
+      }
+    ]
+  }
+}

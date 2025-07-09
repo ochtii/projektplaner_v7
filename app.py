@@ -2,15 +2,11 @@ import os
 import json
 import re
 import uuid
-import subprocess
 import sys
+import subprocess
 from functools import wraps
-from datetime import datetime
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
-
-# HINWEIS: Diese Print-Anweisung dient nur zur Bestätigung, welche Version der Datei ausgeführt wird.
-# Sie können sie entfernen, sobald das Problem behoben ist.
-print(f"--- app.py Version BESTÄTIGUNG {datetime.now()} ---", file=sys.stderr)
+import shutil
 
 app = Flask(__name__)
 app.secret_key = 'your_very_secret_key_12345'
@@ -19,9 +15,9 @@ app.secret_key = 'your_very_secret_key_12345'
 DATA_ROOT = os.path.join('static', 'data')
 USER_DATA_DIR = os.path.join(DATA_ROOT, 'user_data')
 USERS_FILE = os.path.join(DATA_ROOT, 'users.json')
-SETTINGS_FILE = os.path.join('api', 'global_settings.json') 
-STRUCTURE_FILE = 'structure.json' 
+SETTINGS_FILE = os.path.join('api', 'global_settings.json')
 TEMPLATES_DIR = os.path.join(DATA_ROOT, 'templates') 
+STRUCTURE_FILE = 'structure.json'
 os.makedirs(USER_DATA_DIR, exist_ok=True)
 os.makedirs(TEMPLATES_DIR, exist_ok=True) 
 
@@ -48,7 +44,7 @@ def _load_json(filepath, default_data={}):
             return json.loads(content)
     except (json.JSONDecodeError, FileNotFoundError) as e:
         print(f"FEHLER: Beim Laden von JSON aus {filepath}: {e}", file=sys.stderr)
-        return default_data # WICHTIG: default_data auch im Fehlerfall zurückgeben
+        return default_data
 
 def _save_json(filepath, data):
     """
@@ -58,6 +54,7 @@ def _save_json(filepath, data):
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+    return True
 
 def is_valid_email(email):
     """Prüft, ob eine E-Mail-Adresse ein gültiges Format hat."""
@@ -70,7 +67,6 @@ def get_user_data_path(user_id, data_type="projects"):
     os.makedirs(user_dir, exist_ok=True)
     return os.path.join(user_dir, f"{data_type}.json")
 
-# NEU: Funktion zum Abrufen des Pfads für das Benutzerbildverzeichnis
 def get_user_img_path(user_id):
     """Gibt den Pfad zum Bildverzeichnis des Benutzers zurück und erstellt es, falls nötig."""
     if not user_id: return None
@@ -78,12 +74,11 @@ def get_user_img_path(user_id):
     os.makedirs(user_img_dir, exist_ok=True)
     return user_img_dir
 
-# NEU: Funktion zum Abrufen des Pfads zur Profildatei
 def get_user_profile_path(user_id):
     """Gibt den Pfad zur Profildatei des Benutzers zurück."""
     if not user_id: return None
     user_dir = os.path.join(USER_DATA_DIR, str(user_id))
-    os.makedirs(user_dir, exist_ok=True) # Sicherstellen, dass der Benutzerordner existiert
+    os.makedirs(user_dir, exist_ok=True)
     return os.path.join(user_dir, PROFILE_FILE_NAME)
 
 
@@ -131,11 +126,16 @@ def get_templates():
 @app.route('/api/template/<template_id>', methods=['GET'])
 def get_template_content(template_id):
     """Gibt den Inhalt einer spezifischen Projektvorlage zurück."""
-    template_path = os.path.join(TEMPLATES_DIR, f"{template_id}.json")
-    if not os.path.exists(template_path) or template_id == 'bsp': 
+    base_path = os.path.abspath(TEMPLATES_DIR)
+    requested_path = os.path.abspath(os.path.join(base_path, f"{template_id}.json"))
+
+    if not requested_path.startswith(base_path):
+        return jsonify({"error": "Invalid template ID."}), 400
+
+    if not os.path.exists(requested_path) or template_id == 'bsp': 
         return jsonify({"error": "Template not found."}), 404
     try:
-        template_data = _load_json(template_path)
+        template_data = _load_json(requested_path)
         return jsonify(template_data)
     except Exception:
         return jsonify({"error": "Error loading template content."}), 500
@@ -166,6 +166,7 @@ def guest_login():
     session.clear()
     session['is_guest'] = True
     session['username'] = 'Gast'
+    session['user_id'] = f"guest_{uuid.uuid4()}"
     return redirect(url_for('dashboard'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -175,46 +176,41 @@ def login_route():
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        identifier = request.form.get('identifier') # Kann Benutzername oder E-Mail sein
+        identifier = request.form.get('identifier')
         password = request.form.get('password')
         users = _load_json(USERS_FILE)
 
         user_found = None
         for username, user_data in users.items():
-            # Prüfe, ob Identifier Benutzername oder E-Mail ist
             if identifier == username or identifier == user_data.get('email'):
                 user_found = user_data
-                user_found['username'] = username # Füge den Benutzernamen hinzu
+                user_found['username'] = username
                 break
         
         if user_found and user_found['password'] == password:
-            session.clear() # Alte Session-Daten löschen
+            session.clear()
             session['user_id'] = user_found['id']
             session['username'] = user_found['username']
-            session['isAdmin'] = user_found.get('isAdmin', False) # Standard auf False, falls nicht gesetzt
+            session['isAdmin'] = user_found.get('isAdmin', False)
             flash(f"Willkommen zurück, {session['username']}!", "success")
             return redirect(url_for('dashboard'))
         else:
             flash("Ungültiger Benutzername/E-Mail oder Passwort.", "error")
-            return render_template('login.html', identifier=identifier) # Identifier wieder ins Formular füllen
+            return render_template('login.html', identifier=identifier)
 
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
     """Registrierungsseite für neue Benutzer."""
-    # Globale Einstellungen hier laden, um Registrierung zu steuern
     global_app_settings = _load_json(SETTINGS_FILE, {"registration_enabled": True}) 
 
     if 'user_id' in session: return redirect(url_for('dashboard'))
 
-    # Überprüfen, ob Registrierung erlaubt ist
     if not global_app_settings.get('registration_enabled', True): 
-        # Wenn JavaScript nicht aktiviert ist, wird diese Meldung angezeigt
         return render_template('register.html', registration_disabled=True)
         
     if request.method == 'POST':
-        # Auch hier prüfen, falls jemand direkt POST-Request sendet
         if not global_app_settings.get('registration_enabled', True):
             flash('Registrierung ist momentan nicht möglich. Bitte versuchen Sie es zu einem späteren Zeitpunkt.', 'error')
             return render_template('register.html', registration_disabled=True)
@@ -238,27 +234,20 @@ def register_route():
             users[username] = {"id": new_user_id, "email": email, "password": password, "isAdmin": False}
             _save_json(USERS_FILE, users)
             
-            # NEU: Erstelle den 'img'-Ordner und die 'profile.json'-Datei für den neuen Benutzer
-            user_img_dir = get_user_img_path(new_user_id) # Erstellt den img-Ordner
+            get_user_img_path(new_user_id)
             user_profile_path = get_user_profile_path(new_user_id)
             default_profile_data = {
-                "profilbild": STANDARD_PROFILE_PICTURE,
-                "alter": 0,
-                "wohnort": "",
-                "land": "",
-                "plz": "",
-                "aboutme": ""
+                "profilbild": STANDARD_PROFILE_PICTURE, "alter": 0, "wohnort": "", "land": "", "plz": "", "aboutme": ""
             }
-            _save_json(user_profile_path, default_profile_data) # Initialisiert profile.json
+            _save_json(user_profile_path, default_profile_data)
 
             _save_json(get_user_data_path(new_user_id, 'projects'), {})
-            # ÄNDERUNG: Standard-Theme für neue Benutzer von 'light'/'dark' zu 'default'
             _save_json(get_user_data_path(new_user_id, 'settings'), {"design": "default"})
             _save_json(get_user_data_path(new_user_id, 'logs'), [])
             
             flash('Registrierung erfolgreich! Sie können sich jetzt anmelden.', 'success')
             return redirect(url_for('login_route'))
-    return render_template('register.html', registration_disabled=False) # Übergib den Status an das Template
+    return render_template('register.html', registration_disabled=False)
 
 @app.route('/logout')
 def logout():
@@ -329,31 +318,35 @@ def admin_global_settings():
     """Admin-Seite für globale Einstellungen."""
     return render_template('admin_global_settings.html')
 
-@app.route('/api/admin/structure-check')
+@app.route('/admin/structure-check')
 @login_required
 @admin_required
 def admin_structure_check():
     """Admin-Seite für den Struktur-Check."""
     return render_template('admin_run_check.html')
 
+@app.route('/admin/factory-reset')
+@login_required
+@admin_required
+def admin_factory_reset():
+    """Rendert die Seite, von der aus der Reset gestartet werden kann."""
+    return render_template('admin_factory_reset.html')
+
 # --- API-Endpunkte ---
-# NEUE API-Endpunkte für Benutzerverwaltung (Liste aller Benutzer)
 @app.route('/api/admin/users', methods=['GET'])
 @login_required
 @admin_required
 def admin_user_management_api():
     """Gibt eine Liste aller Benutzer zurück (nur für Admins)."""
     users = _load_json(USERS_FILE)
-    # Entferne Passwörter für die Frontend-Sicherheit
     users_safe = []
     for username, user_data in users.items():
         user_copy = user_data.copy()
-        user_copy['username'] = username # Stelle sicher, dass der Benutzername enthalten ist
-        user_copy.pop('password', None) # Entferne das Passwort
+        user_copy['username'] = username
+        user_copy.pop('password', None)
         users_safe.append(user_copy)
     return jsonify(users_safe)
 
-# NEUE API-Endpunkte für Profil-Daten
 @app.route('/api/user/profile', methods=['GET'])
 @login_required
 def get_user_profile():
@@ -364,12 +357,7 @@ def get_user_profile():
     
     profile_path = get_user_profile_path(user_id)
     profile_data = _load_json(profile_path, {
-        "profilbild": STANDARD_PROFILE_PICTURE,
-        "alter": 0,
-        "wohnort": "",
-        "land": "",
-        "plz": "",
-        "aboutme": ""
+        "profilbild": STANDARD_PROFILE_PICTURE, "alter": 0, "wohnort": "", "land": "", "plz": "", "aboutme": ""
     })
     return jsonify(profile_data)
 
@@ -388,20 +376,17 @@ def update_user_profile():
     current_profile_data = _load_json(profile_path, {})
     
     updated_data = request.get_json()
-    current_profile_data.update(updated_data) # Aktualisiere bestehende Daten mit neuen
+    current_profile_data.update(updated_data)
     
     _save_json(profile_path, current_profile_data)
     return jsonify({"message": "Profile updated successfully"}), 200
 
-
-# NEUE API-Endpunkte für Projektverwaltung
 @app.route('/api/projects', methods=['GET'])
 @login_required
 def get_all_projects():
     """Gibt alle Projekte des aktuellen Benutzers zurück."""
     user_projects_path = get_user_data_path(session['user_id'], 'projects')
     projects = _load_json(user_projects_path, {})
-    # Konvertiere das Diktat von Projekten in eine Liste
     return jsonify(list(projects.values()))
 
 @app.route('/api/project/<project_id>', methods=['GET'])
@@ -426,17 +411,15 @@ def create_project():
         return jsonify({"error": "Benutzer nicht identifiziert."}), 400
 
     new_project_data = request.get_json()
-    project_id = new_project_data.get('projectId', str(uuid.uuid4())) # Generiere ID, falls nicht vorhanden
+    project_id = new_project_data.get('projectId', str(uuid.uuid4()))
     
     user_projects_path = get_user_data_path(user_id, 'projects')
     projects = _load_json(user_projects_path, {})
 
-    # Gast-Limits überprüfen
     if is_guest:
         global_app_settings = _load_json(SETTINGS_FILE, {})
         guest_limits = global_app_settings.get('guest_limits', {})
-        max_projects = guest_limits.get('projects', 1) # Standard 1 Projekt für Gast
-
+        max_projects = guest_limits.get('projects', 1)
         if len(projects) >= max_projects:
             return jsonify({"error": f"Als Gast können Sie maximal {max_projects} Projekte erstellen."}), 403
 
@@ -444,7 +427,7 @@ def create_project():
     _save_json(user_projects_path, projects)
     return jsonify({"message": "Project created successfully", "projectId": project_id}), 201
 
-@app.route('/api/project/<project_id>', methods=['POST']) # Diese Route behandelt auch das Speichern (PUT-ähnlich)
+@app.route('/api/project/<project_id>', methods=['POST'])
 @login_required
 def save_project(project_id):
     """Speichert ein bestehendes Projekt des aktuellen Benutzers."""
@@ -455,6 +438,23 @@ def save_project(project_id):
         return jsonify({"error": "Project not found"}), 404
     
     updated_project_data = request.get_json()
+
+    if session.get('is_guest', False):
+        global_app_settings = _load_json(SETTINGS_FILE, {})
+        guest_limits = global_app_settings.get('guest_limits', {})
+        max_phases = guest_limits.get('phases_per_project', 5)
+        max_tasks = guest_limits.get('tasks_per_phase', 10)
+        max_subtasks = guest_limits.get('subtasks_per_task', 10)
+
+        if len(updated_project_data.get('phases', [])) > max_phases:
+            return jsonify({"error": f"Als Gast können Sie maximal {max_phases} Phasen pro Projekt erstellen."}), 403
+        for phase in updated_project_data.get('phases', []):
+            if len(phase.get('tasks', [])) > max_tasks:
+                return jsonify({"error": f"Als Gast können Sie maximal {max_tasks} Aufgaben pro Phase erstellen."}), 403
+            for task in phase.get('tasks', []):
+                if len(task.get('subtasks', [])) > max_subtasks:
+                    return jsonify({"error": f"Als Gast können Sie maximal {max_subtasks} Unteraufgaben pro Aufgabe erstellen."}), 403
+
     projects[project_id] = updated_project_data
     _save_json(user_projects_path, projects)
     return jsonify({"message": "Project saved successfully"}), 200
@@ -484,24 +484,17 @@ def get_session():
 @app.route('/api/settings', methods=['GET', 'POST'])
 def handle_settings():
     """Behandelt das Abrufen und Speichern von Benutzereinstellungen."""
-    # Für GET-Anfragen ist kein Login erforderlich, da Theme-Einstellungen auch für nicht eingeloggte Benutzer relevant sind.
-    # Für POST-Anfragen (Speichern von Einstellungen) ist ein Login erforderlich.
     if request.method == 'GET':
-        # Wenn der Benutzer nicht angemeldet ist, geben Sie Standardeinstellungen zurück
         if 'user_id' not in session and not session.get('is_guest'):
-            return jsonify({"design": "default"}) # Standard Design für nicht eingeloggte Benutzer
-        
+            return jsonify({"design": "default"})
         user_settings_path = get_user_data_path(session['user_id'], 'settings')
-        # ÄNDERUNG: Standard-Theme für GET-Anfragen von 'light'/'dark' zu 'default'
         return jsonify(_load_json(user_settings_path, {"design": "default"}))
     
     if request.method == 'POST':
-        # Für POST-Anfragen (Speichern) ist ein Login erforderlich
         if 'user_id' not in session and not session.get('is_guest'):
             return jsonify({"error": "Sie müssen angemeldet sein, um Einstellungen zu speichern."}), 403
         if session.get('is_guest'):
             return jsonify({"error": "Gäste können keine Servereinstellungen speichern"}), 403
-            
         user_settings_path = get_user_data_path(session['user_id'], 'settings')
         _save_json(user_settings_path, request.get_json())
         return jsonify({"success": True})
@@ -512,23 +505,16 @@ def handle_global_settings_api():
     if request.method == 'GET':
         return jsonify(_load_json(SETTINGS_FILE))
     if request.method == 'POST':
-        # Für POST-Anfragen bleiben die Admin-Rechte erforderlich
         if not session.get('isAdmin'):
             return jsonify({"error": "Zugriff verweigert. Sie benötigen Administratorrechte."}), 403
-        
-        # Lade aktuelle Einstellungen, um nur die übermittelten zu aktualisieren
         current_settings = _load_json(SETTINGS_FILE)
         updated_data = request.get_json()
-        
-        # Merge the incoming data with existing settings
-        # This handles nested structures like guest_limits
         for key, value in updated_data.items():
             if isinstance(value, dict) and key in current_settings and isinstance(current_settings[key], dict):
                 current_settings[key].update(value)
             else:
                 current_settings[key] = value
-                
-        _save_json(SETTINGS_FILE, current_settings) # Speichere die gemergten Einstellungen
+        _save_json(SETTINGS_FILE, current_settings)
         return jsonify({"success": True})
 
 @app.route('/api/admin/get-structure', methods=['GET'])
@@ -549,12 +535,9 @@ def run_structure_check_api():
         return jsonify({"log": "Ungültiges Kommando."}), 400
 
     try:
-        # Führt das Skript im selben Verzeichnis wie app.py aus
         result = subprocess.run(
             [sys.executable, 'check_structure.py', command_flag],
-            capture_output=True,
-            text=True,
-            encoding='utf-8',
+            capture_output=True, text=True, encoding='utf-8',
             cwd=os.path.dirname(os.path.abspath(__file__))
         )
         log_output = result.stdout + result.stderr
@@ -562,6 +545,78 @@ def run_structure_check_api():
     except Exception as e:
         return jsonify({"log": f"Fehler bei der Ausführung des Skripts: {e}"}), 500
 
+# --- NEUE LOGIK FÜR FACTORY RESET ---
+
+def _delete_all_user_data_logic():
+    """Logik zum Löschen des user_data Ordners. Gibt einen Log-String zurück."""
+    log_messages = []
+    if os.path.exists(USER_DATA_DIR):
+        try:
+            shutil.rmtree(USER_DATA_DIR)
+            log_messages.append(f"[SUCCESS]: Verzeichnis '{USER_DATA_DIR}' und sein gesamter Inhalt wurden gelöscht.")
+        except OSError as e:
+            log_messages.append(f"[FEHLER]: Fehler beim Löschen des Verzeichnisses {USER_DATA_DIR}: {e}")
+    else:
+        log_messages.append(f"[INFO]: Verzeichnis '{USER_DATA_DIR}' existiert nicht, keine Aktion erforderlich.")
+    return "\n".join(log_messages)
+
+def _create_initial_users_logic():
+    """Logik zum Erstellen der initialen Benutzer. Gibt Log-String und neue IDs zurück."""
+    log_messages = []
+    admin_id = str(uuid.uuid4())
+    testuser_id = str(uuid.uuid4())
+    
+    initial_users = {
+        "admin": {"id": admin_id, "email": "admin@example.com", "password": "password123", "isAdmin": True},
+        "testuser": {"id": testuser_id, "email": "test@example.com", "password": "test", "isAdmin": False}
+    }
+    
+    if _save_json(USERS_FILE, initial_users):
+        log_messages.append(f"[SUCCESS]: Datei '{USERS_FILE}' wurde erfolgreich mit 2 Testbenutzern erstellt.")
+        return "\n".join(log_messages), [admin_id, testuser_id]
+    else:
+        log_messages.append(f"[FEHLER]: Konnte die Datei '{USERS_FILE}' nicht erstellen.")
+        return "\n".join(log_messages), []
+
+def _create_user_directories_logic(user_ids):
+    """Logik zum Erstellen der Verzeichnisse für neue Benutzer. Gibt einen Log-String zurück."""
+    log_messages = []
+    if not user_ids:
+        log_messages.append("[WARNUNG]: Keine Benutzer-IDs zum Erstellen von Verzeichnissen vorhanden.")
+        return "\n".join(log_messages)
+        
+    for user_id in user_ids:
+        user_dir = os.path.join(USER_DATA_DIR, user_id)
+        try:
+            os.makedirs(os.path.join(user_dir, 'img'), exist_ok=True)
+            _save_json(os.path.join(user_dir, 'projects.json'), {})
+            _save_json(os.path.join(user_dir, 'settings.json'), {"design": "default"})
+            _save_json(os.path.join(user_dir, 'logs.json'), [])
+            _save_json(os.path.join(user_dir, 'profile.json'), {
+                "profilbild": STANDARD_PROFILE_PICTURE, "alter": 0, "wohnort": "", "land": "", "plz": "", "aboutme": ""
+            })
+            log_messages.append(f"[SUCCESS]: Verzeichnis und Standarddateien für Benutzer {user_id} erstellt.")
+        except OSError as e:
+            log_messages.append(f"[FEHLER]: Fehler beim Erstellen des Verzeichnisses für Benutzer {user_id}: {e}")
+    return "\n".join(log_messages)
+
+# NEUER API-ENDPUNKT zum Ausführen des Resets
+@app.route('/api/admin/run-factory-reset', methods=['POST'])
+@login_required
+@admin_required
+def run_factory_reset_api():
+    """Führt den kompletten Reset-Vorgang aus und gibt ein Log zurück."""
+    log = []
+    try:
+        log.append("--- Starte Werkseinstellungen ---")
+        log.append(_delete_all_user_data_logic())
+        log_users, user_ids = _create_initial_users_logic()
+        log.append(log_users)
+        log.append(_create_user_directories_logic(user_ids))
+        log.append("\n[SUCCESS]: Werkseinstellungen erfolgreich wiederhergestellt.")
+        return jsonify({"log": "\n".join(log)})
+    except Exception as e:
+        return jsonify({"log": f"Ein unerwarteter Fehler ist aufgetreten: {e}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

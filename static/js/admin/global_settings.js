@@ -1,4 +1,3 @@
-// ochtii/projektplaner_v7/projektplaner_v7-55c8a693a05caeff31bc85b526881ea8deee5951/static/js/admin/global_settings.js
 "use strict";
 
 // =================================================================
@@ -71,14 +70,13 @@ export async function setupGlobalSettingsPage() {
         };
 
         try {
-            const response = await fetch('/api/admin/global-settings', {
+            const response = await fetch('/api/global-settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedLimits)
             });
             if (response.ok) {
                 showInfoModal('Erfolg', 'Gast-Limits erfolgreich gespeichert.');
-                // Aktualisiere die globale Einstellung im Frontend
                 window.globalSettings.guest_limits = updatedLimits.guest_limits;
                 window.debugLog("Admin_GlobalSettings: Gast-Limits erfolgreich gespeichert.", 'INFO', 'Admin_GlobalSettings', updatedLimits);
             } else {
@@ -110,24 +108,33 @@ export async function setupGlobalSettingsPage() {
                 updatePayload[settingKey] = newState;
 
                 try {
-                    const response = await fetch('/api/admin/global-settings', {
+                    const response = await fetch('/api/global-settings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(updatePayload)
                     });
                     if (response.ok) {
-                        button.classList.toggle('active', newState);
-                        button.textContent = newState ? 'Deaktivieren' : 'Aktivieren';
-                        window.globalSettings[settingKey] = newState; // Globale Variable aktualisieren
-                        showInfoModal('Erfolg', `Einstellung "${settingKey.replace(/_/g, ' ')}" erfolgreich ${newState ? 'aktiviert' : 'deaktiviert'}.`);
-                        window.debugLog(`Admin_GlobalSettings: Einstellung '${settingKey}' erfolgreich geändert zu ${newState}.`, 'INFO', 'Admin_GlobalSettings');
+                        window.globalSettings[settingKey] = newState;
                         
-                        // Wenn Debug-Modus umgeschaltet wird, Seite neu laden
+                        // Wenn Debug-Modus umgeschaltet wird
                         if (settingKey === 'general_debug_mode') {
+                            // Konsole standardmäßig als geschlossen markieren
+                            localStorage.setItem('debugConsoleHidden', 'true'); 
+                            
+                            // Wenn Debug-Modus DEAKTIVIERT wird, deaktiviere auch den Gangster-Modus
+                            if (!newState) {
+                                localStorage.setItem('hackerModeEnabled', 'false');
+                            }
+
                             showInfoModal('Neustart erforderlich', 'Der Debug-Modus wurde geändert. Die Seite wird neu geladen, um die Änderungen zu übernehmen.', () => {
                                 window.location.reload();
                             });
+                        } else {
+                            button.classList.toggle('active', newState);
+                            button.textContent = newState ? 'Deaktivieren' : 'Aktivieren';
+                            showInfoModal('Erfolg', `Einstellung "${settingKey.replace(/_/g, ' ')}" erfolgreich ${newState ? 'aktiviert' : 'deaktiviert'}.`);
                         }
+                        window.debugLog(`Admin_GlobalSettings: Einstellung '${settingKey}' erfolgreich geändert zu ${newState}.`, 'INFO', 'Admin_GlobalSettings');
 
                     } else {
                         showInfoModal('Fehler', `Einstellung "${settingKey.replace(/_/g, ' ')}" konnte nicht geändert werden.`);
@@ -142,19 +149,16 @@ export async function setupGlobalSettingsPage() {
         );
     };
 
-    // Initiales Laden der Einstellungen
     await loadSettings();
 
-    // Event-Listener für den Speicher-Button der Gast-Limits
     saveGuestLimitsBtn.addEventListener('click', (e) => {
-        e.preventDefault(); // Verhindert das Neuladen der Seite
+        e.preventDefault();
         saveGuestLimits();
     });
 
-    // Event-Listener für die System-Einstellungstoggles
     systemSettingToggles.forEach(button => {
         button.addEventListener('click', (e) => {
-            e.preventDefault(); // Verhindert das Neuladen der Seite
+            e.preventDefault();
             const settingKey = button.dataset.settingKey;
             toggleSystemSetting(button, settingKey);
         });

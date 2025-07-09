@@ -11,9 +11,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme_variables.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"> {# NEU: Favicon-Link #}
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
     {% block head %}{% endblock %}
-
 </head>
 <body>
     <div class="app-container">
@@ -35,8 +34,8 @@
                     <div class="submenu">
                         <a href="{{ url_for('info') }}#about">Über die App</a>
                         <a href="{{ url_for('info') }}#anleitung">Anleitung</a>
-                        <a href="{{ url_for('info') }}#faq">FAQ</a> {# NEU: FAQ als separater Link #}
-                        <a href="{{ url_for('agb') }}">AGB</a> {# AGB neu positioniert #}
+                        <a href="{{ url_for('info') }}#faq">FAQ</a>
+                        <a href="{{ url_for('agb') }}">AGB</a>
                         <a href="{{ url_for('info') }}#support">Support</a>
                     </div>
                 </div>
@@ -48,19 +47,40 @@
                         <a href="{{ url_for('admin_user_management') }}">Benutzer verwalten</a>
                         <a href="{{ url_for('admin_global_settings') }}">Globale Einstellungen</a>
                         <a href="{{ url_for('admin_structure_check') }}">Struktur-Check</a>
+                        <a href="{{ url_for('admin_factory_reset') }}">Werkseinstellungen</a>
                      </div>
                 </div>
             </nav>
             <div class="sidebar-footer"><p>&copy; 2025 Projektplaner</p></div>
         </aside>
         <div class="main-content">
-            <header class="main-header"> {# Der Header wurde hierher zurückverschoben #}
+            <header class="main-header">
                 <div class="header-left">
-                    <span id="current-page-header-title" class="page-title"></span> {# Seitentitel zuerst #}
-                    <span id="header-title-separator" class="separator hidden">|</span> {# Trenner #}
-                    <h2 id="current-project-header-title"></h2> {# Projekttitel danach #}
+                    <!-- NEU: Button für eingeklapptes Debug-Menü -->
+                    <button id="header-debug-toggle-btn" class="btn btn-secondary btn-sm hidden">
+                        <span class="debug-indicator" style="animation: none; font-size: 1.2em;">🐞</span>
+                        <span>Debug-Menü</span>
+                    </button>
+                    <span id="current-page-header-title" class="page-title"></span>
+                    <span id="header-title-separator" class="separator hidden">|</span>
+                    <h2 id="current-project-header-title"></h2>
                 </div>
-                <div id="header-actions" class="header-actions"></div>
+                <div id="header-actions" class="header-actions">
+                    <!-- NEU: Struktur für User-Dropdown -->
+                    <div id="user-menu-container" class="user-menu-container hidden">
+                        <button id="user-menu-button" class="user-menu-button">
+                            <img src="/static/img/standard_profile_picture.png" alt="Profilbild" class="profile-pic-sm" id="user-profile-pic">
+                            <span id="user-profile-username">Gast</span>
+                            <svg class="arrow-icon-sm" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div id="user-dropdown-menu" class="user-dropdown-menu hidden">
+                            <a href="#">Mein Profil</a>
+                            <a href="{{ url_for('settings') }}">Einstellungen</a>
+                            <hr>
+                            <a href="/logout">Logout</a>
+                        </div>
+                    </div>
+                </div>
             </header>
             <div id="debug-menu" class="debug-menu hidden">
                 <div class="debug-menu-content">
@@ -76,7 +96,6 @@
                                 <div class="slider round"></div>
                             </label>
                         </div>
-
                         <div class="debug-control-item">
                             <label for="toggle-debug-console-visibility-switch" class="control-label">Konsole</label>
                             <label class="theme-switch" for="toggle-debug-console-visibility-switch">
@@ -84,17 +103,11 @@
                                 <div class="slider round"></div>
                             </label>
                         </div>
+                         <span id="debug-menu-toggle-icon" class="debug-menu-toggle-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        </span>
                     </div>
                 </div>
-                <button id="toggle-debug-menu-btn" class="debug-menu-toggle-btn">
-                    <svg class="arrow-icon arrow-down" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    <svg class="arrow-icon arrow-up hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                </button>
             </div>
             <main>
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -126,30 +139,6 @@
                     </div>
             </div>
         </div>
-        
-        {# NEU: User-Bereich am rechten Rand #}
-        <aside class="user-sidebar">
-            <div class="profile-summary">
-                <img src="/static/img/standard_profile_picture.png" alt="Profilbild" class="profile-pic" id="user-profile-pic">
-                <span class="username-display" id="user-profile-username">Gast</span>
-                {# NEU: Toggle-Button für User-Menü #}
-                <button id="toggle-user-menu-btn" class="user-menu-toggle-btn">
-                    <svg class="arrow-icon arrow-down" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    <svg class="arrow-icon arrow-up hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                </button>
-            </div>
-            {# NEU: Wrapper für den Menü-Inhalt #}
-            <div id="user-nav-content" class="user-nav-content collapsed"> {# Startet eingeklappt #}
-                <nav class="user-nav">
-                    <a href="{{ url_for('dashboard') }}">Mein Profil</a> {# Aktuell nur zum Dashboard #}
-                    <a href="#">Profil bearbeiten</a>
-                    <a href="#">Freunde finden</a>
-                    <a href="#">Meine Freunde</a>
-                    <a href="#">Account Einstellungen</a>
-                    <a href="#">Privatsphäre und Sicherheit</a>
-                </nav>
-            </div>
-        </aside>
     </div>
     <div id="modal-container"></div>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>

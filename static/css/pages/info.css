@@ -1,9 +1,5 @@
 /* static/css/pages/info.css */
 
-/* Info page accordion styles */
-.info-page-container {
-    /* General container for info/AGB pages, can add padding/background if needed */
-}
 
 .info-card .accordion-toggle {
     display: flex;
